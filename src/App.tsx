@@ -12,6 +12,12 @@ interface Package {
   devDependencies: Record<string, string>;
 }
 
+interface PackageInfo {
+  name: string;
+  version: string;
+  latest: string;
+}
+
 const unwrapJSON = (res: Response) => res.json();
 const fetchJSON = (path: string) => fetch(path).then(unwrapJSON);
 
@@ -27,7 +33,7 @@ const isLatestVersion = (version: string, latest: string) =>
 const DependencyItem: React.FC<DependencyItemProps> = props => {
   const path = `/info/${props.name}/${encodeURIComponent(props.version)}`;
 
-  const { data, error } = useApi<{ latest: string }>(path);
+  const { data, error } = useApi<PackageInfo>(path);
 
   useEffect(() => {
     if (data && props.onVersionCheck) {
