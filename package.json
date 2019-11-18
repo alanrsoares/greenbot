@@ -7,7 +7,7 @@
     "bin/"
   ],
   "bin": {
-    "greenbot": "/bin/greenbot.ts"
+    "greenbot": "bin/greenbot.ts"
   },
   "dependencies": {
     "express": "^4.17.1",
