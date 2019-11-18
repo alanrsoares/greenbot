@@ -101,7 +101,9 @@ const Dependencies: React.FC<DependenciesProps> = props => {
   const [passed, setPasses] = useState(0);
 
   const handleVersionCheck = useCallback((isGreen: boolean) => {
-    setPasses(p => p + 1);
+    if (isGreen) {
+      setPasses(passed + 1);
+    }
   }, []);
 
   return (
