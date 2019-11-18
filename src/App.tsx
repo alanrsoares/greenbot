@@ -22,19 +22,19 @@ interface DependencyItemProps {
 }
 
 const isLatestVersion = (version: string, latest: string) =>
-  version.replace(/[\^\~]/, "") === latest;
+  version.replace(/[\^~]/, "") === latest;
 
 const DependencyItem: React.FC<DependencyItemProps> = props => {
   const path = `/info/${props.name}/${encodeURIComponent(props.version)}`;
 
-  const { data, error } = useApi(path);
+  const { data, error } = useApi<{ latest: string }>(path);
 
   useEffect(() => {
     if (data && props.onVersionCheck) {
       const passed = isLatestVersion(props.version, data.latest);
       props.onVersionCheck(passed);
     }
-  }, [data, props.version, props.onVersionCheck]);
+  }, [data, props]);
 
   const renderContent = useCallback(() => {
     if (error) {
