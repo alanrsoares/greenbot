@@ -1,7 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import useSWR from "swr";
 
-import { Versions } from "styled-icons/octicons/Versions";
 import { Npm } from "styled-icons/icomoon/Npm";
 import { Refresh } from "styled-icons/remix-line/Refresh";
 import { CheckShield } from "styled-icons/boxicons-regular/CheckShield";
@@ -137,7 +136,7 @@ const App: React.FC = () => {
     return (
       <>
         <div className="text-center bg-green-800 px-2 py-1 my-4 rounded-lg font-bold">
-          <Npm size="1rem" /> {name} <Versions size="1.4rem" /> v{version}
+          <Npm size="1rem" /> {name} - v{version}
         </div>
         <div className="bg-gray-800 rounded-lg px-3 py-2 mt-2 shadow-md mb-8">
           <Dependencies title="Dependencies" entries={dependencyEntries} />
