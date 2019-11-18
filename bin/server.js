@@ -11,7 +11,11 @@ const DEFAULT_PORT = 5001;
 
 const app = express();
 
-app.use(express.static(path.resolve(__dirname, "build")));
+const buildPath = path.resolve(__dirname, "..", "build");
+
+console.log({ buildPath });
+
+app.use(express.static(buildPath));
 
 app.get("/info/:name/:version?", async (req, res) => {
   const { name, version } = req.params;
@@ -37,11 +41,19 @@ app.get("/info/:namespace/:name/:version?", async (req, res) => {
 
 app.get("/package", (_req, res) => res.json(FILE));
 
-app.listen(DEFAULT_PORT, err => {
-  if (err) {
-    console.log(`An error occurred:`, err);
-    return;
-  }
+const tryListen = (port, tries = 0) => {
+  app.listen(port, err => {
+    if (err) {
+      console.log(`An error occurred:`, err);
 
-  console.log(`Server started listening at http://localhost:${DEFAULT_PORT}`);
-});
+      if (tries < 3) {
+        return tryListen(port + 1, tries + 1);
+      }
+      return;
+    }
+
+    console.log(`Server started listening at http://localhost:${port}`);
+  });
+};
+
+tryListen(DEFAULT_PORT);
