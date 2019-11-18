@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 const package = require("package-json");
 
 const FILE_PATH = process.argv.length === 3 ? process.argv[2] : "package.json";
@@ -10,7 +11,7 @@ const DEFAULT_PORT = 5001;
 
 const app = express();
 
-app.use(express.static("build"));
+app.use(express.static(path.resolve(__dirname, "build")));
 
 app.get("/info/:name/:version?", async (req, res) => {
   const { name, version } = req.params;
