@@ -5,9 +5,7 @@
     "build/",
     "bin/"
   ],
-  "bin": {
-    "greenbot": "./bin/greenbot.ts"
-  },
+  "bin": "./bin/greenbot.js",
   "dependencies": {
     "express": "^4.17.1",
     "package-json": "^6.5.0"
