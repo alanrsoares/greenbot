@@ -35,20 +35,24 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
 
   const { data, error } = useApi<PackageInfo>(path);
 
+  const { version, onVersionCheck, name } = props;
+
   useEffect(() => {
-    if (data && props.onVersionCheck) {
-      const passed = isLatestVersion(props.version, data.latest);
-      props.onVersionCheck(passed);
+    if (data && onVersionCheck) {
+      const passed = isLatestVersion(version, data.latest);
+      if (passed) {
+        onVersionCheck(passed);
+      }
     }
-  }, [data, props]);
+  }, [data, version, onVersionCheck]);
 
   const renderContent = useCallback(() => {
     if (error) {
       return (
         <>
-          <div className="font-bold text-xl">{props.name}</div>
+          <div className="font-bold text-xl">{name}</div>
           <div>
-            <span className="ml-4">{props.version}</span>
+            <span className="ml-4">{version}</span>
             <span className="ml-4">failed</span>
           </div>
         </>
@@ -57,7 +61,7 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
     if (!data) {
       return (
         <>
-          <div className="font-bold text-xl">{props.name}</div>
+          <div className="font-bold text-xl">{name}</div>
           <div className="ml-4 text-right">
             <span className="bg-gray-900 px-2 py-2 rounded-lg">Loading...</span>
           </div>
@@ -67,16 +71,16 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
 
     return (
       <>
-        <div className="font-bold text-xl">{props.name}</div>
+        <div className="font-bold text-xl">{data.name}</div>
         <div className="ml-4 text-right">
-          {isLatestVersion(props.version, data.latest) ? (
+          {isLatestVersion(data.version, data.latest) ? (
             <span className="bg-gray-900 px-2 py-2 pr-1 rounded-lg">
-              {props.version}{" "}
+              {data.version}{" "}
               <CheckShield size="1.8rem" className="pb-1" color="#68d391" />
             </span>
           ) : (
             <>
-              <span>{props.version}</span>
+              <span>{data.version}</span>
               {` → `}
               <button className="bg-green-800 px-2 pr-1 rounded-lg">
                 {data.latest} <Refresh size="1.4rem" className="pb-1" />
@@ -86,7 +90,7 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
         </div>
       </>
     );
-  }, [data, error, props.name, props.version]);
+  }, [data, error, name, version]);
 
   return (
     <li
