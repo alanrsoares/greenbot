@@ -3,7 +3,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const package = require("package-json");
+const packageJson = require("package-json");
 
 const FILE_PATH = process.argv.length === 3 ? process.argv[2] : "package.json";
 
@@ -20,7 +20,7 @@ app.use(express.static(STATIC));
 app.get("/info/:name/:version?", async (req, res) => {
   const { name, version } = req.params;
 
-  const result = await package(
+  const result = await packageJson(
     name,
     version ? { version: version } : undefined
   );
@@ -31,7 +31,7 @@ app.get("/info/:name/:version?", async (req, res) => {
 app.get("/info/:namespace/:name/:version?", async (req, res) => {
   const { namespace, name, version } = req.params;
 
-  const result = await package(
+  const result = await packageJson(
     `${namespace}/${name}`,
     version ? { version: version } : undefined
   );
