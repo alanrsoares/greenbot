@@ -11,11 +11,9 @@ const DEFAULT_PORT = 5001;
 
 const app = express();
 
-const buildPath = path.resolve(__dirname, "..", "build");
+const STATIC = path.resolve(__dirname, "..", "build");
 
-console.log({ buildPath });
-
-app.use(express.static(buildPath));
+app.use(express.static(STATIC));
 
 app.get("/info/:name/:version?", async (req, res) => {
   const { name, version } = req.params;
