@@ -15,28 +15,29 @@ const app = express();
 
 const STATIC = path.resolve(__dirname, "..", "build");
 
+const getLatestVersion = async (name, version, res) => {
+  const { version: latest } = await packageJson(
+    name,
+    version ? { version } : undefined
+  );
+
+  res.json({ name, version, latest });
+};
+
 app.use(express.static(STATIC));
 
 app.get("/info/:name/:version?", async (req, res) => {
-  const { name, version } = req.params;
-
-  const result = await packageJson(
-    name,
-    version ? { version: version } : undefined
-  );
-
-  res.json({ name, version, latest: result.version });
+  const { params } = req;
+  await getLatestVersion(params.name, params.version, res);
 });
 
 app.get("/info/:namespace/:name/:version?", async (req, res) => {
-  const { namespace, name, version } = req.params;
-
-  const result = await packageJson(
-    `${namespace}/${name}`,
-    version ? { version: version } : undefined
+  const { params } = req;
+  await getLatestVersion(
+    `${params.namespace}/${params.name}`,
+    params.version,
+    res
   );
-
-  res.json({ name, version, latest: result.version });
 });
 
 app.get("/package", (_req, res) => res.json(FILE));
