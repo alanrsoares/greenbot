@@ -21,20 +21,20 @@ interface DependencyItemProps {
   onVersionCheck?: (isGreen: boolean) => void;
 }
 
+const isLatestVersion = (version: string, latest: string) =>
+  version.replace(/[\^\~]/, "") === latest;
+
 const DependencyItem: React.FC<DependencyItemProps> = props => {
   const path = `/info/${props.name}/${encodeURIComponent(props.version)}`;
-  const [isGreen, setIsGreen] = useState(false);
 
   const { data, error } = useApi(path);
 
   useEffect(() => {
     if (data && props.onVersionCheck) {
-      const isGreen = props.version.replace(/[\^\~]/, "") === data.latest;
-
-      props.onVersionCheck(isGreen);
-      setIsGreen(isGreen);
+      const passed = isLatestVersion(props.version, data.latest);
+      props.onVersionCheck(passed);
     }
-  }, [data, props.version]);
+  }, [data, props.version, props.onVersionCheck]);
 
   const renderContent = useCallback(() => {
     if (error) {
@@ -63,7 +63,7 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
       <>
         <div className="font-bold text-xl">{props.name}</div>
         <div className="ml-4 text-right">
-          {isGreen ? (
+          {isLatestVersion(props.version, data.latest) ? (
             <span className="bg-gray-900 px-2 py-2 pr-1 rounded-lg">
               {props.version}{" "}
               <CheckShield size="1.8rem" className="pb-1" color="#68d391" />
