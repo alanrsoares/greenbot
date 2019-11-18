@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import useSWR from "swr";
 
 import { Npm } from "styled-icons/icomoon/Npm";
@@ -23,7 +23,16 @@ interface DependencyItemProps {
 
 const DependencyItem: React.FC<DependencyItemProps> = props => {
   const path = `/info/${props.name}/${encodeURIComponent(props.version)}`;
+  const [isGreen, setIsGreen] = useState(false);
+
   const { data, error } = useApi(path);
+
+  useEffect(() => {
+    if (data && props.onVersionCheck) {
+      const isGreen = props.version.replace(/[\^\~]/, "") === data.latest;
+      props.onVersionCheck(isGreen);
+    }
+  }, [data, props.version]);
 
   const renderContent = useCallback(() => {
     if (error) {
@@ -46,12 +55,6 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
           </div>
         </>
       );
-    }
-
-    const isGreen = props.version.replace(/[\^\~]/, "") === data.latest;
-
-    if (props.onVersionCheck) {
-      props.onVersionCheck(isGreen);
     }
 
     return (
@@ -93,18 +96,28 @@ interface DependenciesProps {
 }
 
 const Dependencies: React.FC<DependenciesProps> = props => {
+  const [passed, setPasses] = useState(0);
+
+  const handleVersionCheck = useCallback((isGreen: boolean) => {
+    setPasses(p => p + 1);
+  }, []);
+
   return (
     <div>
       <div className="border-b-2 border-gray-400 py-4 px-1 flex justify-between font-mono">
         <h2 className="text-2xl text-green-400">{props.title}</h2>
-        <div className="flex text-2xl h-12 w-12 rounded-full justify-center items-center bg-green-800">
-          {props.entries.length}
+        <div className="flex text-xl h-16 w-16 rounded-full justify-center items-center bg-green-800">
+          {passed}/{props.entries.length}
         </div>
       </div>
       <div className="p-2">
         <ul>
           {props.entries.map(([name, version]) => (
-            <DependencyItem name={name} version={version} />
+            <DependencyItem
+              name={name}
+              version={version}
+              onVersionCheck={handleVersionCheck}
+            />
           ))}
         </ul>
       </div>
