@@ -30,7 +30,9 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
   useEffect(() => {
     if (data && props.onVersionCheck) {
       const isGreen = props.version.replace(/[\^\~]/, "") === data.latest;
+
       props.onVersionCheck(isGreen);
+      setIsGreen(isGreen);
     }
   }, [data, props.version]);
 
