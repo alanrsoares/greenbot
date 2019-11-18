@@ -111,7 +111,7 @@ const Dependency: React.FC<Props> = props => {
       className="flex my-1 justify-between h-10 items-center"
       key={props.name}
     >
-      <div className="font-bold text-xl">
+      <div className="font-bold text-xl mr-12">
         <a href={`https://www.npmjs.com/package/${props.name}`}>{props.name}</a>
       </div>
       {renderContent()}
