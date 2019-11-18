@@ -1,11 +1,14 @@
 {
   "name": "npm-greenbot",
   "version": "0.1.3",
-  "main": "bin/server.js",
+  "main": "bin/greenbot.js",
   "files": [
     "build/",
     "bin/"
   ],
+  "bin": {
+    "greenbot": "/bin/greenbot.ts"
+  },
   "dependencies": {
     "express": "^4.17.1",
     "package-json": "^6.5.0",
