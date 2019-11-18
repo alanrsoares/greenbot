@@ -65,7 +65,8 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
             </span>
           ) : (
             <>
-              <span>{props.version}</span>` → `
+              <span>{props.version}</span>
+              {` → `}
               <button className="bg-green-800 px-2 pr-1 rounded-lg">
                 {data.latest} <Refresh size="1.4rem" className="pb-1" />
               </button>
@@ -122,7 +123,11 @@ const App: React.FC = () => {
 
   const renderContent = useCallback(() => {
     if (error) {
-      return <div>An error occured: {JSON.stringify(error)}</div>;
+      const message = "Failed to load package.json";
+      if (__DEV__) {
+        console.warn(message, error);
+      }
+      return <div>{message}</div>;
     }
     if (!data) {
       return <div>Loading...</div>;
