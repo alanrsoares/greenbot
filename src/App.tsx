@@ -86,7 +86,7 @@ const DependencyItem: React.FC<DependencyItemProps> = props => {
         </div>
       </>
     );
-  }, [data, error]);
+  }, [data, error, props.name, props.version]);
 
   return (
     <li
