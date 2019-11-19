@@ -43,12 +43,19 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col bg-gray-900 min-h-screen justify-center items-center">
-      <div>
+      <div className="flex mt-8">
         <h1
-          className="text-gray-100 font-bold text-4xl font-mono"
+          className="text-gray-100 font-bold text-4xl font-mono flex"
           style={{ fontFamily: "Share Tech Mono", fontSize: "4em" }}
         >
-          <span className="text-green-500">Green</span>Bot
+          <span className="text-green-500">Green</span>
+          <img
+            className="h-20"
+            style={{ marginLeft: "-0.1em" }}
+            alt="bot"
+            src="/robot.png"
+          />
+          <span>Bot</span>
         </h1>
       </div>
       <div className="text-white">{renderContent()}</div>

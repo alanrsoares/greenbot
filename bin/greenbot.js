@@ -2,10 +2,12 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const fs = require("fs");
 const path = require("path");
 const packageJson = require("package-json");
 const replace = require("replace-in-file");
+const chalk = require("chalk");
+const open = require("open");
+const fs = require("fs").promises;
 
 const rawVersion = version => ({
   version: version.replace(/[\^~]/, ""),
@@ -17,7 +19,11 @@ const PACKAGE_JSON_PATH =
 
 const DEFAULT_PORT = 5001;
 
-let PACKAGE_JSON_FILE = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, "utf8"));
+const readPackageJson = async () => {
+  const raw = await fs.readFile(PACKAGE_JSON_PATH, "utf8");
+
+  return JSON.parse(raw);
+};
 
 const STATIC = path.resolve(__dirname, "..", "build");
 
@@ -26,8 +32,6 @@ const getLatestVersion = async (name, version, res) => {
     name,
     version ? { version } : undefined
   );
-
-  PACKAGE_JSON_FILE = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, "utf8"));
 
   res.json({ name, version, latest });
 };
@@ -63,7 +67,10 @@ app.get("/info/:namespace/:name/:version?", async (req, res) => {
   );
 });
 
-app.get("/package", (_req, res) => res.json(PACKAGE_JSON_FILE));
+app.get("/package", async (_req, res) => {
+  const file = await readPackageJson();
+  res.json(file);
+});
 
 app.post("/upgrade", (req, res) => {
   const { name, version, latest } = req.body;
@@ -73,18 +80,35 @@ app.post("/upgrade", (req, res) => {
   upgradeVersion(info, res);
 });
 
+const MAX_TRIES = 5;
+
 const tryListen = (port, tries = 0) => {
   app.listen(port, err => {
     if (err) {
-      console.log(`An error occurred:`, err);
-
-      if (tries < 3) {
+      console.log(chalk.red("An error occurred:"), err);
+      if (tries < MAX_TRIES) {
         return tryListen(port + 1, tries + 1);
       }
       return;
     }
 
-    console.log(`Server started listening at http://localhost:${port}`);
+    const url = `http://localhost:${port}`;
+
+    console.log(
+      chalk.green(`
+
+ 8""""8                        8""""8               
+ 8    " eeeee  eeee eeee eeeee 8    8   eeeee eeeee 
+ 8e     8   8  8    8    8   8 8eeee8ee 8  88   8   
+ 88  ee 8eee8e 8eee 8eee 8e  8 88     8 8   8   8e  
+ 88   8 88   8 88   88   88  8 88     8 8   8   88  
+ 88eee8 88   8 88ee 88ee 88  8 88eeeee8 8eee8   88
+
+`),
+      `Started listening at ${url}`
+    );
+
+    open(url).catch(() => {});
   });
 };
 
