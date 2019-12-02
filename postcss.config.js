@@ -1,3 +1,6 @@
 import tailwindcss from "tailwindcss";
 
-export const plugins = [tailwindcss("./tailwind.js"), require("autoprefixer")];
+export const plugins = [
+  tailwindcss("./src/ui/tailwind.js"),
+  require("autoprefixer")
+];

@@ -225,6 +225,7 @@ module.exports = {
     },
     fontFamily: {
       sans: [
+        "Lato",
         "-apple-system",
         "BlinkMacSystemFont",
         '"Segoe UI"',
@@ -240,6 +241,7 @@ module.exports = {
       ],
       serif: ["Georgia", "Cambria", '"Times New Roman"', "Times", "serif"],
       mono: [
+        "Share Tech Mono",
         "Menlo",
         "Monaco",
         "Consolas",
