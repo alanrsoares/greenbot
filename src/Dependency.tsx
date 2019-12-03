@@ -10,6 +10,7 @@ interface Props {
   name: string;
   version: string;
   latest: string;
+  isLatest: boolean;
   onVersionCheck?: (isGreen: boolean) => void;
 }
 
@@ -20,7 +21,7 @@ const Dependency: React.FC<Props> = props => {
     error: undefined
   });
 
-  const { version, onVersionCheck, name, latest } = props;
+  const { version, onVersionCheck, name, latest, isLatest } = props;
 
   const upgradePackageVersion = useCallback(() => {
     async function task() {
@@ -58,8 +59,8 @@ const Dependency: React.FC<Props> = props => {
     if (state.error) {
       return (
         <div>
-          <span className="ml-4">{version}</span>
-          <div className="ml-4 text-right">
+          <span className="ml-2">{version}</span>
+          <div className="ml-2 text-right">
             <span className="bg-red-900 px-2 py-2 rounded-lg">
               Failed to upgrade
             </span>
@@ -78,7 +79,7 @@ const Dependency: React.FC<Props> = props => {
 
     return (
       <div className="ml-4 text-right">
-        {state.fulfilled || isLatestVersion(version, latest) ? (
+        {state.fulfilled || isLatest ? (
           <span className="bg-gray-900 px-2 py-2 pr-1 rounded-lg">
             {state.fulfilled
               ? `${rawVersion(version).qualifier}${latest}`
@@ -99,14 +100,14 @@ const Dependency: React.FC<Props> = props => {
         )}
       </div>
     );
-  }, [latest, version, upgradePackageVersion, state]);
+  }, [latest, version, isLatest, upgradePackageVersion, state]);
 
   return (
     <li
       className="flex my-1 justify-between h-10 items-center"
       key={props.name}
     >
-      <div className="font-bold text-xl mr-12">
+      <div className="font-bold text-xl mr-2">
         <a href={`https://www.npmjs.com/package/${props.name}`}>{props.name}</a>
       </div>
       {renderContent()}

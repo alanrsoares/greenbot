@@ -1,6 +1,7 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React from "react";
 
 import Dependency from "./Dependency";
+import { isLatestVersion } from "./helpers";
 
 interface Props {
   title: string;
@@ -10,8 +11,10 @@ interface Props {
 
 const Dependencies: React.FC<Props> = props => {
   const { resolutions, entries, title } = props;
+
   const passed = entries.filter(
-    ([key, version]) => key in resolutions && version === resolutions[key]
+    ([key, version]) =>
+      key in resolutions && isLatestVersion(version, resolutions[key])
   );
 
   return (
@@ -29,6 +32,7 @@ const Dependencies: React.FC<Props> = props => {
               name={name}
               version={version}
               latest={resolutions[name]}
+              isLatest={isLatestVersion(version, resolutions[name])}
             />
           ))}
         </ul>

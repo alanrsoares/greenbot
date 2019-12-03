@@ -11,7 +11,7 @@ import Dependencies from "./Dependencies";
 type TabKind = "dependencies" | "devDependencies";
 
 const Container = styled.div`
-  ${tw`flex flex-col bg-gray-900 min-h-screen justify-center items-center`}
+  ${tw`flex flex-col bg-gray-900 min-h-screen items-center`}
 `;
 
 interface TabProps {
@@ -21,11 +21,18 @@ interface TabProps {
 
 const TabContainer = styled.div`
   display: flex;
+  justify-content: space-between;
 `;
 
 const Tab = styled.div<TabProps>`
-  ${props =>
-    props.active ? tw`flex-1 text-center bg-gray-900` : tw`flex-1 text-center`};
+  width: 12.5em;
+  ${tw`text-center px-3 py-2 rounded-lg border-2 border-gray-700`};
+  ${props => (props.active ? tw`bg-gray-800` : tw`bg-gray-900`)};
+`;
+
+const DependenciesContainer = styled.section`
+  ${tw`bg-gray-800 rounded-lg px-3 py-2 mt-2 shadow-md mb-8`};
+  min-width: 26em;
 `;
 
 const Header = () => (
@@ -58,9 +65,11 @@ const App: React.FC = () => {
   const renderContent = useCallback(() => {
     if (error) {
       const message = "Failed to load package.json";
+
       if (process.env.NODE_ENV === "development") {
         console.warn(message, error);
       }
+
       return <div>{message}</div>;
     }
 
@@ -80,23 +89,23 @@ const App: React.FC = () => {
         <div className="text-center bg-green-800 px-2 py-1 my-4 rounded-lg font-bold">
           <Npm size="1rem" /> {name} - v{version}
         </div>
-        <div className="bg-gray-800 rounded-lg px-3 py-2 mt-2 shadow-md mb-8 min-w-400">
-          {devEntries && (
-            <TabContainer>
-              <Tab
-                onClick={handleTabClick("dependencies")}
-                active={tab === "dependencies"}
-              >
-                Dependencies
-              </Tab>
-              <Tab
-                onClick={handleTabClick("devDependencies")}
-                active={tab === "devDependencies"}
-              >
-                Dev Dependencies
-              </Tab>
-            </TabContainer>
-          )}
+        {devEntries && (
+          <TabContainer>
+            <Tab
+              onClick={handleTabClick("dependencies")}
+              active={tab === "dependencies"}
+            >
+              Dependencies
+            </Tab>
+            <Tab
+              onClick={handleTabClick("devDependencies")}
+              active={tab === "devDependencies"}
+            >
+              Dev Dependencies
+            </Tab>
+          </TabContainer>
+        )}
+        <DependenciesContainer>
           <div>
             {tab === "devDependencies" && devEntries ? (
               <Dependencies
@@ -112,7 +121,7 @@ const App: React.FC = () => {
               />
             )}
           </div>
-        </div>
+        </DependenciesContainer>
       </>
     );
   }, [data, error, tab, handleTabClick]);
@@ -120,7 +129,7 @@ const App: React.FC = () => {
   return (
     <Container>
       <Header />
-      <div className="text-white">{renderContent()}</div>
+      <div className="text-white min-w-50">{renderContent()}</div>
     </Container>
   );
 };
