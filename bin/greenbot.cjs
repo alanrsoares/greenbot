@@ -10,14 +10,13 @@ const chalk = require("chalk");
 const open = require("open");
 const { promises: fs } = require("fs");
 
+/**
+ *
+ * @param xs {{name:string; latest:string;}[]}
+ * @returns {Record<string,string>}
+ */
 const indexEntries = (xs) =>
-  xs.reduce(
-    (acc, { name, latest }) => ({
-      ...acc,
-      [name]: latest,
-    }),
-    {}
-  );
+  xs.reduce((acc, { name, latest }) => ({ ...acc, [name]: latest }), {});
 
 /**
  * @param version {string}
@@ -33,6 +32,9 @@ const PACKAGE_JSON_PATH =
 
 const DEFAULT_PORT = 5001;
 
+/**
+ * @returns {Promise<{dependencies: Record<string, string>; devDependencies?: Record<string,string>}>}
+ */
 async function readPackageJson() {
   const raw = await fs.readFile(PACKAGE_JSON_PATH, "utf8");
 
@@ -72,53 +74,49 @@ async function upgradeVersion({ name, version, latest }) {
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "*",
+app
+  .use(cors({ origin: "*" }))
+  .use(json())
+  .use(express.static(STATIC))
+  .get("/info/:name/:version?", async (req, res) => {
+    const { name, version } = req.params;
+    const result = await fetchLatestVersion(name, version);
+
+    res.json(result);
   })
-);
-app.use(json());
-app.use(express.static(STATIC));
+  .get("/info/:namespace/:name/:version?", async (req, res) => {
+    const { namespace, name, version } = req.params;
+    const result = await fetchLatestVersion(`${namespace}/${name}`, version);
 
-app.get("/info/:name/:version?", async (req, res) => {
-  const { name, version } = req.params;
-  const result = await fetchLatestVersion(name, version);
+    res.json(result);
+  })
+  .get("/package", async (_req, res) => {
+    const { dependencies, devDependencies, ...file } = await readPackageJson();
 
-  res.json(result);
-});
+    const response = { dependencies, devDependencies, ...file };
 
-app.get("/info/:namespace/:name/:version?", async (req, res) => {
-  const { namespace, name, version } = req.params;
-  const result = await fetchLatestVersion(`${namespace}/${name}`, version);
+    const dependencyEntries = Object.entries(dependencies || {});
+    const devDependencyEntries = Object.entries(devDependencies || {});
 
-  res.json(result);
-});
+    const allEntries = [...dependencyEntries, ...devDependencyEntries];
 
-app.get("/package", async (_req, res) => {
-  const { dependencies, devDependencies, ...file } = await readPackageJson();
+    const promises = allEntries.map(([packageName, version]) =>
+      fetchLatestVersion(packageName, version)
+    );
 
-  const response = { dependencies, devDependencies, ...file };
+    const resolved = await Promise.all(promises);
 
-  const dependencyEntries = Object.entries(dependencies || {});
-  const devDependencyEntries = Object.entries(devDependencies || {});
+    res.json({
+      ...response,
+      resolutions: indexEntries(resolved),
+    });
+  })
+  .post("/upgrade", async (req, res) => {
+    const { name, version, latest } = req.body;
+    const result = upgradeVersion({ name, version, latest });
 
-  const allEntries = [...dependencyEntries, ...devDependencyEntries];
-
-  const promises = allEntries.map(([packageName, version]) =>
-    fetchLatestVersion(packageName, version)
-  );
-
-  const resolved = await Promise.all(promises);
-
-  res.json({ ...response, resolutions: indexEntries(resolved) });
-});
-
-app.post("/upgrade", async (req, res) => {
-  const { name, version, latest } = req.body;
-  const result = upgradeVersion({ name, version, latest });
-
-  res.json(result);
-});
+    res.json(result);
+  });
 
 const MAX_TRIES = 5;
 

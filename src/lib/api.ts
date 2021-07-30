@@ -7,6 +7,7 @@ const client = axios.create({
 
 export async function getPackage() {
   const result = await client.get<Package>("/package");
+
   return result.data;
 }
 
@@ -18,5 +19,6 @@ export async function getPackageInfo(
   const result = namespace
     ? await client.get<PackageInfo>(`/info/${namespace}/${name}/${version}`)
     : await client.get<PackageInfo>(`/info/${name}/${version}`);
+
   return result.data;
 }
