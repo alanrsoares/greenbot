@@ -1,0 +1,37 @@
+{
+  "name": "npm-greenbot",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.15",
+    "@tsconfig/svelte": "^2.0.1",
+    "autoprefixer": "^10.3.1",
+    "cssnano": "^5.0.6",
+    "postcss": "^8.3.5",
+    "postcss-load-config": "^3.1.0",
+    "svelte": "^3.37.0",
+    "svelte-check": "^2.1.0",
+    "svelte-preprocess": "^4.7.4",
+    "tailwindcss": "^2.2.7",
+    "tslib": "^2.2.0",
+    "typescript": "^4.3.2",
+    "vite": "^2.4.4"
+  },
+  "dependencies": {
+    "@sveltestack/svelte-query": "^1.4.1",
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "chalk": "^4.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "open": "^8.2.1",
+    "package-json": "^7.0.0",
+    "replace-in-file": "^6.2.0"
+  }
+}
