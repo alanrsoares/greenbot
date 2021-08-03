@@ -12,24 +12,14 @@ export async function getPackage() {
   return result.data;
 }
 
-export async function getPackageInfo(
-  name: string,
-  version: string,
-  namespace?: string
-) {
-  const result = namespace
-    ? await client.get<PackageInfo>(`/info/${namespace}/${name}/${version}`)
-    : await client.get<PackageInfo>(`/info/${name}/${version}`);
+export async function upgradePackage(input: PackageInfo) {
+  const result = await client.post("/upgrade", input);
 
   return result.data;
 }
 
-export async function upgradePackage(variable: {
-  name: string;
-  version: string;
-  latest: string;
-}) {
-  const result = await client.post("/upgrade", variable);
+export async function upgradePackages(input: PackageInfo[]) {
+  const result = await client.post("/upgrade-packages", input);
 
   return result.data;
 }

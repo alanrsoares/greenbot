@@ -5,7 +5,7 @@ const cors = require("cors");
 const { json } = require("body-parser");
 const path = require("path");
 const packageJson = require("package-json");
-const replace = require("replace-in-file");
+const replaceInFile = require("replace-in-file");
 const chalk = require("chalk");
 const open = require("open");
 const { promises: fs } = require("fs");
@@ -63,13 +63,36 @@ const fetchLatestVersion = async (name, version) => {
 async function upgradeVersion({ name, version, latest }) {
   const { qualifier } = rawVersion(version);
 
-  await replace({
+  await replaceInFile({
     files: PACKAGE_JSON_PATH,
     from: `"${name}": "${version}"`,
     to: `"${name}": "${qualifier}${latest}"`,
   });
 
   return { name, version, latest };
+}
+
+/**
+ *
+ * @param packages {Array<{name: string; version: string; latest: string}>}
+ * @returns
+ */
+async function upgradeVersions(packages = []) {
+  const values = packages.map(({ name, version, latest }) => ({
+    name,
+    version,
+    latest,
+    qualifier: rawVersion(version).qualifier,
+  }));
+
+  const from = values.map(({ name, version }) => `"${name}": "${version}"`);
+  const to = values.map(
+    ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`
+  );
+
+  await replaceInFile({ files: PACKAGE_JSON_PATH, from, to });
+
+  return packages;
 }
 
 const app = express();
@@ -113,14 +136,21 @@ app
   })
   .post("/upgrade", async (req, res) => {
     const { name, version, latest } = req.body;
-    const result = upgradeVersion({ name, version, latest });
+    const result = await upgradeVersion({ name, version, latest });
+
+    res.json(result);
+  })
+  .post("/upgrade-packages", async (req, res) => {
+    const packages = req.body;
+
+    const result = await upgradeVersions(packages);
 
     res.json(result);
   });
 
 const MAX_TRIES = 5;
 
-const tryListen = (port, tries = 0) => {
+function tryListen(port, tries = 0) {
   app.listen(port, (err) => {
     if (err) {
       console.log(chalk.red("An error occurred:"), err);
@@ -147,6 +177,6 @@ const tryListen = (port, tries = 0) => {
 
     open(url).catch(() => {});
   });
-};
+}
 
 tryListen(DEFAULT_PORT);

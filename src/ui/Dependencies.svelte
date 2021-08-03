@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { prop, range } from "ramda";
+  import { partition, prop, range } from "ramda";
   import GoFlame from "svelte-icons/go/GoFlame.svelte";
   import { useMutation, useQueryClient } from "@sveltestack/svelte-query";
 
@@ -7,7 +7,7 @@
 
   import { PAGE_SIZE, QUERIES } from "../domain/constants";
   import { isLatestVersion } from "../lib/helpers";
-  import { upgradePackage } from "../lib/api";
+  import { upgradePackage, upgradePackages } from "../lib/api";
   import UpgradeButton from "./UpgradeButton.svelte";
 
   export let label = "";
@@ -17,6 +17,7 @@
   const pages = entries.length / PAGE_SIZE;
 
   const upgradePackageMutation = useMutation(upgradePackage);
+  const upgradePackagesMutation = useMutation(upgradePackages);
 
   function handlePageClick(e: MouseEvent) {
     const { page } = (e.target as HTMLLIElement).dataset;
@@ -53,13 +54,27 @@
     }
   }
 
+  async function handleUpgradePackages(packages: PackageInfo[]) {
+    try {
+      await $upgradePackagesMutation.mutateAsync(packages);
+
+      await queryClient.invalidateQueries([QUERIES.package]);
+      await queryClient.refetchQueries([QUERIES.package]);
+    } catch (error) {
+      console.log("Failed to upgrade packages:", { originalError: error });
+    }
+  }
+
   $: enrichedEntries = entries.map((x) => ({
     ...x,
     isLatest: isLatestVersion(x.version, x.latest),
   }));
   $: startIndex = pageIndex * PAGE_SIZE;
   $: pageEntries = enrichedEntries.slice(startIndex, startIndex + PAGE_SIZE);
-  $: upToDatePackages = enrichedEntries.filter(prop("isLatest"));
+  $: [upToDatePackages, outdatedPackages] = partition(
+    prop("isLatest"),
+    enrichedEntries
+  );
   $: isAllUpToDate = upToDatePackages.length === entries.length;
 </script>
 
@@ -79,7 +94,9 @@
     </div>
     <div>
       {#if !isAllUpToDate}
-        <UpgradeButton>Upgrade all</UpgradeButton>
+        <UpgradeButton on:click={() => handleUpgradePackages(outdatedPackages)}
+          >Upgrade all</UpgradeButton
+        >
       {/if}
     </div>
   </div>
