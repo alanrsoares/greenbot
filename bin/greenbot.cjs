@@ -10,6 +10,8 @@ const chalk = require("chalk");
 const open = require("open");
 const { promises: fs } = require("fs");
 
+const { version } = require("../package.json");
+
 /**
  *
  * @param xs {{name:string; latest:string;}[]}
@@ -170,7 +172,7 @@ function tryListen(port, tries = 0) {
  88  ee 8eee8e 8eee 8eee 8e  8 88     8 8   8   8e  
  88   8 88   8 88   88   88  8 88     8 8   8   88  
  88eee8 88   8 88ee 88ee 88  8 88eeeee8 8eee8   88
-
+ =========================================== v${version}
 `),
       `Started listening at ${url}`
     );
