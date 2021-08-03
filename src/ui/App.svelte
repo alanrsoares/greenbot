@@ -1,17 +1,19 @@
 <script lang="ts">
   import { useQuery } from "@sveltestack/svelte-query";
-  import { dataset_dev } from "svelte/internal";
+  import type { TabKind } from "domain/types";
+
+  import { QUERIES } from "../domain/constants";
   import { getPackage } from "../lib/api";
   import Dependencies from "./Dependencies.svelte";
   import Layout from "./Layout.svelte";
 
-  let selectedTab: "dependencies" | "dev-dependencies" = "dependencies";
+  let selectedTab: TabKind = "dependencies";
 
-  const handleClick = (e) => {
-    const { value } = e.target.dataset;
+  function handleTabClick({ target }: MouseEvent) {
+    const { value } = (target as HTMLButtonElement).dataset;
 
-    selectedTab = value;
-  };
+    selectedTab = value as TabKind;
+  }
 
   function toPackageInfo(
     [name, version]: [string, string],
@@ -20,35 +22,35 @@
     return { name, version, latest: resolutions[name] };
   }
 
-  const queryResult = useQuery("package", getPackage);
+  const queryResult = useQuery(QUERIES.package, getPackage);
 </script>
 
 <Layout>
   <div class="w-full grid gap-4">
-    {#if $queryResult.isLoading}
-      <div>Loading...</div>
-    {/if}
-
-    <div>Hello</div>
-
     <div
       class="border-2 border-granny-smith-apple rounded-xl flex justify-between overflow-hidden"
     >
       <button
         data-value="dependencies"
         class="p-4 cursor-pointer flex-1"
-        on:click={handleClick}
+        class:bg-castleton-green={selectedTab === "dependencies"}
+        on:click={handleTabClick}
       >
         Dependencies
       </button>
       <button
         data-value="dev-dependencies"
         class="p-4 cursor-pointer flex-1 border-l border-granny-smith-apple"
-        on:click={handleClick}
+        class:bg-castleton-green={selectedTab === "dev-dependencies"}
+        on:click={handleTabClick}
       >
         Dev Dependencies
       </button>
     </div>
+
+    {#if $queryResult.isLoading}
+      <div class="mx-auto">Loading dependencies...</div>
+    {/if}
 
     {#if $queryResult.data}
       {#if selectedTab === "dependencies"}

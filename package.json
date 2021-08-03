@@ -16,7 +16,7 @@
     "postcss": "^8.3.6",
     "postcss-load-config": "^3.1.0",
     "svelte": "^3.41.0",
-    "svelte-check": "^2.2.3",
+    "svelte-check": "^2.2.4",
     "svelte-preprocess": "^4.7.4",
     "tailwindcss": "^2.2.7",
     "tslib": "^2.3.0",
@@ -25,13 +25,16 @@
   },
   "dependencies": {
     "@sveltestack/svelte-query": "^1.4.1",
+    "@types/ramda": "^0.27.44",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
-    "chalk": "^4.1.1",
+    "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "open": "^8.2.1",
     "package-json": "^7.0.0",
-    "replace-in-file": "^6.2.0"
+    "ramda": "^0.27.1",
+    "replace-in-file": "^6.2.0",
+    "svelte-icons": "^2.1.0"
   }
 }

@@ -3,6 +3,10 @@ const config = {
   purge: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
     extend: {
+      fontFamily: {
+        mono: "'Fira Mono', mono",
+        sans: "'Fira Mono', mono",
+      },
       colors: {
         "aero-blue": "#d7fff1",
         "granny-smith-apple": "#aafcb8",
