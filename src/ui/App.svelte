@@ -77,4 +77,9 @@
   html {
     @apply bg-castleton-green;
   }
+
+  button {
+    @apply hover:opacity-70;
+    @apply font-medium;
+  }
 </style>

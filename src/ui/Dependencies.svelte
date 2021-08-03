@@ -1,6 +1,5 @@
 <script lang="ts">
   import { prop, range } from "ramda";
-  import GoArrowUp from "svelte-icons/go/GoArrowUp.svelte";
   import GoFlame from "svelte-icons/go/GoFlame.svelte";
   import { useMutation, useQueryClient } from "@sveltestack/svelte-query";
 
@@ -9,6 +8,7 @@
   import { PAGE_SIZE, QUERIES } from "../domain/constants";
   import { isLatestVersion } from "../lib/helpers";
   import { upgradePackage } from "../lib/api";
+  import UpgradeButton from "./UpgradeButton.svelte";
 
   export let label = "";
   export let entries: PackageInfo[] = [];
@@ -46,19 +46,19 @@
         latest,
       });
 
+      await queryClient.invalidateQueries([QUERIES.package]);
       await queryClient.refetchQueries([QUERIES.package]);
     } catch (error) {
       console.log("Failed to upgrade package:", { originalError: error });
     }
   }
 
-  $: enrichedEntries = entries.map((entry) => ({
-    ...entry,
-    isLatest: isLatestVersion(entry.version, entry.latest),
+  $: enrichedEntries = entries.map((x) => ({
+    ...x,
+    isLatest: isLatestVersion(x.version, x.latest),
   }));
   $: startIndex = pageIndex * PAGE_SIZE;
   $: pageEntries = enrichedEntries.slice(startIndex, startIndex + PAGE_SIZE);
-
   $: upToDatePackages = enrichedEntries.filter(prop("isLatest"));
   $: isAllUpToDate = upToDatePackages.length === entries.length;
 </script>
@@ -66,15 +66,23 @@
 <div
   class="border-2 border-granny-smith-apple rounded-xl overflow-hidden relative"
 >
-  <div class="p-4 border-b border-granny-smith-apple flex items-center">
-    {label} ({upToDatePackages.length}/{entries.length})
-    {#if isAllUpToDate}
-      <div class="h-4 w-4 ml-1">
-        <GoFlame />
-      </div>
-    {/if}
+  <div
+    class="p-4 border-b border-granny-smith-apple flex items-center justify-between"
+  >
+    <div class="flex items-center">
+      {label} ({upToDatePackages.length}/{entries.length})
+      {#if isAllUpToDate}
+        <div class="h-4 w-4 ml-1">
+          <GoFlame />
+        </div>
+      {/if}
+    </div>
+    <div>
+      {#if !isAllUpToDate}
+        <UpgradeButton>Upgrade all</UpgradeButton>
+      {/if}
+    </div>
   </div>
-
   <ul class="grid">
     {#each pageEntries as { name, version, latest, isLatest }, i}
       <li
@@ -83,29 +91,25 @@
       >
         {#if isLatest}
           <div>{name}</div>
-          <div>{version} (latest)</div>
+          <div class="flex">
+            {version}
+            <div class="h-4 w-4 ml-1">
+              <GoFlame />
+            </div>
+          </div>
         {:else}
           <div>{name}</div>
-          <button
-            role="button"
-            class="flex items-center rounded-full p-1 focus:ring bg-granny-smith-apple text-castleton-green -mr-1"
+          <UpgradeButton
             on:click={() => handleUpgradePackage(name, version, latest)}
           >
-            <div class="px-1 font-medium">
-              {version} &rArr; {latest}
-            </div>
-            <div
-              class="h-6 w-6 bg-gray-800 rounded-full p-1 text-granny-smith-apple"
-            >
-              <GoArrowUp height="1em" />
-            </div>
-          </button>
+            {version} &rArr; {latest}
+          </UpgradeButton>
         {/if}
       </li>
     {/each}
   </ul>
   <div class="flex justify-center border-t border-granny-smith-apple">
-    <ul class="inline-flex mx-auto">
+    <ul class="inline-flex mx-auto font-medium">
       <li
         role="button"
         class="flex justify-between p-4 px-6 border-r border-l border-granny-smith-apple"
