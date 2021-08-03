@@ -5,7 +5,7 @@
     "dist/",
     "bin/"
   ],
-  "bin": "./bin/greenbot.js",
+  "bin": "./bin/greenbot.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
