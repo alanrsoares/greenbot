@@ -6,20 +6,19 @@ const client = axios.create({
   baseURL: "http://localhost:5001",
 });
 
+const delay = (timeout: number) =>
+  new Promise((resolve) => {
+    setTimeout(() => resolve(timeout), timeout);
+  });
+
 export async function getPackage() {
   const result = await client.get<Package>("/package");
 
   return result.data;
 }
 
-export async function upgradePackage(input: PackageInfo) {
-  const result = await client.post("/upgrade", input);
-
-  return result.data;
-}
-
 export async function upgradePackages(input: PackageInfo[]) {
   const result = await client.post("/upgrade-packages", input);
-
+  await delay(1000 * Math.random());
   return result.data;
 }

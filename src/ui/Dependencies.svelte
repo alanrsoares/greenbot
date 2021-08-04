@@ -7,17 +7,25 @@
 
   import { PAGE_SIZE, QUERIES } from "../domain/constants";
   import { isLatestVersion } from "../lib/helpers";
-  import { upgradePackage, upgradePackages } from "../lib/api";
+  import { upgradePackages } from "../lib/api";
   import UpgradeButton from "./UpgradeButton.svelte";
 
   export let label = "";
   export let entries: PackageInfo[] = [];
 
   let pageIndex = 0;
+  let loadingPackage = "";
+
   const pages = entries.length / PAGE_SIZE;
 
-  const upgradePackageMutation = useMutation(upgradePackage);
-  const upgradePackagesMutation = useMutation(upgradePackages);
+  const upgradePackagesMutation = useMutation(upgradePackages, {
+    onMutate([{ name }]) {
+      loadingPackage = name;
+    },
+    onSettled() {
+      loadingPackage = "";
+    },
+  });
 
   function handlePageClick(e: MouseEvent) {
     const { page } = (e.target as HTMLLIElement).dataset;
@@ -34,25 +42,6 @@
   }
 
   const queryClient = useQueryClient();
-
-  async function handleUpgradePackage(
-    name: string,
-    version: string,
-    latest: string
-  ) {
-    try {
-      await $upgradePackageMutation.mutateAsync({
-        name,
-        version,
-        latest,
-      });
-
-      await queryClient.invalidateQueries([QUERIES.package]);
-      await queryClient.refetchQueries([QUERIES.package]);
-    } catch (error) {
-      console.log("Failed to upgrade package:", { originalError: error });
-    }
-  }
 
   async function handleUpgradePackages(packages: PackageInfo[]) {
     try {
@@ -94,9 +83,13 @@
     </div>
     <div>
       {#if !isAllUpToDate}
-        <UpgradeButton on:click={() => handleUpgradePackages(outdatedPackages)}
-          >Upgrade all</UpgradeButton
+        <UpgradeButton
+          on:click={() => handleUpgradePackages(outdatedPackages)}
+          disabled={$upgradePackagesMutation.isLoading}
+          isLoading={$upgradePackagesMutation.isLoading}
         >
+          Upgrade all
+        </UpgradeButton>
       {/if}
     </div>
   </div>
@@ -117,7 +110,11 @@
         {:else}
           <div>{name}</div>
           <UpgradeButton
-            on:click={() => handleUpgradePackage(name, version, latest)}
+            disabled={$upgradePackagesMutation.isLoading &&
+              loadingPackage === name}
+            isLoading={$upgradePackagesMutation.isLoading &&
+              loadingPackage === name}
+            on:click={() => handleUpgradePackages([{ name, version, latest }])}
           >
             {version} &rArr; {latest}
           </UpgradeButton>
