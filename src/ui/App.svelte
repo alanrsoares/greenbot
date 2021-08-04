@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useQuery } from "@sveltestack/svelte-query";
-  // import DiNpm from "svelte-icons/di/DiNpm.svelte";
+  import DiNpm from "svelte-icons/di/DiNpm.svelte";
 
   import type { TabKind } from "domain/types";
 
@@ -34,7 +34,7 @@
     {/if}
 
     {#if $queryResult.data}
-      <!-- <div
+      <div
         class="bg-[#cb3837] px-4 rounded-xl text-white flex items-center justify-center font-medium"
       >
         <div class="h-12 mr-2 pt-0.5">
@@ -43,7 +43,7 @@
         <div>
           {$queryResult.data.name} - {$queryResult.data.version}
         </div>
-      </div> -->
+      </div>
       <div
         class="border-2 border-granny-smith-apple rounded-xl flex justify-between overflow-hidden"
       >
