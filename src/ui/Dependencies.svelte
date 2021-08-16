@@ -64,10 +64,17 @@
     }
   }
 
-  $: enrichedEntries = entries.map((x) => ({
-    ...x,
-    isLatest: isLatestVersion(x.version, x.latest),
-  }));
+  $: enrichedEntries = entries
+    .map((x) => ({
+      ...x,
+      isLatest: isLatestVersion(x.version, x.latest),
+    }))
+    .sort((a, b) => {
+      if (a.isLatest && b.isLatest) {
+        return 0;
+      }
+      return a.isLatest && !b.isLatest ? 1 : -1;
+    });
   $: startIndex = pageIndex * PAGE_SIZE;
   $: pageEntries = enrichedEntries.slice(startIndex, startIndex + PAGE_SIZE);
   $: [upToDatePackages, outdatedPackages] = partition(
