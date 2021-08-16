@@ -17,7 +17,9 @@ export async function getPackage() {
   return result.data;
 }
 
-export async function upgradePackages(input: PackageInfo[]) {
+export async function upgradePackages(
+  input: PackageInfo[]
+): Promise<PackageInfo[]> {
   const result = await client.post("/upgrade-packages", input);
   await delay(1000 * Math.random());
   return result.data;

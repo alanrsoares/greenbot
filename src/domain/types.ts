@@ -1,4 +1,4 @@
-export type TabKind = "dependencies" | "dev-dependencies";
+export type TabKind = "dependencies" | "devDependencies";
 
 export interface Package {
   name: string;

@@ -71,7 +71,7 @@ async function upgradeVersion({ name, version, latest }) {
     to: `"${name}": "${qualifier}${latest}"`,
   });
 
-  return { name, version, latest };
+  return { name, version, latest: `${qualifier}${latest}` };
 }
 
 /**

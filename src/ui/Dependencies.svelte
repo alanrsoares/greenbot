@@ -2,11 +2,10 @@
   import { partition, prop, range } from "ramda";
   import GoFlame from "svelte-icons/go/GoFlame.svelte";
   import { useMutation, useQueryClient } from "@sveltestack/svelte-query";
-
-  import type { PackageInfo } from "domain/types";
+  import type { Package, PackageInfo } from "domain/types";
 
   import { PAGE_SIZE, QUERIES } from "../domain/constants";
-  import { isLatestVersion } from "../lib/helpers";
+  import { isLatestVersion, rawVersion } from "../lib/helpers";
   import { upgradePackages } from "../lib/api";
   import UpgradeButton from "./UpgradeButton.svelte";
 
@@ -45,7 +44,18 @@
 
   async function handleUpgradePackages(packages: PackageInfo[]) {
     try {
-      await $upgradePackagesMutation.mutateAsync(packages);
+      const updated = await $upgradePackagesMutation.mutateAsync(packages);
+
+      queryClient.setQueryData<Package>([QUERIES.package], (current) => {
+        for (let item of updated) {
+          const { qualifier } = rawVersion(item.version);
+          const latestVersion = `${qualifier}${item.latest}`;
+          current.dependencies[item.name] = latestVersion;
+          current.devDependencies[item.name] = latestVersion;
+        }
+
+        return current;
+      });
 
       await queryClient.invalidateQueries([QUERIES.package]);
       await queryClient.refetchQueries([QUERIES.package]);

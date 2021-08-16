@@ -15,19 +15,19 @@
     "preversion": "yarn build"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.15",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.17",
     "@tsconfig/svelte": "^2.0.1",
     "autoprefixer": "^10.3.1",
     "cssnano": "^5.0.7",
     "postcss": "^8.3.6",
     "postcss-load-config": "^3.1.0",
-    "svelte": "^3.41.0",
+    "svelte": "^3.42.1",
     "svelte-check": "^2.2.4",
     "svelte-preprocess": "^4.7.4",
     "tailwindcss": "^2.2.7",
-    "tslib": "^2.3.0",
+    "tslib": "^2.3.1",
     "typescript": "^4.3.5",
-    "vite": "^2.4.4"
+    "vite": "^2.5.0"
   },
   "dependencies": {
     "@sveltestack/svelte-query": "^1.4.1",

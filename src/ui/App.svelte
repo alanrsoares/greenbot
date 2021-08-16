@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { useQuery } from "@sveltestack/svelte-query";
+  import { useQuery, UseQueryResult } from "@sveltestack/svelte-query";
   import DiNpm from "svelte-icons/di/DiNpm.svelte";
 
-  import type { TabKind } from "domain/types";
+  import type { Package, TabKind } from "domain/types";
 
   import { QUERIES } from "../domain/constants";
   import { getPackage } from "../lib/api";
   import Dependencies from "./Dependencies.svelte";
+  import Bot, { Mood } from "./Bot.svelte";
   import Layout from "./Layout.svelte";
+  import { isLatestVersion } from "../lib/helpers";
 
   let selectedTab: TabKind = "dependencies";
 
@@ -24,10 +26,40 @@
     return { name, version, latest: resolutions[name] };
   }
 
+  function getCurrentMood(result?: UseQueryResult<Package, unknown>): Mood {
+    if (result.isLoading) {
+      return "asleep";
+    }
+    if (result.error) {
+      return "dead";
+    }
+    if (result.data) {
+      const { dependencies, devDependencies, resolutions } = result.data;
+
+      const allEntries = Object.entries({
+        ...dependencies,
+        ...devDependencies,
+      });
+
+      const outdated = allEntries.filter(
+        ([name, version]) => !isLatestVersion(version, resolutions[name])
+      ).length;
+
+      return outdated ? "angry" : "happy";
+    }
+
+    return "awake";
+  }
+
   const queryResult = useQuery(QUERIES.package, getPackage);
+
+  $: mood = getCurrentMood($queryResult);
 </script>
 
 <Layout>
+  <div class="grid place-items-center h-40 w-40 mx-auto">
+    <Bot {mood} />
+  </div>
   <div class="w-full grid gap-4">
     {#if $queryResult.isLoading}
       <div class="mx-auto">Loading dependencies...</div>
@@ -56,30 +88,22 @@
           Dependencies
         </button>
         <button
-          data-value="dev-dependencies"
+          data-value="devDependencies"
           class="p-4 cursor-pointer flex-1 border-l border-granny-smith-apple"
-          class:bg-castleton-green={selectedTab === "dev-dependencies"}
+          class:bg-castleton-green={selectedTab === "devDependencies"}
           on:click={handleTabClick}
         >
           Dev Dependencies
         </button>
       </div>
-      {#if selectedTab === "dependencies"}
-        <Dependencies
-          label="Dependencies"
-          entries={Object.entries($queryResult.data.dependencies).map((pair) =>
-            toPackageInfo(pair, $queryResult.data.resolutions)
-          )}
-        />
-      {/if}
-      {#if selectedTab === "dev-dependencies"}
-        <Dependencies
-          label="Dev Dependencies"
-          entries={Object.entries($queryResult.data.devDependencies).map(
-            (pair) => toPackageInfo(pair, $queryResult.data.resolutions)
-          )}
-        />
-      {/if}
+      <Dependencies
+        label={selectedTab === "devDependencies"
+          ? "Dev Dependencies"
+          : "Dependencies"}
+        entries={Object.entries($queryResult.data[selectedTab]).map((pair) =>
+          toPackageInfo(pair, $queryResult.data.resolutions)
+        )}
+      />
     {/if}
   </div>
 </Layout>
