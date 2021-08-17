@@ -57,7 +57,6 @@
         return current;
       });
 
-      await queryClient.invalidateQueries([QUERIES.package]);
       await queryClient.refetchQueries([QUERIES.package]);
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
