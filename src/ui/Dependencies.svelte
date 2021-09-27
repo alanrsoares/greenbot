@@ -15,7 +15,7 @@
   let pageIndex = 0;
   let loadingPackage = "";
 
-  const pages = entries.length / PAGE_SIZE;
+  $: pages = entries.length / PAGE_SIZE;
 
   const upgradePackagesMutation = useMutation(upgradePackages, {
     onMutate([{ name }]) {
