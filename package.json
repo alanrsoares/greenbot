@@ -1,6 +1,6 @@
 {
   "name": "npm-greenbot",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "files": [
     "dist/",
     "bin/"
