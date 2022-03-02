@@ -38,9 +38,12 @@ const DEFAULT_PORT = 5001;
  * @returns {Promise<{dependencies: Record<string, string>; devDependencies?: Record<string,string>}>}
  */
 async function readPackageJson() {
-  const raw = await fs.readFile(PACKAGE_JSON_PATH, "utf8");
-
-  return JSON.parse(raw);
+  try {
+    const raw = await fs.readFile(PACKAGE_JSON_PATH, "utf8");
+    return JSON.parse(raw);
+  } catch (error) {
+    return { dependencies: {}, devDependencies: {} };
+  }
 }
 
 const STATIC = path.resolve(__dirname, "..", "dist");
