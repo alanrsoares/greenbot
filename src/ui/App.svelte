@@ -1,6 +1,7 @@
 <script lang="ts">
   import { useQuery, type UseQueryResult } from "@sveltestack/svelte-query";
   import DiNpm from "svelte-icons/di/DiNpm.svelte";
+  import FaSpinner from "svelte-icons/fa/FaSpinner.svelte";
 
   import type { Package, TabKind } from "domain/types";
 
@@ -17,6 +18,13 @@
     const { value } = (target as HTMLButtonElement).dataset;
 
     selectedTab = value as TabKind;
+  }
+
+  function getFilteredEntries(
+    entries: [string, string][],
+    resolutions: Record<string, string>
+  ) {
+    return entries.filter(([name, version]) => resolutions[name] !== version);
   }
 
   function toPackageInfo(
@@ -41,11 +49,14 @@
         ...devDependencies,
       });
 
-      const outdated = allEntries.filter(
+      const outdatedPackagesCount = getFilteredEntries(
+        allEntries,
+        result.data.resolutions
+      ).filter(
         ([name, version]) => !isLatestVersion(version, resolutions[name])
       ).length;
 
-      return outdated ? "angry" : "happy";
+      return outdatedPackagesCount ? "angry" : "happy";
     }
 
     return "awake";
@@ -55,14 +66,17 @@
 
   $: mood = getCurrentMood($queryResult);
 
-  $: entries =
+  $: tabEntries =
     $queryResult.isLoading || $queryResult.error
       ? []
-      : Object.entries($queryResult.data[selectedTab])
-          .filter(
-            ([name, version]) => $queryResult.data.resolutions[name] !== version
-          )
-          .map((pair) => toPackageInfo(pair, $queryResult.data.resolutions));
+      : getFilteredEntries(
+          Object.entries($queryResult.data[selectedTab]),
+          $queryResult.data.resolutions
+        );
+
+  $: entries = tabEntries.map((pair) =>
+    toPackageInfo(pair, $queryResult.data.resolutions)
+  );
 </script>
 
 <Layout>
@@ -71,7 +85,12 @@
   </div>
   <div class="w-full grid gap-4">
     {#if $queryResult.isLoading}
-      <div class="mx-auto">Loading dependencies...</div>
+      <div class="flex items-center justify-center gap-2">
+        <div class="h-4 w-4 animate-spin">
+          <FaSpinner />
+        </div>
+        <span>Loading dependencies</span>
+      </div>
     {/if}
 
     {#if $queryResult.data}

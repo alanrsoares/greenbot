@@ -15,7 +15,7 @@
     "preversion": "yarn build"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.38",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.39",
     "@tsconfig/svelte": "^3.0.0",
     "autoprefixer": "^10.4.2",
     "broadcast-channel": "^4.10.0",

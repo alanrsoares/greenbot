@@ -64,10 +64,10 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.0.1.tgz#d26729db850fa327b7cacc5522252194404226f5"
   integrity sha512-Qm9hBEBu18wt1PO2flE7LPb30BHMQt1eQgbV76YntdNk73XZGpn3izvGTYxbGgzXKgbCjiia0uxTd3aTNQrY/g==
 
-"@sveltejs/vite-plugin-svelte@^1.0.0-next.38":
-  version "1.0.0-next.38"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-1.0.0-next.38.tgz#5fb7e911a27e866de5c24d5e5541afefd5ced4bc"
-  integrity sha512-epYAVZvfpiDZwB4Whe5AALk3zF5odKFf8Vx4q2tth+QuXmr0GLZ13ri02zINS6pHRCx+GjtOqCEEwMaPAfPcgQ==
+"@sveltejs/vite-plugin-svelte@^1.0.0-next.39":
+  version "1.0.0-next.39"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-1.0.0-next.39.tgz#b9437de18d13a475f76cf603511174cdf905b8d4"
+  integrity sha512-gnvvcAW2LK+KnUn8lKb2ypcXKwSp2K57mem5C4VNKfjxdRpM6+XwNavWwVf6otnDhz3qPYl/TKKW6/dRr6eeAw==
   dependencies:
     "@rollup/pluginutils" "^4.1.2"
     debug "^4.3.3"
