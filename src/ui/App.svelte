@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { useQuery, UseQueryResult } from "@sveltestack/svelte-query";
+  import { useQuery, type UseQueryResult } from "@sveltestack/svelte-query";
   import DiNpm from "svelte-icons/di/DiNpm.svelte";
 
   import type { Package, TabKind } from "domain/types";
 
-  import { QUERIES } from "../domain/constants";
   import { getPackage } from "../lib/api";
-  import Dependencies from "./Dependencies.svelte";
-  import Bot, { Mood } from "./Bot.svelte";
-  import Layout from "./Layout.svelte";
   import { isLatestVersion } from "../lib/helpers";
+  import { QUERIES } from "../domain/constants";
+  import Dependencies from "./Dependencies.svelte";
+  import Bot, { type Mood } from "./Bot.svelte";
+  import Layout from "./Layout.svelte";
+  import { dataset_dev } from "svelte/internal";
 
   let selectedTab: TabKind = "dependencies";
 
@@ -100,9 +101,11 @@
         label={selectedTab === "devDependencies"
           ? "Dev Dependencies"
           : "Dependencies"}
-        entries={Object.entries($queryResult.data[selectedTab]).map((pair) =>
-          toPackageInfo(pair, $queryResult.data.resolutions)
-        )}
+        entries={Object.entries($queryResult.data[selectedTab])
+          .filter(
+            ([name, version]) => $queryResult.data.resolutions[name] !== version
+          )
+          .map((pair) => toPackageInfo(pair, $queryResult.data.resolutions))}
       />
     {/if}
   </div>
