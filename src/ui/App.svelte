@@ -10,7 +10,6 @@
   import Dependencies from "./Dependencies.svelte";
   import Bot, { type Mood } from "./Bot.svelte";
   import Layout from "./Layout.svelte";
-  import { dataset_dev } from "svelte/internal";
 
   let selectedTab: TabKind = "dependencies";
 
@@ -55,6 +54,15 @@
   const queryResult = useQuery(QUERIES.package, getPackage);
 
   $: mood = getCurrentMood($queryResult);
+
+  $: entries =
+    $queryResult.isLoading || $queryResult.error
+      ? []
+      : Object.entries($queryResult.data[selectedTab])
+          .filter(
+            ([name, version]) => $queryResult.data.resolutions[name] !== version
+          )
+          .map((pair) => toPackageInfo(pair, $queryResult.data.resolutions));
 </script>
 
 <Layout>
@@ -101,11 +109,7 @@
         label={selectedTab === "devDependencies"
           ? "Dev Dependencies"
           : "Dependencies"}
-        entries={Object.entries($queryResult.data[selectedTab])
-          .filter(
-            ([name, version]) => $queryResult.data.resolutions[name] !== version
-          )
-          .map((pair) => toPackageInfo(pair, $queryResult.data.resolutions))}
+        {entries}
       />
     {/if}
   </div>
