@@ -8,7 +8,7 @@ const packageJson = require("package-json");
 const replaceInFile = require("replace-in-file");
 const chalk = require("chalk");
 const open = require("open");
-const { promises: fs } = require("fs");
+const fs = require("fs/promises");
 
 const { version } = require("../package.json");
 
@@ -51,12 +51,28 @@ const STATIC = path.resolve(__dirname, "..", "dist");
  * @returns {Promise<{name:string; version: string; latest: string}>}
  */
 const fetchLatestVersion = async (name, version) => {
-  const { version: latest } = await packageJson(
-    name,
-    version ? { version } : undefined
-  );
+  try {
+    const { version: latest } = await packageJson(
+      name,
+      version ? { version } : undefined
+    );
 
-  return { name, version, latest };
+    return {
+      name,
+      version,
+      latest,
+    };
+  } catch (error) {
+    console.log(
+      chalk.red(`[greenbot] Could not fetch latest version for ${name}`)
+    );
+
+    return {
+      name,
+      version,
+      latest: version,
+    };
+  }
 };
 
 /**
