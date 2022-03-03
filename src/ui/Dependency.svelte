@@ -6,7 +6,7 @@
   import { rawVersion } from "../lib/helpers";
   import { useUpgradePackagesMutation } from "../lib/hooks";
   import { QUERIES } from "../domain/constants";
-  import UpgradeButton from "./UpgradeButton.svelte";
+  import UpgradeButton from "./components/UpgradeButton.svelte";
 
   export let name = "";
   export let version = "";

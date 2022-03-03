@@ -7,7 +7,7 @@
   import { PAGE_SIZE, QUERIES } from "../domain/constants";
   import { isLatestVersion, rawVersion } from "../lib/helpers";
   import { useUpgradePackagesMutation } from "../lib/hooks";
-  import UpgradeButton from "./UpgradeButton.svelte";
+  import UpgradeButton from "./components/UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
 
   export let label = "";

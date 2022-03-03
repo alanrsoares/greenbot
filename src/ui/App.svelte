@@ -1,22 +1,21 @@
 <script lang="ts">
   import DiNpm from "svelte-icons/di/DiNpm.svelte";
   import FaSpinner from "svelte-icons/fa/FaSpinner.svelte";
-
   import type { UseQueryResult } from "@sveltestack/svelte-query";
+
   import type { Package, TabKind } from "domain/types";
 
   import { usePackageQuery } from "../lib/hooks";
   import { isLatestVersion } from "../lib/helpers";
 
   import Dependencies from "./Dependencies.svelte";
-  import Bot, { type Mood } from "./Bot.svelte";
+  import Bot, { type Mood } from "./components/Bot.svelte";
   import Layout from "./Layout.svelte";
+  import Tabs, { type TabItem } from "./components/Tabs.svelte";
 
   let selectedTab: TabKind = "dependencies";
 
-  function handleTabClick({ target }: MouseEvent) {
-    const { value } = (target as HTMLButtonElement).dataset;
-
+  function handleTabCchange({ value }: TabItem) {
     selectedTab = value as TabKind;
   }
 
@@ -104,26 +103,14 @@
           {$packageQuery.data.name} - {$packageQuery.data.version}
         </div>
       </div>
-      <div
-        class="border-2 border-granny-smith-apple rounded-xl flex justify-between overflow-hidden"
-      >
-        <button
-          data-value="dependencies"
-          class="p-4 cursor-pointer flex-1"
-          class:bg-castleton-green={selectedTab === "dependencies"}
-          on:click={handleTabClick}
-        >
-          Dependencies
-        </button>
-        <button
-          data-value="devDependencies"
-          class="p-4 cursor-pointer flex-1 border-l border-granny-smith-apple"
-          class:bg-castleton-green={selectedTab === "devDependencies"}
-          on:click={handleTabClick}
-        >
-          Dev Dependencies
-        </button>
-      </div>
+      <Tabs
+        onChange={handleTabCchange}
+        {selectedTab}
+        tabs={[
+          { value: "dependencies", label: "Dependencies" },
+          { value: "devDependencies", label: "Dev Deoendencies" },
+        ]}
+      />
       <Dependencies
         label={selectedTab === "devDependencies"
           ? "Dev Dependencies"
