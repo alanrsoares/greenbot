@@ -12,7 +12,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "preversion": "yarn build"
+    "preversion": "yarn build",
+    "release": "npm publish && git push && git push --tags"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.39",
