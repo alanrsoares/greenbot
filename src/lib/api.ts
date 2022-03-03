@@ -21,6 +21,8 @@ export async function upgradePackages(
   input: PackageInfo[]
 ): Promise<PackageInfo[]> {
   const result = await client.post("/upgrade-packages", input);
-  await delay(1000 * Math.random());
+  if (process.env.NODE_ENV === "development") {
+    await delay(1000 * Math.random());
+  }
   return result.data;
 }

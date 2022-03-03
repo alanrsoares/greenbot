@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { useQuery, type UseQueryResult } from "@sveltestack/svelte-query";
   import DiNpm from "svelte-icons/di/DiNpm.svelte";
   import FaSpinner from "svelte-icons/fa/FaSpinner.svelte";
 
+  import type { UseQueryResult } from "@sveltestack/svelte-query";
   import type { Package, TabKind } from "domain/types";
 
-  import { getPackage } from "../lib/api";
+  import { usePackageQuery } from "../lib/hooks";
   import { isLatestVersion } from "../lib/helpers";
-  import { QUERIES } from "../domain/constants";
+
   import Dependencies from "./Dependencies.svelte";
   import Bot, { type Mood } from "./Bot.svelte";
   import Layout from "./Layout.svelte";
@@ -62,20 +62,20 @@
     return "awake";
   }
 
-  const queryResult = useQuery(QUERIES.package, getPackage);
+  const packageQuery = usePackageQuery();
 
-  $: mood = getCurrentMood($queryResult);
+  $: mood = getCurrentMood($packageQuery);
 
   $: tabEntries =
-    $queryResult.isLoading || $queryResult.error
+    $packageQuery.isLoading || $packageQuery.error
       ? []
       : getFilteredEntries(
-          Object.entries($queryResult.data[selectedTab]),
-          $queryResult.data.resolutions
+          Object.entries($packageQuery.data[selectedTab]),
+          $packageQuery.data.resolutions
         );
 
   $: entries = tabEntries.map((pair) =>
-    toPackageInfo(pair, $queryResult.data.resolutions)
+    toPackageInfo(pair, $packageQuery.data.resolutions)
   );
 </script>
 
@@ -84,7 +84,7 @@
     <Bot {mood} />
   </div>
   <div class="w-full grid gap-4">
-    {#if $queryResult.isLoading}
+    {#if $packageQuery.isLoading}
       <div class="flex items-center justify-center gap-2">
         <div class="h-4 w-4 animate-spin">
           <FaSpinner />
@@ -93,7 +93,7 @@
       </div>
     {/if}
 
-    {#if $queryResult.data}
+    {#if $packageQuery.data}
       <div
         class="bg-[#cb3837] px-4 rounded-xl text-white flex items-center justify-center font-medium"
       >
@@ -101,7 +101,7 @@
           <DiNpm />
         </div>
         <div>
-          {$queryResult.data.name} - {$queryResult.data.version}
+          {$packageQuery.data.name} - {$packageQuery.data.version}
         </div>
       </div>
       <div
@@ -135,12 +135,7 @@
 </Layout>
 
 <style global lang="postcss">
-  html {
-    @apply bg-castleton-green;
-  }
-
   button {
-    @apply hover:opacity-70;
-    @apply font-medium;
+    @apply hover:opacity-70 font-medium;
   }
 </style>

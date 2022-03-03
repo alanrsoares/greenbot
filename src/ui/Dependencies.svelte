@@ -6,25 +6,18 @@
 
   import { PAGE_SIZE, QUERIES } from "../domain/constants";
   import { isLatestVersion, rawVersion } from "../lib/helpers";
-  import { upgradePackages } from "../lib/api";
+  import { useUpgradePackagesMutation } from "../lib/hooks";
   import UpgradeButton from "./UpgradeButton.svelte";
+  import Dependency from "./Dependency.svelte";
 
   export let label = "";
   export let entries: PackageInfo[] = [];
 
   let pageIndex = 0;
-  let loadingPackage = "";
 
   $: pages = entries.length / PAGE_SIZE;
 
-  const upgradePackagesMutation = useMutation(upgradePackages, {
-    onMutate([{ name }]) {
-      loadingPackage = name;
-    },
-    onSettled() {
-      loadingPackage = "";
-    },
-  });
+  const upgradePackagesMutation = useUpgradePackagesMutation();
 
   function handlePageClick(e: MouseEvent) {
     const { page } = (e.target as HTMLLIElement).dataset;
@@ -63,7 +56,7 @@
     }
   }
 
-  $: enrichedEntries = entries
+  $: displayEntries = entries
     .map((x) => ({
       ...x,
       isLatest: isLatestVersion(x.version, x.latest),
@@ -75,10 +68,10 @@
       return a.isLatest && !b.isLatest ? 1 : -1;
     });
   $: startIndex = pageIndex * PAGE_SIZE;
-  $: pageEntries = enrichedEntries.slice(startIndex, startIndex + PAGE_SIZE);
+  $: pageEntries = displayEntries.slice(startIndex, startIndex + PAGE_SIZE);
   $: [upToDatePackages, outdatedPackages] = partition(
     prop("isLatest"),
-    enrichedEntries
+    displayEntries
   );
   $: isAllUpToDate = upToDatePackages.length === entries.length;
 </script>
@@ -111,31 +104,7 @@
   </div>
   <ul class="grid">
     {#each pageEntries as { name, version, latest, isLatest }, i}
-      <li
-        class="flex justify-between p-4 border-granny-smith-apple text-xs"
-        class:border-t={i !== 0}
-      >
-        {#if isLatest}
-          <div>{name}</div>
-          <div class="flex">
-            {version}
-            <div class="h-4 w-4 ml-1">
-              <GoFlame />
-            </div>
-          </div>
-        {:else}
-          <div>{name}</div>
-          <UpgradeButton
-            disabled={$upgradePackagesMutation.isLoading &&
-              loadingPackage === name}
-            isLoading={$upgradePackagesMutation.isLoading &&
-              loadingPackage === name}
-            on:click={() => handleUpgradePackages([{ name, version, latest }])}
-          >
-            {version} &rArr; {latest}
-          </UpgradeButton>
-        {/if}
-      </li>
+      <Dependency index={i} {name} {version} {latest} {isLatest} />
     {/each}
   </ul>
   <div class="flex justify-center border-t border-granny-smith-apple">
