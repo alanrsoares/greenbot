@@ -14,14 +14,14 @@
 <div
   class="border-2 border-granny-smith-apple rounded-xl flex justify-between overflow-hidden"
 >
-  {#each tabs as { label, value }}
+  {#each tabs as tab}
     <button
       class="p-4 cursor-pointer flex-1"
-      class:bg-castleton-green={selectedTab === value}
-      data-value={value}
-      on:click={onChange.bind(this, { label, value })}
+      class:bg-castleton-green={selectedTab === tab.value}
+      data-value={tab.value}
+      on:click={onChange.bind(this, tab)}
     >
-      {label}
+      {tab.label}
     </button>
   {/each}
 </div>
