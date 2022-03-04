@@ -77,7 +77,7 @@
   $: isAllUpToDate = upToDatePackages.length === entries.length;
 </script>
 
-<div class="bg-slate-900/60 rounded-xl overflow-hidden relative shadow-md p-4">
+<div class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4">
   <div
     class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between"
   >
@@ -101,7 +101,7 @@
       {/if}
     </div>
   </div>
-  <div class="min-h-[40vh]">
+  <div class="min-h-[32rem]">
     <ul class="grid">
       {#each pageEntries as { name, version, latest, isLatest }, i}
         <Dependency index={i} {name} {version} {latest} {isLatest} />

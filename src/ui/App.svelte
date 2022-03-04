@@ -80,6 +80,20 @@
 
 <Layout>
   <Bot {mood} slot="logo" />
+  <div slot="version">
+    {#if $packageQuery.data}
+      <div
+        class="bg-[#cb3837] px-6 rounded-full text-white flex items-center justify-center font-medium"
+      >
+        <div class="h-12 mr-2 pt-0.5">
+          <DiNpm />
+        </div>
+        <div>
+          {$packageQuery.data.name} - {$packageQuery.data.version}
+        </div>
+      </div>
+    {/if}
+  </div>
   <div class="w-full grid gap-4">
     {#if $packageQuery.isLoading}
       <div class="flex items-center justify-center gap-2">
@@ -89,18 +103,7 @@
         <span>Loading dependencies</span>
       </div>
     {/if}
-
     {#if $packageQuery.data}
-      <div
-        class="bg-[#cb3837] px-4 rounded-xl text-white flex items-center justify-center font-medium"
-      >
-        <div class="h-12 mr-2 pt-0.5">
-          <DiNpm />
-        </div>
-        <div>
-          {$packageQuery.data.name} - {$packageQuery.data.version}
-        </div>
-      </div>
       <Tabs
         onChange={handleTabCchange}
         {selectedTab}
