@@ -79,9 +79,7 @@
 </script>
 
 <Layout>
-  <div class="grid place-items-center h-40 w-40 mx-auto">
-    <Bot {mood} />
-  </div>
+  <Bot {mood} slot="logo" />
   <div class="w-full grid gap-4">
     {#if $packageQuery.isLoading}
       <div class="flex items-center justify-center gap-2">
