@@ -1,12 +1,12 @@
 <script lang="ts">
   import { partition, prop, range } from "ramda";
-  import GoFlame from "svelte-icons/go/GoFlame.svelte";
-  import { useMutation, useQueryClient } from "@sveltestack/svelte-query";
-  import type { Package, PackageInfo } from "domain/types";
+  import { useQueryClient } from "@sveltestack/svelte-query";
+  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
 
-  import { PAGE_SIZE, QUERIES } from "../../domain/constants";
-  import { isLatestVersion, rawVersion } from "../../lib/helpers";
-  import { useUpgradePackagesMutation } from "../../lib/hooks";
+  import type { Package, PackageInfo } from "domain/types";
+  import { PAGE_SIZE, QUERIES } from "domain/constants";
+  import { isLatestVersion, rawVersion } from "lib/helpers";
+  import { useUpgradePackagesMutation } from "lib/hooks";
 
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
@@ -81,11 +81,18 @@
   <div
     class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between"
   >
-    <div class="flex items-center">
-      {label} ({upToDatePackages.length}/{entries.length})
+    <div class="flex items-center justify-between w-full">
+      <div>
+        {label}
+        <span
+          class="text-xs tracking-wider bg-castleton-green px-2 py-1 rounded-full"
+        >
+          {upToDatePackages.length}/{entries.length}
+        </span>
+      </div>
       {#if isAllUpToDate}
         <div class="h-4 w-4 ml-1">
-          <GoFlame />
+          <FaRegCheckCircle />
         </div>
       {/if}
     </div>

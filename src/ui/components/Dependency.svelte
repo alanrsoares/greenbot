@@ -1,11 +1,11 @@
 <script lang="ts">
-  import GoFlame from "svelte-icons/go/GoFlame.svelte";
+  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
   import { useQueryClient } from "@sveltestack/svelte-query";
   import type { Package, PackageInfo } from "domain/types";
 
-  import { rawVersion } from "../../lib/helpers";
-  import { useUpgradePackagesMutation } from "../../lib/hooks";
-  import { QUERIES } from "../../domain/constants";
+  import { rawVersion } from "lib/helpers";
+  import { useUpgradePackagesMutation } from "lib/hooks";
+  import { QUERIES } from "domain/constants";
 
   import UpgradeButton from "./UpgradeButton.svelte";
 
@@ -54,16 +54,26 @@
   class="flex justify-between p-4 border-granny-smith-apple/50 text-xs"
   class:border-t={index !== 0}
 >
+  <div>
+    <a
+      href={`https://npmjs.com/package/${name}`}
+      target="_blank"
+      class="hover:underline"
+      rel="noopener roreferrer"
+    >
+      {name}
+    </a>
+  </div>
   {#if isLatest}
-    <div>{name}</div>
-    <div class="flex">
-      {version}
+    <div class="flex gap-2">
+      <div>
+        {version}
+      </div>
       <div class="h-4 w-4 ml-1">
-        <GoFlame />
+        <FaRegCheckCircle />
       </div>
     </div>
   {:else}
-    <div>{name}</div>
     <UpgradeButton
       disabled={$upgradePackagesMutation.isLoading && isLoading}
       isLoading={$upgradePackagesMutation.isLoading && isLoading}

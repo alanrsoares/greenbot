@@ -1,17 +1,17 @@
 <script lang="ts">
-  import DiNpm from "svelte-icons/di/DiNpm.svelte";
   import FaSpinner from "svelte-icons/fa/FaSpinner.svelte";
   import type { UseQueryResult } from "@sveltestack/svelte-query";
 
   import type { Package, TabKind } from "domain/types";
 
-  import { usePackageQuery } from "../lib/hooks";
-  import { isLatestVersion } from "../lib/helpers";
+  import { usePackageQuery } from "lib/hooks";
+  import { isLatestVersion } from "lib/helpers";
 
-  import Dependencies from "./components/Dependencies.svelte";
-  import Bot, { type Mood } from "./components/Bot.svelte";
-  import Layout from "./components/Layout.svelte";
-  import Tabs, { type TabItem } from "./components/Tabs.svelte";
+  import Dependencies from "ui/components/Dependencies.svelte";
+  import Bot, { type Mood } from "ui/components/Bot.svelte";
+  import Layout from "ui/components/Layout.svelte";
+  import Tabs, { type TabItem } from "ui/components/Tabs.svelte";
+  import NPMBadge from "ui/components/NPMBadge.svelte";
 
   let selectedTab: TabKind = "dependencies";
 
@@ -82,16 +82,10 @@
   <Bot {mood} slot="logo" />
   <div slot="version">
     {#if $packageQuery.data}
-      <div
-        class="bg-[#cb3837] px-6 rounded-full text-white flex items-center justify-center font-medium"
-      >
-        <div class="h-12 mr-2 pt-0.5">
-          <DiNpm />
-        </div>
-        <div>
-          {$packageQuery.data.name} - {$packageQuery.data.version}
-        </div>
-      </div>
+      <NPMBadge
+        name={$packageQuery.data.name}
+        version={$packageQuery.data.version}
+      />
     {/if}
   </div>
   <div class="w-full grid gap-4">
@@ -109,7 +103,7 @@
         {selectedTab}
         tabs={[
           { value: "dependencies", label: "Dependencies" },
-          { value: "devDependencies", label: "Dev Deoendencies" },
+          { value: "devDependencies", label: "Dev Dependencies" },
         ]}
       />
       <Dependencies
