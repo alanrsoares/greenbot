@@ -16,6 +16,7 @@ const config = {
         "granny-smith-apple-2": "#8cd790",
         "green-sheen": "#77af9c",
         "castleton-green": "#285943",
+        npm: "#cb3837",
       },
     },
   },

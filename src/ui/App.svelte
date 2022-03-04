@@ -1,5 +1,4 @@
 <script lang="ts">
-  import FaSpinner from "svelte-icons/fa/FaSpinner.svelte";
   import type { UseQueryResult } from "@sveltestack/svelte-query";
 
   import type { Package, TabKind } from "domain/types";
@@ -12,6 +11,7 @@
   import Layout from "ui/components/Layout.svelte";
   import Tabs, { type TabItem } from "ui/components/Tabs.svelte";
   import NPMBadge from "ui/components/NPMBadge.svelte";
+  import Spinner from "./components/Spinner.svelte";
 
   let selectedTab: TabKind = "dependencies";
 
@@ -90,9 +90,11 @@
   </div>
   <div class="w-full grid gap-4">
     {#if $packageQuery.isLoading}
-      <div class="flex items-center justify-center gap-2">
-        <div class="h-4 w-4 animate-spin">
-          <FaSpinner />
+      <div
+        class="border-2 border-slate-900 bg-slate-900/60  rounded-3xl flex justify-center items-center overflow-hidden p-8  gap-2"
+      >
+        <div class="h-4 w-4">
+          <Spinner animated />
         </div>
         <span>Loading dependencies</span>
       </div>

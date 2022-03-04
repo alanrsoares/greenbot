@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { partition, prop, range } from "ramda";
+  import { partition, prop } from "ramda";
   import { useQueryClient } from "@sveltestack/svelte-query";
   import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
 
@@ -10,29 +10,16 @@
 
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
+  import Pagination from "./Pagination.svelte";
 
   export let label = "";
   export let entries: PackageInfo[] = [];
 
   let pageIndex = 0;
 
-  $: pages = entries.length / PAGE_SIZE;
+  $: pages = Math.ceil(entries.length / PAGE_SIZE);
 
   const upgradePackagesMutation = useUpgradePackagesMutation();
-
-  function handlePageClick(e: MouseEvent) {
-    const { page } = (e.target as HTMLLIElement).dataset;
-
-    pageIndex = Number(page);
-  }
-
-  function handleNextPageClick() {
-    if (pageIndex < pages - 1) pageIndex++;
-  }
-
-  function handlePreviousPageClick() {
-    if (pageIndex > 0) pageIndex--;
-  }
 
   const queryClient = useQueryClient();
 
@@ -77,7 +64,9 @@
   $: isAllUpToDate = upToDatePackages.length === entries.length;
 </script>
 
-<div class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4">
+<div
+  class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 px-6"
+>
   <div
     class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between"
   >
@@ -115,33 +104,7 @@
       {/each}
     </ul>
   </div>
-  <div class="flex justify-center border-t border-granny-smith-apple/50">
-    <ul class="inline-flex mx-auto font-medium p-4">
-      <li
-        role="button"
-        class="flex justify-between p-4 px-6"
-        on:click={handlePreviousPageClick}
-      >
-        ◄
-      </li>
-      {#each range(0, pages) as index}
-        <li
-          role="button"
-          data-page={index}
-          on:click={handlePageClick}
-          class="flex justify-between p-4 px-6 rounded-xl text-xl"
-          class:bg-castleton-green={index === pageIndex}
-        >
-          {index + 1}
-        </li>
-      {/each}
-      <li
-        role="button"
-        class="flex justify-between p-4 px-6"
-        on:click={handleNextPageClick}
-      >
-        ►
-      </li>
-    </ul>
+  <div class="grid place-items-center border-t border-granny-smith-apple/50">
+    <Pagination {pages} bind:pageIndex />
   </div>
 </div>

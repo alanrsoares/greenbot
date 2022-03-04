@@ -4,11 +4,7 @@
   export let version = "";
 </script>
 
-<a
-  target="_blank"
-  class="bg-[#cb3837] px-6 rounded-full text-white flex items-center justify-center gap-2"
-  href={`https://www.npmjs.com/package/${name}`}
->
+<a target="_blank" href={`https://www.npmjs.com/package/${name}`}>
   <div class="h-10">
     <FaNpm />
   </div>
@@ -16,3 +12,10 @@
     {name} @ {version}
   </div>
 </a>
+
+<style lang="postcss">
+  a {
+    @apply bg-npm px-6 rounded-full text-white flex items-center justify-center gap-2 outline-none;
+    @apply focus:ring-4 ring-npm/50;
+  }
+</style>
