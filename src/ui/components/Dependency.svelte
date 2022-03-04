@@ -3,10 +3,11 @@
   import { useQueryClient } from "@sveltestack/svelte-query";
   import type { Package, PackageInfo } from "domain/types";
 
-  import { rawVersion } from "../lib/helpers";
-  import { useUpgradePackagesMutation } from "../lib/hooks";
-  import { QUERIES } from "../domain/constants";
-  import UpgradeButton from "./components/UpgradeButton.svelte";
+  import { rawVersion } from "../../lib/helpers";
+  import { useUpgradePackagesMutation } from "../../lib/hooks";
+  import { QUERIES } from "../../domain/constants";
+
+  import UpgradeButton from "./UpgradeButton.svelte";
 
   export let name = "";
   export let version = "";
@@ -50,7 +51,7 @@
 </script>
 
 <li
-  class="flex justify-between p-4 border-granny-smith-apple text-xs"
+  class="flex justify-between p-4 border-granny-smith-apple/50 text-xs"
   class:border-t={index !== 0}
 >
   {#if isLatest}

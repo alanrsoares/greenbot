@@ -8,9 +8,9 @@
   import { usePackageQuery } from "../lib/hooks";
   import { isLatestVersion } from "../lib/helpers";
 
-  import Dependencies from "./Dependencies.svelte";
+  import Dependencies from "./components/Dependencies.svelte";
   import Bot, { type Mood } from "./components/Bot.svelte";
-  import Layout from "./Layout.svelte";
+  import Layout from "./components/Layout.svelte";
   import Tabs, { type TabItem } from "./components/Tabs.svelte";
 
   let selectedTab: TabKind = "dependencies";
