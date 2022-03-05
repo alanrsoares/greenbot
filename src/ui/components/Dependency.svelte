@@ -7,7 +7,7 @@
   import FaNpm from "svelte-icons/fa/FaNpm.svelte";
   import FaBug from "svelte-icons/fa/FaBug.svelte";
 
-  import { useQueryClient } from "@sveltestack/svelte-query";
+  import { useQuery, useQueryClient } from "@sveltestack/svelte-query";
   import type { Package, PackageInfo } from "domain/types";
 
   import { ellipsis, rawVersion } from "lib/helpers";
@@ -74,6 +74,13 @@
       expandedRowIndex = -1;
     }
   }
+
+  const bundlephobiaQuery = useQuery(["bundlephobia", name], async () => {
+    const response = await fetch(
+      `https://bundlephobia.com/api/size?package=${name}&record=true`
+    );
+    return await response.json();
+  });
 
   onMount(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -144,12 +151,26 @@
           <div class="text-granny-smith-apple/90 italic">
             "{meta.description}"
           </div>
+
           {#if meta.author}
             <div class="text-granny-smith-apple flex items-center gap-2">
               <span>Authored by</span>
               <span class="font-semibold">
                 {meta.author.name}
               </span>
+            </div>
+          {/if}
+
+          {#if $bundlephobiaQuery.data}
+            <div>
+              Bundle size
+              <span class="font-semibold">
+                {($bundlephobiaQuery.data.gzip / 1024).toFixed(1)}kb
+              </span>
+              (gzipped) |
+              <span class="font-semibold">
+                {($bundlephobiaQuery.data.size / 1024).toFixed(1)}kb
+              </span> (uncompressed)
             </div>
           {/if}
         </div>
