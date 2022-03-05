@@ -16,7 +16,7 @@
       <slot name="version" />
     </nav>
   </header>
-  <main class="layout-content">
+  <main class="layout-main">
     <slot />
   </main>
   <footer>
@@ -30,7 +30,7 @@
   .layout {
     @apply min-h-screen text-granny-smith-apple;
   }
-  .layout-content {
+  .layout-main {
     @apply grid place-items-center py-12 w-full max-w-xl mx-auto;
   }
 </style>

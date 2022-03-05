@@ -116,15 +116,31 @@
       expandedRowIndex = -1;
     }
   }
+
+  $: {
+    if (searchTerm) {
+      // reset pageIndex on searchTerm change
+      pageIndex = 0;
+      expandedRowIndex = -1;
+    }
+  }
 </script>
 
 <section
-  class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 px-6"
+  class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2"
 >
-  <div
-    class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between"
+  <div class="">
+    <input
+      type="text"
+      class="w-full p-4 text-sm text-white bg-slate-800/50 rounded-xl outline-none focus:ring-4 ring-castleton-green/60"
+      placeholder="package name or version"
+      bind:value={searchTerm}
+    />
+  </div>
+  <header
+    class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2"
   >
-    <header class="flex items-center justify-between w-full">
+    <div class="flex items-center justify-between w-full">
       <div>
         {label}
         <span
@@ -138,7 +154,7 @@
           <FaRegCheckCircle />
         </div>
       {/if}
-    </header>
+    </div>
     <div>
       {#if !isAllUpToDate}
         <UpgradeButton
@@ -150,8 +166,8 @@
         </UpgradeButton>
       {/if}
     </div>
-  </div>
-  <main class="min-h-[32rem]">
+  </header>
+  <main class="min-h-[32rem] mx-2">
     <ul class="grid">
       {#each pageEntries as { name, version, latest, isLatest, meta }, index}
         <Dependency
@@ -167,10 +183,10 @@
     </ul>
   </main>
   {#if pages > 1}
-    <footer
-      class="grid place-items-center border-t border-granny-smith-apple/50"
-    >
-      <Pagination {pages} bind:pageIndex />
+    <footer class="grid place-items-center">
+      <div class="bg-slate-900/90 rounded-full">
+        <Pagination {pages} bind:pageIndex />
+      </div>
     </footer>
   {/if}
 </section>

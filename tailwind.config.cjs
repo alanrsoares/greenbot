@@ -24,8 +24,8 @@ const config = {
       keyframes: {
         fadeIn: {
           "0%": {
-            opacity: 0.05,
-            transform: "translateX(-100%)",
+            opacity: 0,
+            transform: "translateX(-25%)",
           },
           "100%": {
             opacity: 1,

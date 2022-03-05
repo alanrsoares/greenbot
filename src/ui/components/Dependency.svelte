@@ -107,7 +107,7 @@
     class:expanded={isExpanded}
     class="transition-[transform,background] duration-300 ease-in-out"
   >
-    <div class="flex justify-between p-4">
+    <div class="flex justify-between p-4 py-2 items-center">
       <div>
         <a
           href={`https://npmjs.com/package/${name}`}
@@ -144,14 +144,13 @@
     </div>
 
     {#if isExpanded}
+      <div class="text-granny-smith-apple/90 max-w-md p-4 py-2 font-medium">
+        {meta.description}
+      </div>
       <div
-        class="px-2 py-4 flex justify-between items-center border-t mx-2 border-granny-smith-apple/60"
+        class="px-2 pt-2 py-4 flex justify-between items-center border-t mx-2 border-granny-smith-apple/60"
       >
         <div class="grid gap-2">
-          <div class="text-granny-smith-apple/90 italic">
-            "{meta.description}"
-          </div>
-
           {#if meta.author}
             <div class="text-granny-smith-apple flex items-center gap-2">
               <span>Authored by</span>
