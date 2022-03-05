@@ -1,5 +1,9 @@
 <script lang="ts">
+  import type { FullMetadata } from "package-json";
   import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
+  import FaGithub from "svelte-icons/fa/FaGithub.svelte";
+  import FaRegUser from "svelte-icons/fa/FaRegUser.svelte";
+
   import { useQueryClient } from "@sveltestack/svelte-query";
   import type { Package, PackageInfo } from "domain/types";
 
@@ -8,12 +12,15 @@
   import { QUERIES } from "domain/constants";
 
   import UpgradeButton from "./UpgradeButton.svelte";
+  import FaNpm from "svelte-icons/fa/FaNpm.svelte";
 
   export let name = "";
   export let version = "";
   export let latest = "";
   export let index = 0;
   export let isLatest = false;
+  export let meta: FullMetadata;
+  export let expandedRowIndex = -1;
 
   let isLoading = false;
 
@@ -48,38 +55,106 @@
       console.log("Failed to upgrade packages:", { originalError: error });
     }
   }
+
+  function handleToggleExpandedRow() {
+    if (expandedRowIndex === index) {
+      expandedRowIndex = -1;
+    } else {
+      expandedRowIndex = index;
+    }
+  }
+
+  $: isExpanded = expandedRowIndex === index;
 </script>
 
 <li
-  class="flex justify-between p-4 border-granny-smith-apple/50 text-xs"
   class:border-t={index !== 0}
+  class:expanded={isExpanded}
+  role="button"
+  on:click={handleToggleExpandedRow}
 >
-  <div>
-    <a
-      href={`https://npmjs.com/package/${name}`}
-      target="_blank"
-      class="hover:underline"
-      rel="noopener roreferrer"
-    >
-      {name}
-    </a>
-  </div>
-  {#if isLatest}
-    <div class="flex gap-2">
-      <div>
-        {version}
+  <div class="flex justify-between p-4">
+    <div>
+      <a
+        href={`https://npmjs.com/package/${name}`}
+        target="_blank"
+        class="hover:underline font-semibold"
+        class:text-base={isExpanded}
+        rel="noopener roreferrer"
+      >
+        {name}
+      </a>
+    </div>
+    {#if isLatest}
+      <div class="flex gap-2">
+        <div>
+          {version}
+        </div>
+        <div class="h-4 w-4 ml-1">
+          <FaRegCheckCircle />
+        </div>
       </div>
-      <div class="h-4 w-4 ml-1">
-        <FaRegCheckCircle />
+    {:else}
+      <UpgradeButton
+        disabled={$upgradePackagesMutation.isLoading && isLoading}
+        isLoading={$upgradePackagesMutation.isLoading && isLoading}
+        on:click={() =>
+          handleUpgradePackages([{ name, version, latest, meta }])}
+      >
+        {version} &rArr; {latest}
+      </UpgradeButton>
+    {/if}
+  </div>
+
+  {#if isExpanded}
+    <div class="p-4 pt-0 flex justify-between items-center">
+      <div class="grid gap-2">
+        <div class="text-granny-smith-apple/90 italic">
+          "{meta.description}"
+        </div>
+        {#if meta.author}
+          <div class="text-granny-smith-apple flex items-center gap-2">
+            <div class="h-4">
+              <FaRegUser />
+            </div>
+            {meta.author.name}
+          </div>
+        {/if}
+      </div>
+      <div class="flex gap-2 items-center">
+        <div class="h-8">
+          <a
+            href={`https://npmjs.com/package/${name}`}
+            target="_blank"
+            class="hover:underline"
+            rel="noopener roreferrer"
+          >
+            <FaNpm />
+          </a>
+        </div>
+        {#if meta.repository}
+          <div class="h-6">
+            <a
+              href={meta.repository.url.replace(/^git\+/, "")}
+              target="_blank"
+              class="hover:underline"
+              rel="noopener roreferrer"
+            >
+              <FaGithub />
+            </a>
+          </div>
+        {/if}
       </div>
     </div>
-  {:else}
-    <UpgradeButton
-      disabled={$upgradePackagesMutation.isLoading && isLoading}
-      isLoading={$upgradePackagesMutation.isLoading && isLoading}
-      on:click={() => handleUpgradePackages([{ name, version, latest }])}
-    >
-      {version} &rArr; {latest}
-    </UpgradeButton>
   {/if}
 </li>
+
+<style lang="postcss">
+  li {
+    @apply border-granny-smith-apple/50 text-xs transition-all;
+    @apply hover:text-opacity-80;
+  }
+  .expanded {
+    @apply bg-castleton-green rounded-2xl scale-105 border-none;
+  }
+</style>

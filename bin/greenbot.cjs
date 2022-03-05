@@ -9,6 +9,7 @@ const replaceInFile = require("replace-in-file");
 const chalk = require("chalk");
 const open = require("open");
 const fs = require("fs/promises");
+const { indexBy, prop } = require("ramda");
 
 const { version } = require("../package.json");
 
@@ -51,19 +52,19 @@ const STATIC = path.resolve(__dirname, "..", "dist");
 /**
  * @param name {string}
  * @param version {string}
- * @returns {Promise<{name:string; version: string; latest: string}>}
+ * @returns {Promise<{name:string; version: string; latest: string, meta: import("package-json").FullMetadata}>}
  */
-const fetchLatestVersion = async (name, version) => {
+const fetchNPMPackageMeta = async (name, version = "latest") => {
   try {
-    const { version: latest } = await packageJson(
-      name,
-      version ? { version } : undefined
-    );
+    const options = { version, fullMetadata: true };
+
+    const { version: latest, ...meta } = await packageJson(name, options);
 
     return {
       name,
       version,
       latest,
+      meta,
     };
   } catch (error) {
     console.log(
@@ -124,13 +125,13 @@ app
   .use(express.static(STATIC))
   .get("/info/:name/:version?", async (req, res) => {
     const { name, version } = req.params;
-    const result = await fetchLatestVersion(name, version);
+    const result = await fetchNPMPackageMeta(name, version);
 
     res.json(result);
   })
   .get("/info/:namespace/:name/:version?", async (req, res) => {
     const { namespace, name, version } = req.params;
-    const result = await fetchLatestVersion(`${namespace}/${name}`, version);
+    const result = await fetchNPMPackageMeta(`${namespace}/${name}`, version);
 
     res.json(result);
   })
@@ -145,7 +146,7 @@ app
     const allEntries = [...dependencyEntries, ...devDependencyEntries];
 
     const promises = allEntries.map(([packageName, version]) =>
-      fetchLatestVersion(packageName, version)
+      fetchNPMPackageMeta(packageName, version)
     );
 
     const resolved = await Promise.all(promises);
@@ -153,6 +154,7 @@ app
     res.json({
       ...response,
       resolutions: indexEntries(resolved),
+      meta: indexBy(prop("name"), resolved.map(prop("meta"))),
     });
   })
   .post("/upgrade", async (req, res) => {

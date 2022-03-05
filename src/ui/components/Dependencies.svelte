@@ -11,11 +11,13 @@
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
   import Pagination from "./Pagination.svelte";
+  import type { FullMetadata } from "package-json";
 
   export let label = "";
   export let entries: PackageInfo[] = [];
 
   let pageIndex = 0;
+  let expandedRowIndex = -1;
 
   $: pages = Math.ceil(entries.length / PAGE_SIZE);
 
@@ -99,8 +101,16 @@
   </div>
   <div class="min-h-[32rem]">
     <ul class="grid">
-      {#each pageEntries as { name, version, latest, isLatest }, i}
-        <Dependency index={i} {name} {version} {latest} {isLatest} />
+      {#each pageEntries as { name, version, latest, isLatest, meta }, index}
+        <Dependency
+          {index}
+          {name}
+          {version}
+          {latest}
+          {isLatest}
+          {meta}
+          bind:expandedRowIndex
+        />
       {/each}
     </ul>
   </div>

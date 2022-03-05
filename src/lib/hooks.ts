@@ -4,8 +4,9 @@ import {
   type UseMutationOptions,
 } from "@sveltestack/svelte-query";
 
-import { QUERIES } from "../domain/constants";
-import type { PackageInfo } from "../domain/types";
+import { QUERIES } from "domain/constants";
+import type { PackageInfo } from "domain/types";
+
 import * as api from "./api";
 
 export const useUpgradePackagesMutation = (

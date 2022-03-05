@@ -12,6 +12,7 @@
   import Tabs, { type TabItem } from "ui/components/Tabs.svelte";
   import NPMBadge from "ui/components/NPMBadge.svelte";
   import Spinner from "./components/Spinner.svelte";
+  import type { FullMetadata } from "package-json";
 
   let selectedTab: TabKind = "dependencies";
 
@@ -28,9 +29,10 @@
 
   function toPackageInfo(
     [name, version]: [string, string],
-    resolutions: Record<string, string>
+    resolutions: Record<string, string>,
+    meta: Record<string, FullMetadata>
   ) {
-    return { name, version, latest: resolutions[name] };
+    return { name, version, latest: resolutions[name], meta: meta[name] };
   }
 
   function getCurrentMood(result?: UseQueryResult<Package, unknown>): Mood {
@@ -74,7 +76,7 @@
         );
 
   $: entries = tabEntries.map((pair) =>
-    toPackageInfo(pair, $packageQuery.data.resolutions)
+    toPackageInfo(pair, $packageQuery.data.resolutions, $packageQuery.data.meta)
   );
 </script>
 
@@ -113,6 +115,7 @@
           ? "Dev Dependencies"
           : "Dependencies"}
         {entries}
+        meta={$packageQuery.data.meta}
       />
     {/if}
   </div>
