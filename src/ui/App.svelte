@@ -115,7 +115,6 @@
           ? "Dev Dependencies"
           : "Dependencies"}
         {entries}
-        meta={$packageQuery.data.meta}
       />
     {/if}
   </div>
