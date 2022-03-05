@@ -19,12 +19,12 @@ const config = {
         npm: "#cb3837",
       },
       animation: {
-        fadeIn: "fadeIn 1s ease-in-out forwards",
+        fadeIn: "fadeIn .66s ease-in-out forwards",
       },
       keyframes: {
         fadeIn: {
           "0%": {
-            opacity: 0.1,
+            opacity: 0.05,
             transform: "translateX(-100%)",
           },
           "100%": {

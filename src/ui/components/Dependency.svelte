@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { onDestroy, onMount } from "svelte";
   import type { FullMetadata } from "package-json";
   import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
   import FaGithub from "svelte-icons/fa/FaGithub.svelte";
-  import FaRegUser from "svelte-icons/fa/FaRegUser.svelte";
+  import FaGlobe from "svelte-icons/fa/FaGlobe.svelte";
+  import FaNpm from "svelte-icons/fa/FaNpm.svelte";
+  import FaBug from "svelte-icons/fa/FaBug.svelte";
 
   import { useQueryClient } from "@sveltestack/svelte-query";
   import type { Package, PackageInfo } from "domain/types";
@@ -12,8 +15,6 @@
   import { QUERIES } from "domain/constants";
 
   import UpgradeButton from "./UpgradeButton.svelte";
-  import FaNpm from "svelte-icons/fa/FaNpm.svelte";
-  import { repeat } from "ramda";
 
   export let name = "";
   export let version = "";
@@ -68,89 +69,131 @@
   const MAX_LENGTH = 40;
   const STAGGER_TIME = 1 / 30; // 30fps
 
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === "Escape") {
+      expandedRowIndex = -1;
+    }
+  }
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
+
   $: isExpanded = expandedRowIndex === index;
+  $: isBlurred = !isExpanded && expandedRowIndex !== -1;
 </script>
 
 <li
   role="button"
-  class="animate-fadeIn opacity-0"
-  class:border-t={index !== 0}
-  class:expanded={isExpanded}
+  class="animate-fadeIn transition-opacity"
   on:click={handleToggleExpandedRow}
-  style={`animation-delay: ${(index + 1) * STAGGER_TIME}s;`}
+  class:border-t={index !== 0}
+  style={`animation-delay: ${(index + 1) * STAGGER_TIME}s; opacity: ${
+    isBlurred ? 0.4 : 1
+  }!important;`}
 >
-  <div class="flex justify-between p-4">
-    <a
-      href={`https://npmjs.com/package/${name}`}
-      target="_blank"
-      class="hover:underline font-semibold whitespace-nowrap"
-      class:text-base={isExpanded}
-      rel="noopener roreferrer"
-    >
-      {ellipsis(MAX_LENGTH, name)}
-    </a>
-    {#if isLatest}
-      <div class="flex gap-2 min-w-[6rem] justify-end">
-        <div>
-          {version}
+  <div class:expanded={isExpanded} class="transition-all">
+    <div class="flex justify-between p-4">
+      <div>
+        <a
+          href={`https://npmjs.com/package/${name}`}
+          target="_blank"
+          class="hover:underline font-semibold whitespace-nowrap flex items-center gap-2"
+          class:text-base={isExpanded}
+          rel="noopener roreferrer"
+        >
+          <div class:hidden={!isExpanded} class="h-8">
+            <FaNpm />
+          </div>
+          {ellipsis(MAX_LENGTH, name)}
+        </a>
+      </div>
+      {#if isLatest}
+        <div class="flex gap-2 min-w-[6rem] justify-end">
+          <div>
+            {version}
+          </div>
+          <div class="h-4 w-4 ml-1">
+            <FaRegCheckCircle />
+          </div>
         </div>
-        <div class="h-4 w-4 ml-1">
-          <FaRegCheckCircle />
+      {:else}
+        <UpgradeButton
+          disabled={$upgradePackagesMutation.isLoading && isLoading}
+          isLoading={$upgradePackagesMutation.isLoading && isLoading}
+          on:click={() =>
+            handleUpgradePackages([{ name, version, latest, meta }])}
+        >
+          {version} &rArr; {latest}
+        </UpgradeButton>
+      {/if}
+    </div>
+
+    {#if isExpanded}
+      <div
+        class="px-2 py-4 flex justify-between items-center border-t mx-2 border-granny-smith-apple/60"
+      >
+        <div class="grid gap-2">
+          <div class="text-granny-smith-apple/90 italic">
+            "{meta.description}"
+          </div>
+          {#if meta.author}
+            <div class="text-granny-smith-apple flex items-center gap-2">
+              <span>Authored by</span>
+              <span class="font-semibold">
+                {meta.author.name}
+              </span>
+            </div>
+          {/if}
+        </div>
+        <div class="flex gap-2 items-center">
+          {#if meta.repository?.url}
+            <div class="h-5">
+              <a
+                href={meta.repository.url.replace(/^git\+/, "")}
+                target="_blank"
+                class="hover:underline"
+                rel="noopener roreferrer"
+                title="Github"
+              >
+                <FaGithub />
+              </a>
+            </div>
+          {/if}
+          {#if meta.homepage}
+            <div class="h-5">
+              <a
+                href={meta.homepage}
+                target="_blank"
+                class="hover:underline"
+                rel="noopener roreferrer"
+                title="Homepage"
+              >
+                <FaGlobe />
+              </a>
+            </div>
+          {/if}
+          {#if meta.bugs}
+            <div class="h-5">
+              <a
+                href={meta.bugs.url}
+                target="_blank"
+                class="hover:underline"
+                rel="noopener roreferrer"
+                title="Bugs"
+              >
+                <FaBug />
+              </a>
+            </div>
+          {/if}
         </div>
       </div>
-    {:else}
-      <UpgradeButton
-        disabled={$upgradePackagesMutation.isLoading && isLoading}
-        isLoading={$upgradePackagesMutation.isLoading && isLoading}
-        on:click={() =>
-          handleUpgradePackages([{ name, version, latest, meta }])}
-      >
-        {version} &rArr; {latest}
-      </UpgradeButton>
     {/if}
   </div>
-
-  {#if isExpanded}
-    <div class="p-4 pt-0 flex justify-between items-center">
-      <div class="grid gap-2">
-        <div class="text-granny-smith-apple/90 italic">
-          "{meta.description}"
-        </div>
-        {#if meta.author}
-          <div class="text-granny-smith-apple flex items-center gap-2">
-            <div class="h-4">
-              <FaRegUser />
-            </div>
-            {meta.author.name}
-          </div>
-        {/if}
-      </div>
-      <div class="flex gap-2 items-center">
-        <div class="h-8">
-          <a
-            href={`https://npmjs.com/package/${name}`}
-            target="_blank"
-            class="hover:underline"
-            rel="noopener roreferrer"
-          >
-            <FaNpm />
-          </a>
-        </div>
-        {#if meta.repository}
-          <div class="h-6">
-            <a
-              href={meta.repository.url.replace(/^git\+/, "")}
-              target="_blank"
-              class="hover:underline"
-              rel="noopener roreferrer"
-            >
-              <FaGithub />
-            </a>
-          </div>
-        {/if}
-      </div>
-    </div>
-  {/if}
 </li>
 
 <style lang="postcss">
@@ -159,6 +202,6 @@
     @apply hover:text-opacity-80;
   }
   .expanded {
-    @apply bg-castleton-green rounded-2xl scale-105 border-none;
+    @apply bg-castleton-green rounded-2xl scale-105;
   }
 </style>

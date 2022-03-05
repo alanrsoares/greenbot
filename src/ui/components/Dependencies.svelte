@@ -11,6 +11,7 @@
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
   import Pagination from "./Pagination.svelte";
+  import { onDestroy, onMount } from "svelte";
 
   export let label = "";
   export let entries: PackageInfo[] = [];
@@ -44,6 +45,45 @@
     }
   }
 
+  function handleKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "ArrowUp":
+        if (expandedRowIndex > 0) {
+          expandedRowIndex--;
+        } else {
+          expandedRowIndex = pageEntries.length - 1;
+        }
+        break;
+      case "ArrowDown":
+        if (expandedRowIndex < pageEntries.length - 1) {
+          expandedRowIndex++;
+        } else {
+          expandedRowIndex = 0;
+        }
+        break;
+      case "ArrowLeft":
+        if (pageIndex > 0) {
+          pageIndex--;
+          expandedRowIndex = -1;
+        }
+        break;
+      case "ArrowRight":
+        if (pageIndex < pages - 1) {
+          pageIndex++;
+          expandedRowIndex = -1;
+        }
+        break;
+    }
+  }
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
+
   $: filteredEntries = entries.filter(
     ({ name, version }) =>
       name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,6 +113,7 @@
     if (label) {
       // reset pageIndex on label change
       pageIndex = 0;
+      expandedRowIndex = -1;
     }
   }
 </script>
