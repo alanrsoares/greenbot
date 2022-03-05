@@ -122,26 +122,29 @@
           {ellipsis(MAX_LENGTH, name)}
         </a>
       </div>
-      <div class="grid place-items-end gap-2 justify-end">
+      <div class="grid place-items-end gap-2 items-center">
         {#if isLatest}
-          <div>
-            {version}
-          </div>
-          <div class="h-4 w-4 ml-1">
-            <FaRegCheckCircle />
+          <div class="flex items-center gap-2 justify-end py-2">
+            <div>
+              {version}
+            </div>
+            <div class="h-4 w-4 ml-1">
+              <FaRegCheckCircle />
+            </div>
           </div>
         {:else}
-          <UpgradeButton
-            disabled={$upgradePackagesMutation.isLoading && isLoading}
-            isLoading={$upgradePackagesMutation.isLoading && isLoading}
-            on:click={() =>
-              handleUpgradePackages([{ name, version, latest, meta }])}
-          >
-            {version} &rArr; {latest}
-          </UpgradeButton>
+          <div class="py-1">
+            <UpgradeButton
+              disabled={$upgradePackagesMutation.isLoading && isLoading}
+              isLoading={$upgradePackagesMutation.isLoading && isLoading}
+              on:click={() =>
+                handleUpgradePackages([{ name, version, latest, meta }])}
+            >
+              {version} &rArr; {latest}
+            </UpgradeButton>
+          </div>
         {/if}
-        {meta["dist-tags"]}
-        {meta.license}
+        {meta.license ?? ""}
       </div>
     </div>
 
@@ -227,6 +230,6 @@
     @apply hover:text-opacity-80;
   }
   .expanded {
-    @apply bg-castleton-green rounded-2xl scale-105 shadow-lg;
+    @apply bg-castleton-green rounded-3xl scale-105 shadow-lg;
   }
 </style>
