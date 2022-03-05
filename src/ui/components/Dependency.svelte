@@ -7,12 +7,13 @@
   import { useQueryClient } from "@sveltestack/svelte-query";
   import type { Package, PackageInfo } from "domain/types";
 
-  import { rawVersion } from "lib/helpers";
+  import { ellipsis, rawVersion } from "lib/helpers";
   import { useUpgradePackagesMutation } from "lib/hooks";
   import { QUERIES } from "domain/constants";
 
   import UpgradeButton from "./UpgradeButton.svelte";
   import FaNpm from "svelte-icons/fa/FaNpm.svelte";
+  import { repeat } from "ramda";
 
   export let name = "";
   export let version = "";
@@ -64,29 +65,32 @@
     }
   }
 
+  const MAX_LENGTH = 40;
+  const STAGGER_TIME = 1 / 30; // 30fps
+
   $: isExpanded = expandedRowIndex === index;
 </script>
 
 <li
+  role="button"
+  class="animate-fadeIn opacity-0"
   class:border-t={index !== 0}
   class:expanded={isExpanded}
-  role="button"
   on:click={handleToggleExpandedRow}
+  style={`animation-delay: ${(index + 1) * STAGGER_TIME}s;`}
 >
   <div class="flex justify-between p-4">
-    <div>
-      <a
-        href={`https://npmjs.com/package/${name}`}
-        target="_blank"
-        class="hover:underline font-semibold"
-        class:text-base={isExpanded}
-        rel="noopener roreferrer"
-      >
-        {name}
-      </a>
-    </div>
+    <a
+      href={`https://npmjs.com/package/${name}`}
+      target="_blank"
+      class="hover:underline font-semibold whitespace-nowrap"
+      class:text-base={isExpanded}
+      rel="noopener roreferrer"
+    >
+      {ellipsis(MAX_LENGTH, name)}
+    </a>
     {#if isLatest}
-      <div class="flex gap-2">
+      <div class="flex gap-2 min-w-[6rem] justify-end">
         <div>
           {version}
         </div>

@@ -7,7 +7,7 @@
 
 <template>
   <button
-    class="flex items-center rounded-full p-1 focus:ring bg-granny-smith-apple text-castleton-green -mr-1"
+    class="flex items-center rounded-full p-1 focus:ring bg-granny-smith-apple text-castleton-green -mr-1 whitespace-nowrap"
     on:click
     class:opacity-90={isLoading}
     class:opacity-70={disabled}

@@ -18,6 +18,21 @@ const config = {
         "castleton-green": "#285943",
         npm: "#cb3837",
       },
+      animation: {
+        fadeIn: "fadeIn 1s ease-in-out forwards",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": {
+            opacity: 0.1,
+            transform: "translateX(-100%)",
+          },
+          "100%": {
+            opacity: 1,
+            transform: "translateX(0)",
+          },
+        },
+      },
     },
   },
   plugins: [],

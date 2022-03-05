@@ -11,15 +11,13 @@
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
   import Pagination from "./Pagination.svelte";
-  import type { FullMetadata } from "package-json";
 
   export let label = "";
   export let entries: PackageInfo[] = [];
 
   let pageIndex = 0;
   let expandedRowIndex = -1;
-
-  $: pages = Math.ceil(entries.length / PAGE_SIZE);
+  let searchTerm = "";
 
   const upgradePackagesMutation = useUpgradePackagesMutation();
 
@@ -46,7 +44,13 @@
     }
   }
 
-  $: displayEntries = entries
+  $: filteredEntries = entries.filter(
+    ({ name, version }) =>
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      version.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  $: pages = Math.ceil(filteredEntries.length / PAGE_SIZE);
+  $: displayEntries = filteredEntries
     .map((x) => ({
       ...x,
       isLatest: isLatestVersion(x.version, x.latest),
@@ -64,15 +68,22 @@
     displayEntries
   );
   $: isAllUpToDate = upToDatePackages.length === entries.length;
+
+  $: {
+    if (label) {
+      // reset pageIndex on label change
+      pageIndex = 0;
+    }
+  }
 </script>
 
-<div
+<section
   class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 px-6"
 >
   <div
     class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between"
   >
-    <div class="flex items-center justify-between w-full">
+    <header class="flex items-center justify-between w-full">
       <div>
         {label}
         <span
@@ -86,7 +97,7 @@
           <FaRegCheckCircle />
         </div>
       {/if}
-    </div>
+    </header>
     <div>
       {#if !isAllUpToDate}
         <UpgradeButton
@@ -99,7 +110,7 @@
       {/if}
     </div>
   </div>
-  <div class="min-h-[32rem]">
+  <main class="min-h-[32rem]">
     <ul class="grid">
       {#each pageEntries as { name, version, latest, isLatest, meta }, index}
         <Dependency
@@ -113,8 +124,12 @@
         />
       {/each}
     </ul>
-  </div>
-  <div class="grid place-items-center border-t border-granny-smith-apple/50">
-    <Pagination {pages} bind:pageIndex />
-  </div>
-</div>
+  </main>
+  {#if pages > 1}
+    <footer
+      class="grid place-items-center border-t border-granny-smith-apple/50"
+    >
+      <Pagination {pages} bind:pageIndex />
+    </footer>
+  {/if}
+</section>

@@ -5,3 +5,6 @@ export const rawVersion = (version: string) => ({
 
 export const isLatestVersion = (version: string, latest: string) =>
   rawVersion(version).version === latest;
+
+export const ellipsis = (max: number, str: string) =>
+  str.length <= max ? str : str.slice(0, max).concat("…");
