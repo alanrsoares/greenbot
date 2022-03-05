@@ -122,25 +122,27 @@
           {ellipsis(MAX_LENGTH, name)}
         </a>
       </div>
-      {#if isLatest}
-        <div class="flex gap-2 min-w-[6rem] justify-end">
+      <div class="grid place-items-end gap-2 justify-end">
+        {#if isLatest}
           <div>
             {version}
           </div>
           <div class="h-4 w-4 ml-1">
             <FaRegCheckCircle />
           </div>
-        </div>
-      {:else}
-        <UpgradeButton
-          disabled={$upgradePackagesMutation.isLoading && isLoading}
-          isLoading={$upgradePackagesMutation.isLoading && isLoading}
-          on:click={() =>
-            handleUpgradePackages([{ name, version, latest, meta }])}
-        >
-          {version} &rArr; {latest}
-        </UpgradeButton>
-      {/if}
+        {:else}
+          <UpgradeButton
+            disabled={$upgradePackagesMutation.isLoading && isLoading}
+            isLoading={$upgradePackagesMutation.isLoading && isLoading}
+            on:click={() =>
+              handleUpgradePackages([{ name, version, latest, meta }])}
+          >
+            {version} &rArr; {latest}
+          </UpgradeButton>
+        {/if}
+        {meta["dist-tags"]}
+        {meta.license}
+      </div>
     </div>
 
     {#if isExpanded}
