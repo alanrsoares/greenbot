@@ -96,7 +96,10 @@
     isBlurred ? 0.4 : 1
   }!important;`}
 >
-  <div class:expanded={isExpanded} class="transition-all">
+  <div
+    class:expanded={isExpanded}
+    class="transition-[transform,background] duration-300 ease-in-out"
+  >
     <div class="flex justify-between p-4">
       <div>
         <a
@@ -202,6 +205,6 @@
     @apply hover:text-opacity-80;
   }
   .expanded {
-    @apply bg-castleton-green rounded-2xl scale-105;
+    @apply bg-castleton-green rounded-2xl scale-105 shadow-lg;
   }
 </style>
