@@ -112,7 +112,7 @@
         <a
           href={`https://npmjs.com/package/${name}`}
           target="_blank"
-          class="hover:underline font-semibold whitespace-nowrap flex items-center gap-2"
+          class="hover:underline font-medium whitespace-nowrap flex items-center gap-2 text-lg"
           class:text-base={isExpanded}
           rel="noopener roreferrer"
         >

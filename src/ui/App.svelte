@@ -110,12 +110,7 @@
           { value: "devDependencies", label: "Dev Dependencies" },
         ]}
       />
-      <Dependencies
-        label={selectedTab === "devDependencies"
-          ? "Dev Dependencies"
-          : "Dependencies"}
-        {entries}
-      />
+      <Dependencies bind:selectedTab {entries} />
     {/if}
   </div>
 </Layout>

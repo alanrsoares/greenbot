@@ -1,9 +1,14 @@
 <script lang="ts">
+  import { onDestroy, onMount } from "svelte";
   import { partition, prop } from "ramda";
   import { useQueryClient } from "@sveltestack/svelte-query";
   import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
+  import FaArrowUp from "svelte-icons/fa/FaArrowUp.svelte";
 
-  import type { Package, PackageInfo } from "domain/types";
+  import GoX from "svelte-icons/go/GoX.svelte";
+  import GoInfo from "svelte-icons/go/GoInfo.svelte";
+
+  import type { Package, PackageInfo, TabKind } from "domain/types";
   import { PAGE_SIZE, QUERIES } from "domain/constants";
   import { isLatestVersion, rawVersion } from "lib/helpers";
   import { useUpgradePackagesMutation } from "lib/hooks";
@@ -11,14 +16,18 @@
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
   import Pagination from "./Pagination.svelte";
-  import { onDestroy, onMount } from "svelte";
 
-  export let label = "";
+  /**
+   * bound selectedTab
+   */
+  export let selectedTab: TabKind = "dependencies";
   export let entries: PackageInfo[] = [];
 
   let pageIndex = 0;
   let expandedRowIndex = -1;
   let searchTerm = "";
+  let isHelpVisible = false;
+  let isSearchFocused = false;
 
   const upgradePackagesMutation = useUpgradePackagesMutation();
 
@@ -46,8 +55,22 @@
   }
 
   function handleKeyDown(event: KeyboardEvent) {
+    if (event.shiftKey) {
+      switch (event.key) {
+        case "ArrowRight":
+        case "ArrowLeft":
+          event.preventDefault();
+          selectedTab =
+            selectedTab === "dependencies" ? "devDependencies" : "dependencies";
+          pageIndex = 0;
+          expandedRowIndex = -1;
+          break;
+      }
+    }
+
     switch (event.key) {
       case "ArrowUp":
+        event.preventDefault();
         if (expandedRowIndex > 0) {
           expandedRowIndex--;
         } else {
@@ -55,6 +78,7 @@
         }
         break;
       case "ArrowDown":
+        event.preventDefault();
         if (expandedRowIndex < pageEntries.length - 1) {
           expandedRowIndex++;
         } else {
@@ -63,16 +87,29 @@
         break;
       case "ArrowLeft":
         if (pageIndex > 0) {
+          event.preventDefault();
           pageIndex--;
           expandedRowIndex = -1;
         }
         break;
       case "ArrowRight":
         if (pageIndex < pages - 1) {
+          event.preventDefault();
           pageIndex++;
           expandedRowIndex = -1;
         }
         break;
+      case "Escape":
+        event.preventDefault();
+        if (isHelpVisible) {
+          isHelpVisible = false;
+        }
+        break;
+      case "h":
+        if (!isSearchFocused) {
+          event.preventDefault();
+          isHelpVisible = !isHelpVisible;
+        }
     }
   }
 
@@ -110,8 +147,8 @@
   $: isAllUpToDate = upToDatePackages.length === entries.length;
 
   $: {
-    if (label) {
-      // reset pageIndex on label change
+    if (selectedTab) {
+      // reset pageIndex on selectedTab change
       pageIndex = 0;
       expandedRowIndex = -1;
     }
@@ -124,69 +161,154 @@
       expandedRowIndex = -1;
     }
   }
+
+  const helpItems = [
+    {
+      keys: [
+        { symbol: "↑", rotation: 0 },
+        { symbol: "↓", rotation: 180 },
+      ],
+      label: "Switch rows.",
+    },
+    {
+      keys: [
+        { symbol: "←", rotation: -90 },
+        { symbol: "→", rotation: 90 },
+      ],
+      label: "Switch pages.",
+    },
+    {
+      keys: [
+        { symbol: "←", rotation: -90 },
+        { symbol: "→", rotation: 90 },
+      ],
+      label: "+ Shift, Switch tabs.",
+    },
+  ];
 </script>
 
-<section
-  class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2"
->
-  <div class="">
-    <input
-      type="text"
-      class="w-full p-4 text-sm text-white bg-slate-800/50 rounded-xl outline-none focus:ring-4 ring-castleton-green/60"
-      placeholder="package name or version"
-      bind:value={searchTerm}
-    />
-  </div>
-  <header
-    class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2"
+<div class="relative">
+  <aside
+    class="absolute right-0 top-8 transition-all"
+    class:translate-x-64={isHelpVisible}
   >
-    <div class="flex items-center justify-between w-full">
-      <div>
-        {label}
-        <span
-          class="text-xs tracking-wider bg-castleton-green px-2 py-1 rounded-full"
-        >
-          {upToDatePackages.length}/{entries.length}
-        </span>
-      </div>
-      {#if isAllUpToDate}
-        <div class="h-4 w-4 ml-1">
-          <FaRegCheckCircle />
-        </div>
+    <button
+      class="help-trigger"
+      on:click={() => {
+        isHelpVisible = !isHelpVisible;
+      }}
+    >
+      {#if isHelpVisible}
+        <GoX />
+      {:else}
+        <GoInfo />
       {/if}
-    </div>
-    <div>
-      {#if !isAllUpToDate}
-        <UpgradeButton
-          on:click={() => handleUpgradePackages(outdatedPackages)}
-          disabled={$upgradePackagesMutation.isLoading}
-          isLoading={$upgradePackagesMutation.isLoading}
-        >
-          Upgrade all
-        </UpgradeButton>
-      {/if}
-    </div>
-  </header>
-  <main class="min-h-[32rem] mx-2">
-    <ul class="grid">
-      {#each pageEntries as { name, version, latest, isLatest, meta }, index}
-        <Dependency
-          {index}
-          {name}
-          {version}
-          {latest}
-          {isLatest}
-          {meta}
-          bind:expandedRowIndex
-        />
+    </button>
+    <ul
+      class="bg-slate-900/60 p-4 rounded-xl rounded-tr-none grid gap-2 opacity-10"
+      class:opacity-100={isHelpVisible}
+      aria-hidden={!isHelpVisible}
+    >
+      {#each helpItems as { keys, label }}
+        <li class="flex items-center">
+          <div class="flex gap-2">
+            {#each keys as { symbol, rotation }}
+              <kbd
+                class="text-sm font-semibold flex p-1.5 bg-castleton-green/40 rounded"
+              >
+                <div
+                  class="h-3 w-3"
+                  style={`transform: rotate(${rotation}deg);`}
+                >
+                  <FaArrowUp />
+                </div>
+                <span class="sr-only">{symbol}</span>
+              </kbd>
+            {/each}
+          </div>
+
+          <span class="ml-2 text-sm">{label}</span>
+        </li>
       {/each}
     </ul>
-  </main>
-  {#if pages > 1}
-    <footer class="grid place-items-center">
-      <div class="bg-slate-900/90 rounded-full">
-        <Pagination {pages} bind:pageIndex />
+  </aside>
+  <section
+    class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2"
+  >
+    <div class="">
+      <input
+        type="search"
+        class="search-input"
+        placeholder="package name or version"
+        bind:value={searchTerm}
+        on:focus={() => {
+          isSearchFocused = true;
+        }}
+        on:blur={() => {
+          isSearchFocused = false;
+        }}
+      />
+    </div>
+    <header
+      class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2"
+    >
+      <div class="flex items-center justify-between w-full">
+        <div>
+          {selectedTab === "dependencies" ? "Dependencies" : "Dev Dependencies"}
+          <span
+            class="text-xs tracking-wider bg-castleton-green px-2 py-1 rounded-full"
+          >
+            {upToDatePackages.length}/{entries.length}
+          </span>
+        </div>
+        {#if isAllUpToDate}
+          <div class="h-4 w-4 ml-1">
+            <FaRegCheckCircle />
+          </div>
+        {/if}
       </div>
-    </footer>
-  {/if}
-</section>
+      <div>
+        {#if !isAllUpToDate}
+          <UpgradeButton
+            on:click={() => handleUpgradePackages(outdatedPackages)}
+            disabled={$upgradePackagesMutation.isLoading}
+            isLoading={$upgradePackagesMutation.isLoading}
+          >
+            Upgrade all
+          </UpgradeButton>
+        {/if}
+      </div>
+    </header>
+    <main class="min-h-[32rem] mx-2">
+      <ul class="grid">
+        {#each pageEntries as { name, version, latest, isLatest, meta }, index}
+          <Dependency
+            {index}
+            {name}
+            {version}
+            {latest}
+            {isLatest}
+            {meta}
+            bind:expandedRowIndex
+          />
+        {/each}
+      </ul>
+    </main>
+    {#if pages > 1}
+      <footer class="grid place-items-center">
+        <div class="bg-slate-900/90 rounded-full">
+          <Pagination {pages} bind:pageIndex />
+        </div>
+      </footer>
+    {/if}
+  </section>
+</div>
+
+<style lang="postcss">
+  .help-trigger {
+    @apply h-10 w-10 absolute -right-10 p-2 bg-black/40 rounded-r-full opacity-80 hover:opacity-100 transition-opacity outline-none;
+  }
+  .search-input {
+    @apply w-full p-4 text-sm text-white bg-white/5 rounded-xl outline-none focus:ring-4 ring-castleton-green/60;
+  }
+</style>
