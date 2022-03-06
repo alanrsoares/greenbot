@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import type { FullMetadata } from "package-json";
+  import FaBalanceScale from "svelte-icons/fa/FaBalanceScale.svelte";
   import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
   import FaGithub from "svelte-icons/fa/FaGithub.svelte";
   import FaGlobe from "svelte-icons/fa/FaGlobe.svelte";
@@ -107,13 +108,13 @@
     class:expanded={isExpanded}
     class="transition-[transform,background] duration-300 ease-in-out"
   >
-    <div class="flex justify-between p-4 py-2 items-center">
+    <div class="flex justify-between p-4 py-2">
       <div>
         <a
           href={`https://npmjs.com/package/${name}`}
           target="_blank"
           class="hover:underline font-medium whitespace-nowrap flex items-center gap-2 text-lg"
-          class:text-base={isExpanded}
+          class:pt-1={isExpanded}
           rel="noopener roreferrer"
         >
           <div class:hidden={!isExpanded} class="h-8">
@@ -144,7 +145,6 @@
             </UpgradeButton>
           </div>
         {/if}
-        {meta.license ?? ""}
       </div>
     </div>
 
@@ -156,6 +156,16 @@
         class="px-2 pt-2 py-4 flex justify-between items-center border-t mx-2 border-granny-smith-apple/60"
       >
         <div class="grid gap-2">
+          {#if meta.license}
+            <div class="flex gap-1 items-center">
+              <div class="h-text -translate-y-px">
+                <FaBalanceScale />
+              </div>
+              <span>
+                {meta.license ?? ""}
+              </span>
+            </div>
+          {/if}
           {#if meta.author}
             <div class="text-granny-smith-apple flex items-center gap-2">
               <span>Authored by</span>
@@ -164,7 +174,6 @@
               </span>
             </div>
           {/if}
-
           {#if $bundlephobiaQuery.data}
             <div>
               Bundle size
@@ -178,9 +187,9 @@
             </div>
           {/if}
         </div>
-        <div class="flex gap-2 items-center">
+        <div class="flex gap-2 items-center text-lg">
           {#if meta.repository?.url}
-            <div class="h-5">
+            <div class="h-text">
               <a
                 href={meta.repository.url.replace(/^git\+/, "")}
                 target="_blank"
@@ -193,7 +202,7 @@
             </div>
           {/if}
           {#if meta.homepage}
-            <div class="h-5">
+            <div class="h-text">
               <a
                 href={meta.homepage}
                 target="_blank"
@@ -206,7 +215,7 @@
             </div>
           {/if}
           {#if meta.bugs}
-            <div class="h-5">
+            <div class="h-text">
               <a
                 href={meta.bugs.url}
                 target="_blank"

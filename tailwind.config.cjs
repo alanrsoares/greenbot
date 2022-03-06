@@ -18,6 +18,9 @@ const config = {
         "castleton-green": "#285943",
         npm: "#cb3837",
       },
+      spacing: {
+        text: "1em",
+      },
       animation: {
         fadeIn: "fadeIn .66s ease-in-out forwards",
       },
