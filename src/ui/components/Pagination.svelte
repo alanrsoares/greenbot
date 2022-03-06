@@ -19,7 +19,7 @@
   }
 </script>
 
-<ul class="inline-flex mx-auto font-medium p-4 items-center gap-2">
+<ul class="inline-flex mx-auto font-medium p-4 py-2 items-center gap-2">
   <li>
     <button
       class="btn-arrow"

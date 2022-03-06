@@ -13,7 +13,7 @@
     class:opacity-70={disabled}
     {disabled}
   >
-    <div class="px-1 font-medium relative">
+    <div class="px-2 font-medium relative">
       {#if isLoading}
         {"..."}
         <div class="opacity-0 h-0">
