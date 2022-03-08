@@ -138,8 +138,10 @@
             <UpgradeButton
               disabled={$upgradePackagesMutation.isLoading && isLoading}
               isLoading={$upgradePackagesMutation.isLoading && isLoading}
-              on:click={() =>
-                handleUpgradePackages([{ name, version, latest, meta }])}
+              on:click={(e) => {
+                e.stopPropagation();
+                handleUpgradePackages([{ name, version, latest, meta }]);
+              }}
             >
               {version} &rArr; {latest}
             </UpgradeButton>

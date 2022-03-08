@@ -16,6 +16,7 @@
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
   import Pagination from "./Pagination.svelte";
+  import { clickOutside } from "lib/directives";
 
   /**
    * bound selectedTab
@@ -189,11 +190,14 @@
 
 <div class="relative">
   <aside
-    class="absolute right-0 top-8 transition-all"
+    class="absolute right-0 top-8 transition-all duration-300 ease-in"
     class:translate-x-64={isHelpVisible}
+    use:clickOutside
+    on:outsideclick={() => (isHelpVisible = false)}
   >
     <button
       class="help-trigger"
+      class:hidden={isHelpVisible}
       on:click={() => {
         isHelpVisible = !isHelpVisible;
       }}
@@ -205,7 +209,7 @@
       {/if}
     </button>
     <ul
-      class="bg-slate-900/60 p-4 rounded-xl rounded-tr-none grid gap-2 opacity-10"
+      class="bg-slate-900/60 p-4 rounded-xl grid gap-2 opacity-10"
       class:opacity-100={isHelpVisible}
       aria-hidden={!isHelpVisible}
     >
@@ -306,7 +310,7 @@
 
 <style lang="postcss">
   .help-trigger {
-    @apply h-10 w-10 absolute -right-10 p-2 bg-black/40 rounded-r-full opacity-80 hover:opacity-100 transition-opacity outline-none;
+    @apply h-10 w-10 absolute -right-10 p-2 bg-black/40 rounded-r-full opacity-40 hover:opacity-100 transition-opacity outline-none;
   }
   .search-input {
     @apply w-full p-4 text-sm text-white bg-white/5 rounded-xl outline-none focus:ring-4 ring-castleton-green/60;
