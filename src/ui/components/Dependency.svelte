@@ -67,7 +67,7 @@
     }
   }
 
-  const MAX_LENGTH = 40;
+  const MAX_LENGTH = 36;
   const STAGGER_TIME = 1 / 30; // 30fps
 
   function handleKeyDown(event: KeyboardEvent) {
