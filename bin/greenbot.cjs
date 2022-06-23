@@ -140,8 +140,8 @@ app
 
     const response = { dependencies, devDependencies, ...file };
 
-    const dependencyEntries = Object.entries(dependencies || {});
-    const devDependencyEntries = Object.entries(devDependencies || {});
+    const dependencyEntries = Object.entries(dependencies ?? {});
+    const devDependencyEntries = Object.entries(devDependencies ?? {});
 
     const allEntries = [...dependencyEntries, ...devDependencyEntries];
 

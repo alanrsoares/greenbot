@@ -71,7 +71,7 @@
     $packageQuery.isLoading || $packageQuery.error
       ? []
       : getFilteredEntries(
-          Object.entries($packageQuery.data[selectedTab]),
+          Object.entries($packageQuery.data[selectedTab] ?? {}),
           $packageQuery.data.resolutions
         );
 
