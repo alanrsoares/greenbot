@@ -1,6 +1,7 @@
 {
   "name": "@greenbot/cli",
-  "version": "0.16.6",
+  "version": "0.17.0",
+  "private": "false",
   "files": [
     "dist/",
     "bin/"
