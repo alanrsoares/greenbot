@@ -1,7 +1,10 @@
 {
   "name": "@greenbot/cli",
   "version": "0.17.0",
+<<<<<<< HEAD
   "private": "false",
+=======
+>>>>>>> chore: fix conflict
   "files": [
     "dist/",
     "bin/"
