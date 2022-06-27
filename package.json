@@ -1,5 +1,5 @@
 {
-  "name": "npm-greenbot",
+  "name": "@greenbot/cli",
   "version": "0.16.6",
   "files": [
     "dist/",
