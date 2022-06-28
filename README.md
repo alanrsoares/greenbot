@@ -2,21 +2,29 @@
 
 interactive npm dependency updater
 
-## Getting started
+## Quick start
 
-- npm 
-  ```
-  npx @greenbot/cli
-  ```
-- pnpm
-  ```
-  pnpx  @greenbot/cli
-  ```
-- yarn
-  ```
-  yarn global add @greenbot/cli
-  @greenbot/cli
-  ```
+Use your favorite package manager to run greenbot
+
+With npm:
+
+```bash
+npx @greenbot/cli
+```
+
+With pnpm:
+
+```bash
+pnpx  @greenbot/cli
+```
+
+With yarn:
+
+```bash
+yarn global add @greenbot/cli
+@greenbot/cli
+```
+
 ## License
 
 MIT
