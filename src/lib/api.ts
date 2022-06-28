@@ -1,9 +1,9 @@
-import axios from "axios";
+import axios from "ky";
 
 import type { Package, PackageInfo } from "domain/types";
 
 const client = axios.create({
-  baseURL: "http://localhost:5001",
+  prefixUrl: "http://localhost:5001",
 });
 
 const delay = (timeout: number) =>
@@ -12,17 +12,22 @@ const delay = (timeout: number) =>
   });
 
 export async function getPackage() {
-  const result = await client.get<Package>("/package");
+  const result = await client.get("/package").json<Package>();
 
-  return result.data;
+  return result;
 }
 
 export async function upgradePackages(
   input: PackageInfo[]
 ): Promise<PackageInfo[]> {
-  const result = await client.post("/upgrade-packages", input);
+  const result = await client
+    .post("/upgrade-packages", {
+      body: JSON.stringify(input),
+    })
+    .json<PackageInfo[]>();
   if (process.env.NODE_ENV === "development") {
     await delay(1000 * Math.random());
   }
-  return result.data;
+
+  return result;
 }

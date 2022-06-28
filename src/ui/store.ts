@@ -1,5 +1,5 @@
 import type { TabKind } from "domain/types";
-import { assoc } from "ramda";
+import { assoc } from "rambda";
 import { writable } from "svelte/store";
 
 const INITIAL_STATE = {

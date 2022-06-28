@@ -33,15 +33,14 @@
   },
   "dependencies": {
     "@sveltestack/svelte-query": "^1.6.0",
-    "@types/ramda": "^0.27.66",
-    "axios": "^0.21.4",
     "body-parser": "^1.19.2",
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "express": "^4.17.3",
+    "ky": "^0.31.0",
     "open": "^8.4.0",
     "package-json": "^7.0.0",
-    "ramda": "^0.27.2",
+    "rambda": "^7.1.4",
     "replace-in-file": "^6.3.2",
     "svelte-icons": "^2.1.0"
   }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { range } from "ramda";
+  import { range } from "rambda";
 
   export let pages = 0;
   export let pageIndex = 0;
