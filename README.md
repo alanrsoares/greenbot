@@ -1,6 +1,6 @@
-# npm-greenbot
+# Greenbot
 
-NPM GreenBot - interactive npm dependency updater
+interactive npm dependency updater
 
 ## Getting started
 
