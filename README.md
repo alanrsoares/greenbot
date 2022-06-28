@@ -4,8 +4,19 @@ NPM GreenBot - interactive npm dependency updater
 
 ## Getting started
 
-Simply run `npx npm-greenbot` on any project with a package.json file and there you go:
-
+- npm 
+  ```
+  npx @greenbot/cli
+  ```
+- pnpm
+  ```
+  pnpx  @greenbot/cli
+  ```
+- yarn
+  ```
+  yarn global add @greenbot/cli
+  @greenbot/cli
+  ```
 ## License
 
 MIT
