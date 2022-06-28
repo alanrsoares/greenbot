@@ -3,7 +3,7 @@ import axios from "ky";
 import type { Package, PackageInfo } from "domain/types";
 
 const client = axios.create({
-  prefixUrl: "http://localhost:5001",
+  prefixUrl: "http://localhost:5001/",
 });
 
 const delay = (timeout: number) =>
@@ -12,7 +12,7 @@ const delay = (timeout: number) =>
   });
 
 export async function getPackage() {
-  const result = await client.get("/package").json<Package>();
+  const result = await client.get("package").json<Package>();
 
   return result;
 }
@@ -21,7 +21,7 @@ export async function upgradePackages(
   input: PackageInfo[]
 ): Promise<PackageInfo[]> {
   const result = await client
-    .post("/upgrade-packages", {
+    .post("upgrade-packages", {
       body: JSON.stringify(input),
     })
     .json<PackageInfo[]>();

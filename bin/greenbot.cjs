@@ -9,7 +9,7 @@ const replaceInFile = require("replace-in-file");
 const chalk = require("chalk");
 const open = require("open");
 const fs = require("fs/promises");
-const { indexBy, prop } = require("ramda");
+const { indexBy, prop } = require("rambda");
 
 const { version } = require("../package.json");
 
@@ -195,7 +195,9 @@ function tryListen(port, tries = 0) {
  88eee8 88   8 88ee 88ee 88  8 88eeeee8 8eee8   88
  =========================================== v${version}
 `),
-      `Started listening at ${url}`
+      `Started listening at ${chalk.blue(url)}`,
+      `\r\n\n`,
+      `hit ${chalk.yellow("Ctrl+C")} to stop.\n`
     );
 
     open(url).catch(() => {});
