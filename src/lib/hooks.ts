@@ -6,6 +6,7 @@ import {
 
 import { QUERIES } from "domain/constants";
 import type { PackageInfo } from "domain/types";
+import { onDestroy, onMount } from "svelte";
 
 import * as api from "./api";
 
@@ -14,3 +15,13 @@ export const useUpgradePackagesMutation = (
 ) => useMutation(api.upgradePackages, options);
 
 export const usePackageQuery = () => useQuery(QUERIES.package, api.getPackage);
+
+export function useKeyDown(onKeyDown: (e: KeyboardEvent) => void) {
+  onMount(() => {
+    window.addEventListener("keydown", onKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", onKeyDown);
+  });
+}

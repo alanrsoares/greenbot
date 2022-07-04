@@ -11,7 +11,7 @@
   import type { Package, PackageInfo, TabKind } from "domain/types";
   import { PAGE_SIZE, QUERIES } from "domain/constants";
   import { isLatestVersion, rawVersion } from "lib/helpers";
-  import { useUpgradePackagesMutation } from "lib/hooks";
+  import { useKeyDown, useUpgradePackagesMutation } from "lib/hooks";
 
   import UpgradeButton from "./UpgradeButton.svelte";
   import Dependency from "./Dependency.svelte";
@@ -55,7 +55,7 @@
     }
   }
 
-  function handleKeyDown(event: KeyboardEvent) {
+  useKeyDown((event) => {
     if (event.shiftKey) {
       switch (event.key) {
         case "ArrowRight":
@@ -112,14 +112,6 @@
           isHelpVisible = !isHelpVisible;
         }
     }
-  }
-
-  onMount(() => {
-    window.addEventListener("keydown", handleKeyDown);
-  });
-
-  onDestroy(() => {
-    window.removeEventListener("keydown", handleKeyDown);
   });
 
   $: filteredEntries = entries.filter(
