@@ -1,8 +1,7 @@
-import axios from "ky";
-
+import ky from "ky";
 import type { Package, PackageInfo } from "domain/types";
 
-const client = axios.create({
+const client = ky.create({
   prefixUrl: "http://localhost:5001/",
 });
 
