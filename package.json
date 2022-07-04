@@ -21,7 +21,8 @@
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "preversion": "yarn build",
-    "release": "npm publish && git push && git push --tags"
+    "release": "npm publish && git push && git push --tags",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.49",
@@ -54,10 +55,5 @@
     "rambda": "^7.1.4",
     "replace-in-file": "^6.3.5",
     "svelte-icons": "^2.1.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
   }
 }
