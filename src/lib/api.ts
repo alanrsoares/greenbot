@@ -25,9 +25,6 @@ export async function upgradePackages(
       json: input,
     })
     .json<PackageInfo[]>();
-  if (process.env.NODE_ENV === "development") {
-    await delay(1000 * Math.random());
-  }
 
   return result;
 }
