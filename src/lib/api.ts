@@ -22,7 +22,7 @@ export async function upgradePackages(
 ): Promise<PackageInfo[]> {
   const result = await client
     .post("upgrade-packages", {
-      body: JSON.stringify(input),
+      json: input,
     })
     .json<PackageInfo[]>();
   if (process.env.NODE_ENV === "development") {
