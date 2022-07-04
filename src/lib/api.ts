@@ -6,11 +6,6 @@ const client = axios.create({
   prefixUrl: "http://localhost:5001/",
 });
 
-const delay = (timeout: number) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(timeout), timeout);
-  });
-
 export async function getPackage() {
   const result = await client.get("package").json<Package>();
 
