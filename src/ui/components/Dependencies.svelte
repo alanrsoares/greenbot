@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
   import { partition, prop } from "rambda";
   import { useQueryClient } from "@sveltestack/svelte-query";
   import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
