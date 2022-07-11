@@ -1,21 +1,25 @@
 <script lang="ts">
-  import { partition, prop } from "rambda";
   import { useQueryClient } from "@sveltestack/svelte-query";
-  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
+  import { partition, prop } from "rambda";
   import FaArrowUp from "svelte-icons/fa/FaArrowUp.svelte";
+  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
 
-  import GoX from "svelte-icons/go/GoX.svelte";
   import GoInfo from "svelte-icons/go/GoInfo.svelte";
+  import GoX from "svelte-icons/go/GoX.svelte";
 
-  import type { Package, PackageInfo, TabKind } from "domain/types";
   import { PAGE_SIZE, QUERIES } from "domain/constants";
-  import { isLatestVersion, rawVersion } from "lib/helpers";
-  import { useKeyDown, useUpgradePackagesMutation } from "lib/hooks";
+  import type { Package, PackageInfo, TabKind } from "domain/types";
+  import { isLatestVersion } from "lib/helpers";
+  import {
+    updatePackageQueryCache,
+    useKeyDown,
+    useUpgradePackagesMutation,
+  } from "lib/hooks";
 
-  import UpgradeButton from "./UpgradeButton.svelte";
+  import { clickOutside } from "lib/directives";
   import Dependency from "./Dependency.svelte";
   import Pagination from "./Pagination.svelte";
-  import { clickOutside } from "lib/directives";
+  import UpgradeButton from "./UpgradeButton.svelte";
 
   /**
    * bound selectedTab
@@ -37,16 +41,10 @@
     try {
       const updated = await $upgradePackagesMutation.mutateAsync(packages);
 
-      queryClient.setQueryData<Package>([QUERIES.package], (current) => {
-        for (let item of updated) {
-          const { qualifier } = rawVersion(item.version);
-          const latestVersion = `${qualifier}${item.latest}`;
-          current.dependencies[item.name] = latestVersion;
-          current.devDependencies[item.name] = latestVersion;
-        }
-
-        return current;
-      });
+      queryClient.setQueryData<Package>(
+        [QUERIES.package],
+        updatePackageQueryCache(updated)
+      );
 
       await queryClient.refetchQueries([QUERIES.package]);
     } catch (error) {

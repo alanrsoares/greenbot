@@ -11,8 +11,11 @@
   import { useQuery, useQueryClient } from "@sveltestack/svelte-query";
   import type { Package, PackageInfo } from "domain/types";
 
-  import { ellipsis, rawVersion } from "lib/helpers";
-  import { useUpgradePackagesMutation } from "lib/hooks";
+  import { ellipsis } from "lib/helpers";
+  import {
+    updatePackageQueryCache,
+    useUpgradePackagesMutation,
+  } from "lib/hooks";
   import { QUERIES } from "domain/constants";
 
   import UpgradeButton from "./UpgradeButton.svelte";
@@ -42,16 +45,10 @@
     try {
       const updated = await $upgradePackagesMutation.mutateAsync(packages);
 
-      queryClient.setQueryData<Package>([QUERIES.package], (current) => {
-        for (let item of updated) {
-          const { qualifier } = rawVersion(item.version);
-          const latestVersion = `${qualifier}${item.latest}`;
-          current.dependencies[item.name] = latestVersion;
-          current.devDependencies[item.name] = latestVersion;
-        }
-
-        return current;
-      });
+      queryClient.setQueryData<Package>(
+        [QUERIES.package],
+        updatePackageQueryCache(updated)
+      );
 
       await queryClient.refetchQueries([QUERIES.package]);
     } catch (error) {
