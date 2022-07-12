@@ -5615,7 +5615,7 @@ class lr extends G {
   }
 }
 const ur = "@greenbot/cli",
-  cr = "0.18.3",
+  cr = "0.18.5",
   fr = ["greenbot", "cli", "package updater"],
   dr = "An interactive package updater for npm based applications",
   hr = "https://github.com/alanrsoares/greenbot",
