@@ -5615,7 +5615,7 @@ class lr extends G {
   }
 }
 const ur = "@greenbot/cli",
-  cr = "0.19.1",
+  cr = "0.19.2",
   fr = ["greenbot", "cli", "package updater"],
   dr = "An interactive package updater for npm based applications",
   hr = "https://github.com/alanrsoares/greenbot",
@@ -5654,7 +5654,7 @@ const ur = "@greenbot/cli",
   yr = {
     "@sveltestack/svelte-query": "^1.6.0",
     "body-parser": "^1.20.0",
-    chalk: "^4.1.12",
+    chalk: "^4.1.2",
     cors: "^2.8.5",
     express: "^4.18.1",
     ky: "^0.31.0",

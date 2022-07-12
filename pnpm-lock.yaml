@@ -7,7 +7,7 @@ specifiers:
   autoprefixer: ^10.4.7
   body-parser: ^1.20.0
   broadcast-channel: ^4.13.0
-  chalk: ^5.0.1
+  chalk: ^4.1.2
   cors: ^2.8.5
   cssnano: ^5.1.12
   express: ^4.18.1
@@ -33,7 +33,7 @@ specifiers:
 dependencies:
   "@sveltestack/svelte-query": 1.6.0_broadcast-channel@4.13.0
   body-parser: 1.20.0
-  chalk: 5.0.1
+  chalk: 4.1.2
   cors: 2.8.5
   express: 4.18.1
   ky: 0.31.0
@@ -600,14 +600,6 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
-    dev: false
-
-  /chalk/5.0.1:
-    resolution:
-      {
-        integrity: sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==,
-      }
-    engines: { node: ^12.17.0 || ^14.13 || >=16.0.0 }
     dev: false
 
   /chokidar/3.5.3:
