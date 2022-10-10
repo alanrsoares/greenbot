@@ -3,10 +3,10 @@ import {
   useQuery,
   type UseMutationOptions,
 } from "@sveltestack/svelte-query";
-
-import { QUERIES } from "domain/constants";
-import type { Package, PackageInfo } from "domain/types";
 import { onDestroy, onMount } from "svelte";
+
+import { QUERIES } from "~/domain/constants";
+import type { Package, PackageInfo } from "~/domain/types";
 
 import * as api from "./api";
 import { rawVersion } from "./helpers";

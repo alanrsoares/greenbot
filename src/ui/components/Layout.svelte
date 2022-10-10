@@ -1,5 +1,5 @@
 <script lang="ts">
-  import packageJson from "../../../package.json";
+  import packageJson from "package.json";
 </script>
 
 <div class="layout">

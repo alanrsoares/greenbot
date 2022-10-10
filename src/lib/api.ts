@@ -1,5 +1,5 @@
 import ky from "ky";
-import type { Package, PackageInfo } from "domain/types";
+import type { Package, PackageInfo } from "~/domain/types";
 
 const client = ky.create({
   prefixUrl: "http://localhost:5001/",

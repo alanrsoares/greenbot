@@ -2,17 +2,17 @@
   import type { UseQueryResult } from "@sveltestack/svelte-query";
   import type { FullMetadata } from "package-json";
 
-  import type { Package, TabKind } from "domain/types";
+  import type { Package, TabKind } from "~/domain/types";
 
-  import { isLatestVersion } from "lib/helpers";
-  import { usePackageQuery } from "lib/hooks";
+  import { isLatestVersion } from "~/lib/helpers";
+  import { usePackageQuery } from "~/lib/hooks";
 
-  import Bot, { type Mood } from "ui/components/Bot.svelte";
-  import Dependencies from "ui/components/Dependencies.svelte";
-  import Layout from "ui/components/Layout.svelte";
-  import NPMBadge from "ui/components/NPMBadge.svelte";
-  import Tabs, { type TabItem } from "ui/components/Tabs.svelte";
-  import Spinner from "./components/Spinner.svelte";
+  import Bot, { type Mood } from "~/ui/components/Bot.svelte";
+  import Dependencies from "~/ui/components/Dependencies.svelte";
+  import Layout from "~/ui/components/Layout.svelte";
+  import NPMBadge from "~/ui/components/NPMBadge.svelte";
+  import Tabs, { type TabItem } from "~/ui/components/Tabs.svelte";
+  import Spinner from "~/ui/components/Spinner.svelte";
 
   let selectedTab: TabKind = "dependencies";
 

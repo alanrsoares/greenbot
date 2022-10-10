@@ -1,22 +1,21 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
   import type { FullMetadata } from "package-json";
+  import { onDestroy, onMount } from "svelte";
   import FaBalanceScale from "svelte-icons/fa/FaBalanceScale.svelte";
-  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
+  import FaBug from "svelte-icons/fa/FaBug.svelte";
   import FaGithub from "svelte-icons/fa/FaGithub.svelte";
   import FaGlobe from "svelte-icons/fa/FaGlobe.svelte";
   import FaNpm from "svelte-icons/fa/FaNpm.svelte";
-  import FaBug from "svelte-icons/fa/FaBug.svelte";
-
+  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
   import { useQuery, useQueryClient } from "@sveltestack/svelte-query";
-  import type { Package, PackageInfo } from "domain/types";
 
-  import { ellipsis } from "lib/helpers";
+  import type { Package, PackageInfo } from "~/domain/types";
+  import { QUERIES } from "~/domain/constants";
+  import { ellipsis } from "~/lib/helpers";
   import {
     updatePackageQueryCache,
     useUpgradePackagesMutation,
-  } from "lib/hooks";
-  import { QUERIES } from "domain/constants";
+  } from "~/lib/hooks";
 
   import UpgradeButton from "./UpgradeButton.svelte";
 
@@ -96,6 +95,7 @@
   role="button"
   class="animate-fadeIn transition-opacity"
   on:click={handleToggleExpandedRow}
+  on:keydown={handleToggleExpandedRow}
   class:border-t={index !== 0}
   style={`animation-delay: ${(index + 1) * STAGGER_TIME}s; opacity: ${
     isBlurred ? 0.4 : 1

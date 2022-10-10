@@ -7,16 +7,16 @@
   import GoInfo from "svelte-icons/go/GoInfo.svelte";
   import GoX from "svelte-icons/go/GoX.svelte";
 
-  import { PAGE_SIZE, QUERIES } from "domain/constants";
-  import type { Package, PackageInfo, TabKind } from "domain/types";
-  import { isLatestVersion } from "lib/helpers";
+  import { PAGE_SIZE, QUERIES } from "~/domain/constants";
+  import type { Package, PackageInfo, TabKind } from "~/domain/types";
+  import { clickOutside } from "~/lib/directives";
+  import { isLatestVersion } from "~/lib/helpers";
   import {
     updatePackageQueryCache,
     useKeyDown,
     useUpgradePackagesMutation,
-  } from "lib/hooks";
+  } from "~/lib/hooks";
 
-  import { clickOutside } from "lib/directives";
   import Dependency from "./Dependency.svelte";
   import Pagination from "./Pagination.svelte";
   import UpgradeButton from "./UpgradeButton.svelte";
