@@ -4409,7 +4409,7 @@ function Vt(n) {
           h(t, "href", (i = n[5].repository.url.replace(/^git\+/, ""))),
           h(t, "target", "_blank"),
           h(t, "class", "hover:underline"),
-          h(t, "rel", "noopener roreferrer"),
+          h(t, "rel", "noopener noreferrer"),
           h(t, "title", "Github"),
           h(e, "class", "h-text");
       },
@@ -4445,7 +4445,7 @@ function Zt(n) {
           h(t, "href", (i = n[5].homepage)),
           h(t, "target", "_blank"),
           h(t, "class", "hover:underline"),
-          h(t, "rel", "noopener roreferrer"),
+          h(t, "rel", "noopener noreferrer"),
           h(t, "title", "Homepage"),
           h(e, "class", "h-text");
       },
@@ -4479,7 +4479,7 @@ function Gt(n) {
           h(t, "href", (i = n[5].bugs.url)),
           h(t, "target", "_blank"),
           h(t, "class", "hover:underline"),
-          h(t, "rel", "noopener roreferrer"),
+          h(t, "rel", "noopener noreferrer"),
           h(t, "title", "Bugs"),
           h(e, "class", "h-text");
       },
@@ -4555,7 +4555,7 @@ function Ji(n) {
           "class",
           "hover:underline font-medium whitespace-nowrap flex items-center gap-2 text-lg"
         ),
-        h(r, "rel", "noopener roreferrer"),
+        h(r, "rel", "noopener noreferrer"),
         K(r, "pt-1", n[6]),
         h(b, "class", "grid place-items-end gap-2 items-center"),
         h(s, "class", "flex justify-between p-4 py-2"),
@@ -5675,7 +5675,7 @@ class or extends G {
   }
 }
 const lr = "@greenbot/cli",
-  ur = "0.20.0",
+  ur = "0.20.1",
   cr = ["greenbot", "cli", "package updater"],
   fr = "An interactive package updater for npm based applications",
   dr = "https://github.com/alanrsoares/greenbot",
@@ -5862,6 +5862,7 @@ function Rr(n) {
           h(r, "class", "font-mono font-medium"),
           h(e, "target", "_blank"),
           h(e, "href", (u = `https://www.npmjs.com/package/${n[0]}`)),
+          h(e, "rel", "noopener noreferrer"),
           h(e, "class", "svelte-8yqr22");
       },
       m(p, f) {

@@ -112,7 +112,7 @@
           target="_blank"
           class="hover:underline font-medium whitespace-nowrap flex items-center gap-2 text-lg"
           class:pt-1={isExpanded}
-          rel="noopener roreferrer"
+          rel="noopener noreferrer"
         >
           <div class:hidden={!isExpanded} class="h-8">
             <FaNpm />
@@ -193,7 +193,7 @@
                 href={meta.repository.url.replace(/^git\+/, "")}
                 target="_blank"
                 class="hover:underline"
-                rel="noopener roreferrer"
+                rel="noopener noreferrer"
                 title="Github"
               >
                 <FaGithub />
@@ -206,7 +206,7 @@
                 href={meta.homepage}
                 target="_blank"
                 class="hover:underline"
-                rel="noopener roreferrer"
+                rel="noopener noreferrer"
                 title="Homepage"
               >
                 <FaGlobe />
@@ -219,7 +219,7 @@
                 href={meta.bugs.url}
                 target="_blank"
                 class="hover:underline"
-                rel="noopener roreferrer"
+                rel="noopener noreferrer"
                 title="Bugs"
               >
                 <FaBug />

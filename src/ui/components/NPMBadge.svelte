@@ -4,7 +4,11 @@
   export let version = "";
 </script>
 
-<a target="_blank" href={`https://www.npmjs.com/package/${name}`}>
+<a
+  target="_blank"
+  href={`https://www.npmjs.com/package/${name}`}
+  rel="noopener noreferrer"
+>
   <div class="h-10">
     <FaNpm />
   </div>
