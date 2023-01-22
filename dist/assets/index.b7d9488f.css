@@ -1,4 +1,4 @@
-/*! tailwindcss v3.1.8 | MIT License | https://tailwindcss.com*/
+/*! tailwindcss v3.2.4 | MIT License | https://tailwindcss.com*/
 *,
 :after,
 :before {
@@ -11,6 +11,7 @@
 }
 html {
   -webkit-text-size-adjust: 100%;
+  font-feature-settings: normal;
   font-family: Fira Mono, mono;
   line-height: 1.5;
   -moz-tab-size: 4;
@@ -191,6 +192,9 @@ img,
 video {
   height: auto;
   max-width: 100%;
+}
+[hidden] {
+  display: none;
 }
 *,
 :after,

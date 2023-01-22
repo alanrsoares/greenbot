@@ -196,7 +196,7 @@ function tryListen(port, tries = 0) {
  =========================================== v${version}
 `),
       `Started listening at ${chalk.blue(url)}`,
-      `\r\n\n`,
+      "\r\n\n",
       `hit ${chalk.yellow("Ctrl+C")} to stop.\n`
     );
 
