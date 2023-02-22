@@ -1,4 +1,4 @@
-import type { TabKind } from "domain/types";
+import type { TabKind } from "~/domain/types";
 import { assoc } from "rambda";
 import { writable } from "svelte/store";
 

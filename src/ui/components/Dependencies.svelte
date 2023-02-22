@@ -130,10 +130,9 @@
     });
   $: startIndex = pageIndex * PAGE_SIZE;
   $: pageEntries = displayEntries.slice(startIndex, startIndex + PAGE_SIZE);
-  $: [upToDatePackages, outdatedPackages] = partition(
-    prop("isLatest"),
-    displayEntries
-  );
+  $: [upToDatePackages, outdatedPackages] = partition<
+    PackageInfo & { isLatest: boolean }
+  >(prop("isLatest"), displayEntries);
   $: isAllUpToDate = upToDatePackages.length === entries.length;
 
   $: {
