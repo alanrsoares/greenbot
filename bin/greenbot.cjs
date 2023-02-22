@@ -14,6 +14,7 @@ const { indexBy, prop } = require("rambda");
 const { version } = require("../package.json");
 
 /**
+ * indexEntries - index entries by name
  *
  * @param xs {{name:string; latest:string;}[]}
  * @returns {Record<string,string>}
@@ -22,6 +23,8 @@ const indexEntries = (xs) =>
   xs.reduce((acc, { name, latest }) => ({ ...acc, [name]: latest }), {});
 
 /**
+ * rawVersion - extract version and qualifier from version string
+ *
  * @param version {string}
  * @returns {{version:string; qualifier: string | undefined}}
  */
@@ -36,6 +39,8 @@ const PACKAGE_JSON_PATH =
 const DEFAULT_PORT = 5001;
 
 /**
+ * readPackageJson - read package.json file
+ *
  * @returns {Promise<{dependencies: Record<string, string>; devDependencies?: Record<string,string>}>}
  */
 async function readPackageJson() {
@@ -50,21 +55,27 @@ async function readPackageJson() {
 const STATIC = path.resolve(__dirname, "..", "dist");
 
 /**
+ * fetchNPMPackageMeta - fetch package.json from npm
+ *
  * @param name {string}
  * @param version {string}
- * @returns {Promise<{name:string; version: string; latest: string, meta: import("package-json").FullMetadata}>}
+ * @returns {Promise<{name:string; version: string; latest: string, latestOutOfRange: string, meta: import("package-json").FullMetadata}>}
  */
 const fetchNPMPackageMeta = async (name, version = "latest") => {
   try {
     const options = { version, fullMetadata: true };
 
-    const { version: latest, ...meta } = await packageJson(name, options);
+    const [{ version: latest, ...meta }, outOfRange] = await Promise.all([
+      packageJson(name, options),
+      packageJson(name, { ...options, version: "latest" }),
+    ]);
 
     return {
       name,
       version,
       latest,
       meta,
+      latestOutOfRange: outOfRange.version,
     };
   } catch (error) {
     console.log(
