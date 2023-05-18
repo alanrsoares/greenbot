@@ -92,7 +92,6 @@
 </script>
 
 <li
-  role="button"
   class="animate-fadeIn transition-opacity"
   on:click={handleToggleExpandedRow}
   on:keydown={handleToggleExpandedRow}

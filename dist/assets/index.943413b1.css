@@ -1,4 +1,4 @@
-/*! tailwindcss v3.2.7 | MIT License | https://tailwindcss.com*/
+/*! tailwindcss v3.3.2 | MIT License | https://tailwindcss.com*/
 *,
 :after,
 :before {
@@ -13,6 +13,7 @@ html {
   -webkit-text-size-adjust: 100%;
   font-feature-settings: normal;
   font-family: Fira Mono, mono;
+  font-variation-settings: normal;
   line-height: 1.5;
   -moz-tab-size: 4;
   -o-tab-size: 4;
@@ -212,6 +213,9 @@ video {
   --tw-pan-y: ;
   --tw-pinch-zoom: ;
   --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position: ;
+  --tw-gradient-via-position: ;
+  --tw-gradient-to-position: ;
   --tw-ordinal: ;
   --tw-slashed-zero: ;
   --tw-numeric-figure: ;
@@ -258,6 +262,9 @@ video {
   --tw-pan-y: ;
   --tw-pinch-zoom: ;
   --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position: ;
+  --tw-gradient-via-position: ;
+  --tw-gradient-to-position: ;
   --tw-ordinal: ;
   --tw-slashed-zero: ;
   --tw-numeric-figure: ;
