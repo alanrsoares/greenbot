@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GoArrowUp from "svelte-icons/go/GoArrowUp.svelte";
+  import { ArrowUpIcon } from "lucide-svelte";
 
   export let isLoading = false;
   export let disabled = false;
@@ -24,7 +24,7 @@
       {/if}
     </div>
     <div class="h-6 w-6 bg-gray-800 rounded-full p-1 text-granny-smith-apple">
-      <GoArrowUp height="1em" />
+      <ArrowUpIcon class="h-5 w-5" />
     </div>
   </button>
 </template>

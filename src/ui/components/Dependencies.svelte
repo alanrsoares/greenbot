@@ -1,11 +1,7 @@
 <script lang="ts">
   import { useQueryClient } from "@tanstack/svelte-query";
   import { partition, prop } from "rambda";
-  import FaArrowUp from "svelte-icons/fa/FaArrowUp.svelte";
-  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
-
-  import GoInfo from "svelte-icons/go/GoInfo.svelte";
-  import GoX from "svelte-icons/go/GoX.svelte";
+  import { ArrowUpIcon, InfoIcon, XIcon, CheckCircleIcon } from "lucide-svelte";
 
   import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
   import type { Package, PackageInfo, TabKind } from "~/domain/types";
@@ -191,9 +187,9 @@
       }}
     >
       {#if isHelpVisible}
-        <GoX />
+        <XIcon />
       {:else}
-        <GoInfo />
+        <InfoIcon />
       {/if}
     </button>
     <ul
@@ -208,12 +204,10 @@
               <kbd
                 class="text-sm font-semibold flex p-1.5 bg-castleton-green/40 rounded"
               >
-                <div
+                <ArrowUpIcon
                   class="h-3 w-3"
                   style={`transform: rotate(${rotation}deg);`}
-                >
-                  <FaArrowUp />
-                </div>
+                />
                 <span class="sr-only">{symbol}</span>
               </kbd>
             {/each}
@@ -254,9 +248,7 @@
           </span>
         </div>
         {#if isAllUpToDate}
-          <div class="h-4 w-4 ml-1">
-            <FaRegCheckCircle />
-          </div>
+          <CheckCircleIcon class="h-4 w-4 ml-1" />
         {/if}
       </div>
       <div>

@@ -1,15 +1,15 @@
 <script lang="ts">
-  import ky from "ky";
   import type { FullMetadata } from "package-json";
   import { onDestroy, onMount } from "svelte";
-  import FaBalanceScale from "svelte-icons/fa/FaBalanceScale.svelte";
+
   import {
-    FaBug,
-    FaGithub,
-    FaGlobe,
-    FaNpm,
-    FaRegCheckCircle,
-  } from "svelte-icons/fa";
+    BugIcon,
+    GithubIcon,
+    GlobeIcon,
+    PackageIcon,
+    CheckCircleIcon,
+    ScaleIcon,
+  } from "lucide-svelte";
 
   import { createQuery, useQueryClient } from "@tanstack/svelte-query";
 
@@ -113,8 +113,8 @@
           class:pt-1={isExpanded}
           rel="noopener noreferrer"
         >
-          <div class:hidden={!isExpanded} class="h-8">
-            <FaNpm />
+          <div class:hidden={!isExpanded}>
+            <PackageIcon class="h-6 w-6" />
           </div>
           {ellipsis(MAX_LENGTH, name)}
         </a>
@@ -125,9 +125,7 @@
             <div>
               {version}
             </div>
-            <div class="h-4 w-4 ml-1">
-              <FaRegCheckCircle />
-            </div>
+            <CheckCircleIcon class="h-4 w-4 ml-1" />
           </div>
         {:else}
           <div class="py-1">
@@ -157,7 +155,7 @@
           {#if meta.license}
             <div class="flex gap-1 items-center">
               <div class="h-text -translate-y-px">
-                <FaBalanceScale />
+                <ScaleIcon class="h-4 w-4" />
               </div>
               <span>
                 {meta.license ?? ""}
@@ -195,7 +193,7 @@
                 rel="noopener noreferrer"
                 title="Github"
               >
-                <FaGithub />
+                <GithubIcon />
               </a>
             </div>
           {/if}
@@ -208,7 +206,7 @@
                 rel="noopener noreferrer"
                 title="Homepage"
               >
-                <FaGlobe />
+                <GlobeIcon />
               </a>
             </div>
           {/if}
@@ -221,7 +219,7 @@
                 rel="noopener noreferrer"
                 title="Bugs"
               >
-                <FaBug />
+                <BugIcon />
               </a>
             </div>
           {/if}

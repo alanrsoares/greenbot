@@ -1,5 +1,5 @@
 <script lang="ts">
-  import FaNpm from "svelte-icons/fa/FaNpm.svelte";
+  import { PackageIcon } from "lucide-svelte";
   export let name = "";
   export let version = "";
 </script>
@@ -9,9 +9,7 @@
   href={`https://www.npmjs.com/package/${name}`}
   rel="noopener noreferrer"
 >
-  <div class="h-10">
-    <FaNpm />
-  </div>
+  <PackageIcon class="h-6 w-6" />
   <div class="font-mono font-medium">
     {name} @ {version}
   </div>
@@ -19,7 +17,7 @@
 
 <style lang="postcss">
   a {
-    @apply bg-npm px-6 rounded-full text-white flex items-center justify-center gap-2 outline-none;
+    @apply bg-npm px-4 py-2 rounded-full text-white flex items-center justify-center gap-2 outline-none;
     @apply focus:ring-4 ring-npm/50;
   }
 </style>
