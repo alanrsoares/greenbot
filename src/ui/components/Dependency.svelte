@@ -154,9 +154,7 @@
         <div class="grid gap-2">
           {#if meta.license}
             <div class="flex gap-1 items-center">
-              <div class="h-text -translate-y-px">
-                <ScaleIcon class="h-4 w-4" />
-              </div>
+              <ScaleIcon class="h-4 w-4 -translate-y-px" />
               <span>
                 {meta.license ?? ""}
               </span>
@@ -185,43 +183,37 @@
         </div>
         <div class="flex gap-2 items-center text-lg">
           {#if meta.repository?.url}
-            <div class="h-text">
-              <a
-                href={meta.repository.url.replace(/^git\+/, "")}
-                target="_blank"
-                class="hover:underline"
-                rel="noopener noreferrer"
-                title="Github"
-              >
-                <GithubIcon />
-              </a>
-            </div>
+            <a
+              href={meta.repository.url.replace(/^git\+/, "")}
+              target="_blank"
+              class="hover:underline"
+              rel="noopener noreferrer"
+              title="Github"
+            >
+              <GithubIcon class="h-4 w-4" />
+            </a>
           {/if}
           {#if meta.homepage}
-            <div class="h-text">
-              <a
-                href={meta.homepage}
-                target="_blank"
-                class="hover:underline"
-                rel="noopener noreferrer"
-                title="Homepage"
-              >
-                <GlobeIcon />
-              </a>
-            </div>
+            <a
+              href={meta.homepage}
+              target="_blank"
+              class="hover:underline"
+              rel="noopener noreferrer"
+              title="Homepage"
+            >
+              <GlobeIcon class="h-4 w-4" />
+            </a>
           {/if}
           {#if meta.bugs}
-            <div class="h-text">
-              <a
-                href={meta.bugs.url}
-                target="_blank"
-                class="hover:underline"
-                rel="noopener noreferrer"
-                title="Bugs"
-              >
-                <BugIcon />
-              </a>
-            </div>
+            <a
+              href={meta.bugs.url}
+              target="_blank"
+              class="hover:underline"
+              rel="noopener noreferrer"
+              title="Bugs"
+            >
+              <BugIcon class="h-5 w-5" />
+            </a>
           {/if}
         </div>
       </div>

@@ -125,7 +125,7 @@ function T(s) {
 function Ae(s, e) {
   for (let t = 0; t < s.length; t += 1) s[t] && s[t].d(e);
 }
-function L(s) {
+function R(s) {
   return document.createElement(s);
 }
 function ge(s) {
@@ -732,11 +732,11 @@ function An(s) {
           const q = (k = s.retry) != null ? k : 3,
             P = (O = s.retryDelay) != null ? O : Cs,
             v = typeof P == "function" ? P(t, w) : P,
-            R =
+            L =
               q === !0 ||
               (typeof q == "number" && t < q) ||
               (typeof q == "function" && q(t, w));
-          if (e || !R) {
+          if (e || !L) {
             h(w);
             return;
           }
@@ -1287,7 +1287,7 @@ class Ps extends Fn {
   }
   async execute() {
     const e = () => {
-        var R;
+        var L;
         return (
           (this.retryer = An({
             fn: () =>
@@ -1303,7 +1303,7 @@ class Ps extends Fn {
             onContinue: () => {
               this.dispatch({ type: "continue" });
             },
-            retry: (R = this.options.retry) != null ? R : 0,
+            retry: (L = this.options.retry) != null ? L : 0,
             retryDelay: this.options.retryDelay,
             networkMode: this.options.networkMode,
           })),
@@ -1329,50 +1329,50 @@ class Ps extends Fn {
             variables: this.state.variables,
           });
       }
-      const R = await e();
+      const L = await e();
       return (
         await ((n = (r = this.mutationCache.config).onSuccess) == null
           ? void 0
-          : n.call(r, R, this.state.variables, this.state.context, this)),
+          : n.call(r, L, this.state.variables, this.state.context, this)),
         await ((i = (o = this.options).onSuccess) == null
           ? void 0
-          : i.call(o, R, this.state.variables, this.state.context)),
+          : i.call(o, L, this.state.variables, this.state.context)),
         await ((l = (a = this.mutationCache.config).onSettled) == null
           ? void 0
-          : l.call(a, R, null, this.state.variables, this.state.context, this)),
+          : l.call(a, L, null, this.state.variables, this.state.context, this)),
         await ((u = (c = this.options).onSettled) == null
           ? void 0
-          : u.call(c, R, null, this.state.variables, this.state.context)),
-        this.dispatch({ type: "success", data: R }),
-        R
+          : u.call(c, L, null, this.state.variables, this.state.context)),
+        this.dispatch({ type: "success", data: L }),
+        L
       );
-    } catch (R) {
+    } catch (L) {
       try {
         var p, b, w, k, O, q, P, v;
         throw (
           (await ((p = (b = this.mutationCache.config).onError) == null
             ? void 0
-            : p.call(b, R, this.state.variables, this.state.context, this)),
+            : p.call(b, L, this.state.variables, this.state.context, this)),
           await ((w = (k = this.options).onError) == null
             ? void 0
-            : w.call(k, R, this.state.variables, this.state.context)),
+            : w.call(k, L, this.state.variables, this.state.context)),
           await ((O = (q = this.mutationCache.config).onSettled) == null
             ? void 0
             : O.call(
                 q,
                 void 0,
-                R,
+                L,
                 this.state.variables,
                 this.state.context,
                 this
               )),
           await ((P = (v = this.options).onSettled) == null
             ? void 0
-            : P.call(v, void 0, R, this.state.variables, this.state.context)),
-          R)
+            : P.call(v, void 0, L, this.state.variables, this.state.context)),
+          L)
         );
       } finally {
-        this.dispatch({ type: "error", error: R });
+        this.dispatch({ type: "error", error: L });
       }
     }
   }
@@ -1543,8 +1543,8 @@ function Es() {
             Object.defineProperty(v, "signal", {
               enumerable: !0,
               get: () => {
-                var R;
-                if ((R = s.signal) != null && R.aborted) p = !0;
+                var L;
+                if ((L = s.signal) != null && L.aborted) p = !0;
                 else {
                   var S;
                   (S = s.signal) == null ||
@@ -1557,12 +1557,12 @@ function Es() {
             });
           },
           w = s.options.queryFn || (() => Promise.reject("Missing queryFn")),
-          k = (v, R, S, M) => (
-            (f = M ? [R, ...f] : [...f, R]), M ? [S, ...v] : [...v, S]
+          k = (v, L, S, M) => (
+            (f = M ? [L, ...f] : [...f, L]), M ? [S, ...v] : [...v, S]
           ),
-          O = (v, R, S, M) => {
+          O = (v, L, S, M) => {
             if (p) return Promise.reject("Cancelled");
-            if (typeof S > "u" && !R && v.length) return Promise.resolve(v);
+            if (typeof S > "u" && !L && v.length) return Promise.resolve(v);
             const K = {
               queryKey: s.queryKey,
               pageParam: S,
@@ -1576,12 +1576,12 @@ function Es() {
         if (!d.length) q = O([]);
         else if (c) {
           const v = typeof u < "u",
-            R = v ? u : Nt(s.options, d);
-          q = O(d, v, R);
+            L = v ? u : Nt(s.options, d);
+          q = O(d, v, L);
         } else if (y) {
           const v = typeof u < "u",
-            R = v ? u : Ms(s.options, d);
-          q = O(d, v, R, !0);
+            L = v ? u : Ms(s.options, d);
+          q = O(d, v, L, !0);
         } else {
           f = [];
           const v = typeof s.options.getNextPageParam > "u";
@@ -4137,7 +4137,7 @@ function ai(s) {
     c() {
       (t = j(e)),
         (n = D()),
-        (r = L("div")),
+        (r = R("div")),
         l && l.c(),
         m(r, "class", "opacity-0 h-0");
     },
@@ -4174,11 +4174,11 @@ function ui(s) {
     (l = new xn({ props: { class: "h-5 w-5" } })),
     {
       c() {
-        (e = L("button")),
-          (t = L("div")),
+        (e = R("button")),
+          (t = R("div")),
           r.c(),
           (i = D()),
-          (o = L("div")),
+          (o = R("div")),
           N(l.$$.fragment),
           m(t, "class", "px-2 font-medium relative"),
           m(
@@ -4270,7 +4270,7 @@ function fi(s) {
     t.$on("click", s[17]),
     {
       c() {
-        (e = L("div")), N(t.$$.fragment), m(e, "class", "py-1");
+        (e = R("div")), N(t.$$.fragment), m(e, "class", "py-1");
       },
       m(r, i) {
         A(r, e, i), Q(t, e, null), (n = !0);
@@ -4300,8 +4300,8 @@ function di(s) {
     (i = new es({ props: { class: "h-4 w-4 ml-1" } })),
     {
       c() {
-        (e = L("div")),
-          (t = L("div")),
+        (e = R("div")),
+          (t = R("div")),
           (n = j(s[1])),
           (r = D()),
           N(i.$$.fragment),
@@ -4365,18 +4365,18 @@ function Jt(s) {
     O = s[5].bugs && nn(s);
   return {
     c() {
-      (e = L("div")),
+      (e = R("div")),
         (n = j(t)),
         (r = D()),
-        (i = L("div")),
-        (o = L("div")),
+        (i = R("div")),
+        (o = R("div")),
         f && f.c(),
         (l = D()),
         p && p.c(),
         (a = D()),
         b && b.c(),
         (u = D()),
-        (c = L("div")),
+        (c = R("div")),
         w && w.c(),
         (y = D()),
         k && k.c(),
@@ -4416,7 +4416,7 @@ function Jt(s) {
         (h = !0);
     },
     p(P, v) {
-      var R;
+      var L;
       (!h || v & 32) && t !== (t = P[5].description + "") && ae(n, t),
         P[5].license
           ? f
@@ -4438,7 +4438,7 @@ function Jt(s) {
             ? b.p(P, v)
             : ((b = xt(P)), b.c(), b.m(o, null))
           : b && (b.d(1), (b = null)),
-        (R = P[5].repository) != null && R.url
+        (L = P[5].repository) != null && L.url
           ? w
             ? (w.p(P, v), v & 32 && _(w, 1))
             : ((w = en(P)), w.c(), _(w, 1), w.m(c, y))
@@ -4493,37 +4493,34 @@ function Yt(s) {
     t,
     n,
     r,
-    i,
-    o = (s[5].license ?? "") + "",
-    l,
-    a;
+    i = (s[5].license ?? "") + "",
+    o,
+    l;
   return (
-    (n = new ei({ props: { class: "h-4 w-4" } })),
+    (t = new ei({ props: { class: "h-4 w-4 -translate-y-px" } })),
     {
       c() {
-        (e = L("div")),
-          (t = L("div")),
-          N(n.$$.fragment),
-          (r = D()),
-          (i = L("span")),
-          (l = j(o)),
-          m(t, "class", "h-text -translate-y-px"),
+        (e = R("div")),
+          N(t.$$.fragment),
+          (n = D()),
+          (r = R("span")),
+          (o = j(i)),
           m(e, "class", "flex gap-1 items-center");
       },
-      m(u, c) {
-        A(u, e, c), g(e, t), Q(n, t, null), g(e, r), g(e, i), g(i, l), (a = !0);
+      m(a, u) {
+        A(a, e, u), Q(t, e, null), g(e, n), g(e, r), g(r, o), (l = !0);
       },
-      p(u, c) {
-        (!a || c & 32) && o !== (o = (u[5].license ?? "") + "") && ae(l, o);
+      p(a, u) {
+        (!l || u & 32) && i !== (i = (a[5].license ?? "") + "") && ae(o, i);
       },
-      i(u) {
-        a || (_(n.$$.fragment, u), (a = !0));
+      i(a) {
+        l || (_(t.$$.fragment, a), (l = !0));
       },
-      o(u) {
-        C(n.$$.fragment, u), (a = !1);
+      o(a) {
+        C(t.$$.fragment, a), (l = !1);
       },
-      d(u) {
-        u && T(e), $(n);
+      d(a) {
+        a && T(e), $(t);
       },
     }
   );
@@ -4537,11 +4534,11 @@ function Xt(s) {
     o;
   return {
     c() {
-      (e = L("div")),
-        (t = L("span")),
+      (e = R("div")),
+        (t = R("span")),
         (t.textContent = "Authored by"),
         (n = D()),
-        (r = L("span")),
+        (r = R("span")),
         (o = j(i)),
         m(r, "class", "font-semibold"),
         m(e, "class", "text-granny-smith-apple flex items-center gap-2");
@@ -4572,16 +4569,16 @@ function xt(s) {
     d;
   return {
     c() {
-      (e = L("div")),
+      (e = R("div")),
         (t = j(`Bundle size
               `)),
-        (n = L("span")),
+        (n = R("span")),
         (i = j(r)),
         (o = j("kb")),
         (l = j(`
               (gzipped) |
               `)),
-        (a = L("span")),
+        (a = R("span")),
         (c = j(u)),
         (y = j("kb")),
         (d = j(" (uncompressed)")),
@@ -4614,105 +4611,99 @@ function xt(s) {
   };
 }
 function en(s) {
-  let e, t, n, r, i;
+  let e, t, n, r;
   return (
-    (n = new Dr({})),
+    (t = new Dr({ props: { class: "h-4 w-4" } })),
     {
       c() {
-        (e = L("div")),
-          (t = L("a")),
-          N(n.$$.fragment),
-          m(t, "href", (r = s[5].repository.url.replace(/^git\+/, ""))),
-          m(t, "target", "_blank"),
-          m(t, "class", "hover:underline"),
-          m(t, "rel", "noopener noreferrer"),
-          m(t, "title", "Github"),
-          m(e, "class", "h-text");
+        (e = R("a")),
+          N(t.$$.fragment),
+          m(e, "href", (n = s[5].repository.url.replace(/^git\+/, ""))),
+          m(e, "target", "_blank"),
+          m(e, "class", "hover:underline"),
+          m(e, "rel", "noopener noreferrer"),
+          m(e, "title", "Github");
       },
-      m(o, l) {
-        A(o, e, l), g(e, t), Q(n, t, null), (i = !0);
+      m(i, o) {
+        A(i, e, o), Q(t, e, null), (r = !0);
       },
-      p(o, l) {
-        (!i ||
-          (l & 32 && r !== (r = o[5].repository.url.replace(/^git\+/, "")))) &&
-          m(t, "href", r);
+      p(i, o) {
+        (!r ||
+          (o & 32 && n !== (n = i[5].repository.url.replace(/^git\+/, "")))) &&
+          m(e, "href", n);
       },
-      i(o) {
-        i || (_(n.$$.fragment, o), (i = !0));
+      i(i) {
+        r || (_(t.$$.fragment, i), (r = !0));
       },
-      o(o) {
-        C(n.$$.fragment, o), (i = !1);
+      o(i) {
+        C(t.$$.fragment, i), (r = !1);
       },
-      d(o) {
-        o && T(e), $(n);
+      d(i) {
+        i && T(e), $(t);
       },
     }
   );
 }
 function tn(s) {
-  let e, t, n, r, i;
+  let e, t, n, r;
   return (
-    (n = new jr({})),
+    (t = new jr({ props: { class: "h-4 w-4" } })),
     {
       c() {
-        (e = L("div")),
-          (t = L("a")),
-          N(n.$$.fragment),
-          m(t, "href", (r = s[5].homepage)),
-          m(t, "target", "_blank"),
-          m(t, "class", "hover:underline"),
-          m(t, "rel", "noopener noreferrer"),
-          m(t, "title", "Homepage"),
-          m(e, "class", "h-text");
+        (e = R("a")),
+          N(t.$$.fragment),
+          m(e, "href", (n = s[5].homepage)),
+          m(e, "target", "_blank"),
+          m(e, "class", "hover:underline"),
+          m(e, "rel", "noopener noreferrer"),
+          m(e, "title", "Homepage");
       },
-      m(o, l) {
-        A(o, e, l), g(e, t), Q(n, t, null), (i = !0);
+      m(i, o) {
+        A(i, e, o), Q(t, e, null), (r = !0);
       },
-      p(o, l) {
-        (!i || (l & 32 && r !== (r = o[5].homepage))) && m(t, "href", r);
+      p(i, o) {
+        (!r || (o & 32 && n !== (n = i[5].homepage))) && m(e, "href", n);
       },
-      i(o) {
-        i || (_(n.$$.fragment, o), (i = !0));
+      i(i) {
+        r || (_(t.$$.fragment, i), (r = !0));
       },
-      o(o) {
-        C(n.$$.fragment, o), (i = !1);
+      o(i) {
+        C(t.$$.fragment, i), (r = !1);
       },
-      d(o) {
-        o && T(e), $(n);
+      d(i) {
+        i && T(e), $(t);
       },
     }
   );
 }
 function nn(s) {
-  let e, t, n, r, i;
+  let e, t, n, r;
   return (
-    (n = new Or({})),
+    (t = new Or({ props: { class: "h-5 w-5" } })),
     {
       c() {
-        (e = L("div")),
-          (t = L("a")),
-          N(n.$$.fragment),
-          m(t, "href", (r = s[5].bugs.url)),
-          m(t, "target", "_blank"),
-          m(t, "class", "hover:underline"),
-          m(t, "rel", "noopener noreferrer"),
-          m(t, "title", "Bugs"),
-          m(e, "class", "h-text");
+        (e = R("a")),
+          N(t.$$.fragment),
+          m(e, "href", (n = s[5].bugs.url)),
+          m(e, "target", "_blank"),
+          m(e, "class", "hover:underline"),
+          m(e, "rel", "noopener noreferrer"),
+          m(e, "title", "Bugs");
       },
-      m(o, l) {
-        A(o, e, l), g(e, t), Q(n, t, null), (i = !0);
+      m(i, o) {
+        A(i, e, o), Q(t, e, null), (r = !0);
       },
-      p(o, l) {
-        (!i || (l & 32 && r !== (r = o[5].bugs.url))) && m(t, "href", r);
+      p(i, o) {
+        (!r || (o & 32 && n !== (n = i[5].bugs.url))) && m(e, "href", n);
       },
-      i(o) {
-        i || (_(n.$$.fragment, o), (i = !0));
+      i(i) {
+        r || (_(t.$$.fragment, i), (r = !0));
       },
-      o(o) {
-        C(n.$$.fragment, o), (i = !1);
+      o(i) {
+        C(t.$$.fragment, i), (r = !1);
       },
-      d(o) {
-        o && T(e), $(n);
+      d(i) {
+        i && T(e), $(t);
       },
     }
   );
@@ -4741,24 +4732,24 @@ function pi(s) {
   l = new ts({ props: { class: "h-6 w-6" } });
   const P = [di, fi],
     v = [];
-  function R(M, K) {
+  function L(M, K) {
     return M[4] ? 0 : 1;
   }
-  (f = R(s)), (p = v[f] = P[f](s));
+  (f = L(s)), (p = v[f] = P[f](s));
   let S = s[6] && Jt(s);
   return {
     c() {
-      (e = L("li")),
-        (t = L("div")),
-        (n = L("div")),
-        (r = L("div")),
-        (i = L("a")),
-        (o = L("div")),
+      (e = R("li")),
+        (t = R("div")),
+        (n = R("div")),
+        (r = R("div")),
+        (i = R("a")),
+        (o = R("div")),
         N(l.$$.fragment),
         (a = D()),
         (c = j(u)),
         (d = D()),
-        (h = L("div")),
+        (h = R("div")),
         p.c(),
         (b = D()),
         S && S.c(),
@@ -4815,7 +4806,7 @@ function pi(s) {
           m(i, "href", y),
         (!k || K & 64) && z(i, "pt-1", M[6]);
       let ce = f;
-      (f = R(M)),
+      (f = L(M)),
         f === ce
           ? v[f].p(M, K)
           : (ne(),
@@ -4880,11 +4871,11 @@ function mi(s, e, t) {
       t(7, (f = !1));
     },
   });
-  Ve(s, p, (R) => t(9, (i = R)));
+  Ve(s, p, (L) => t(9, (i = L)));
   const b = st();
-  async function w(R) {
+  async function w(L) {
     try {
-      const S = await i.mutateAsync(R);
+      const S = await i.mutateAsync(L);
       b.setQueryData([Fe.package], Jn(S)), await b.refetchQueries([Fe.package]);
     } catch (S) {
       console.log("Failed to upgrade packages:", { originalError: S });
@@ -4894,29 +4885,29 @@ function mi(s, e, t) {
     h === c ? t(16, (h = -1)) : t(16, (h = c));
   }
   const O = 1 / 30;
-  function q(R) {
-    R.key === "Escape" && t(16, (h = -1));
+  function q(L) {
+    L.key === "Escape" && t(16, (h = -1));
   }
   const P = lr(l);
-  Ve(s, P, (R) => t(10, (o = R))),
+  Ve(s, P, (L) => t(10, (o = L))),
     _t(() => {
       window.addEventListener("keydown", q);
     }),
     vt(() => {
       window.removeEventListener("keydown", q);
     });
-  const v = (R) => {
-    R.stopPropagation(), w([{ name: l, version: a, latest: u, meta: d }]);
+  const v = (L) => {
+    L.stopPropagation(), w([{ name: l, version: a, latest: u, meta: d }]);
   };
   return (
-    (s.$$set = (R) => {
-      "name" in R && t(0, (l = R.name)),
-        "version" in R && t(1, (a = R.version)),
-        "latest" in R && t(2, (u = R.latest)),
-        "index" in R && t(3, (c = R.index)),
-        "isLatest" in R && t(4, (y = R.isLatest)),
-        "meta" in R && t(5, (d = R.meta)),
-        "expandedRowIndex" in R && t(16, (h = R.expandedRowIndex));
+    (s.$$set = (L) => {
+      "name" in L && t(0, (l = L.name)),
+        "version" in L && t(1, (a = L.version)),
+        "latest" in L && t(2, (u = L.latest)),
+        "index" in L && t(3, (c = L.index)),
+        "isLatest" in L && t(4, (y = L.isLatest)),
+        "meta" in L && t(5, (d = L.meta)),
+        "expandedRowIndex" in L && t(16, (h = L.expandedRowIndex));
     }),
     (s.$$.update = () => {
       s.$$.dirty & 65544 && t(6, (n = h === c)),
@@ -4953,8 +4944,8 @@ function on(s) {
     l;
   return {
     c() {
-      (e = L("li")),
-        (t = L("button")),
+      (e = R("li")),
+        (t = R("button")),
         (r = j(n)),
         m(t, "data-page", (i = s[5])),
         m(t, "class", "btn-arrow text-xl svelte-16bdnnj"),
@@ -4992,11 +4983,11 @@ function bi(s) {
   for (let b = 0; b < f.length; b += 1) p[b] = on(rn(s, f, b));
   return {
     c() {
-      (e = L("ul")), (t = L("li")), (n = L("button")), (r = j("◄")), (o = D());
+      (e = R("ul")), (t = R("li")), (n = R("button")), (r = j("◄")), (o = D());
       for (let b = 0; b < p.length; b += 1) p[b].c();
       (l = D()),
-        (a = L("li")),
-        (u = L("button")),
+        (a = R("li")),
+        (u = R("button")),
         (c = j("►")),
         m(n, "class", "btn-arrow svelte-16bdnnj"),
         (n.disabled = i = s[0] === 0),
@@ -5144,10 +5135,10 @@ function cn(s) {
     })),
     {
       c() {
-        (e = L("kbd")),
+        (e = R("kbd")),
           N(t.$$.fragment),
           (n = D()),
-          (r = L("span")),
+          (r = R("span")),
           (o = j(i)),
           (l = D()),
           m(r, "class", "sr-only"),
@@ -5191,10 +5182,10 @@ function fn(s) {
     });
   return {
     c() {
-      (e = L("li")), (t = L("div"));
+      (e = R("li")), (t = R("div"));
       for (let d = 0; d < c.length; d += 1) c[d].c();
       (n = D()),
-        (r = L("span")),
+        (r = R("span")),
         (o = j(i)),
         (l = D()),
         m(t, "class", "flex gap-2"),
@@ -5371,8 +5362,8 @@ function mn(s) {
     je.push(() => Ct(n, "pageIndex", o)),
     {
       c() {
-        (e = L("footer")),
-          (t = L("div")),
+        (e = R("footer")),
+          (t = R("div")),
           N(n.$$.fragment),
           m(t, "class", "bg-slate-900/90 rounded-full"),
           m(e, "class", "grid place-items-center");
@@ -5423,7 +5414,7 @@ function ki(s) {
     q,
     P = s[4].length + "",
     v,
-    R,
+    L,
     S = s[1].length + "",
     M,
     K,
@@ -5461,35 +5452,35 @@ function ki(s) {
   let ee = s[11] > 1 && mn(s);
   return {
     c() {
-      (e = L("div")),
-        (t = L("aside")),
-        (n = L("button")),
+      (e = R("div")),
+        (t = R("aside")),
+        (n = R("button")),
         i.c(),
         (o = D()),
-        (l = L("ul"));
+        (l = R("ul"));
       for (let E = 0; E < G.length; E += 1) G[E].c();
       (u = D()),
-        (c = L("section")),
-        (y = L("div")),
-        (d = L("input")),
+        (c = R("section")),
+        (y = R("div")),
+        (d = R("input")),
         (h = D()),
-        (f = L("header")),
-        (p = L("div")),
-        (b = L("div")),
+        (f = R("header")),
+        (p = R("div")),
+        (b = R("div")),
         (k = j(w)),
         (O = D()),
-        (q = L("span")),
+        (q = R("span")),
         (v = j(P)),
-        (R = j("/")),
+        (L = j("/")),
         (M = j(S)),
         (K = D()),
         te && te.c(),
         (ce = D()),
-        (we = L("div")),
+        (we = R("div")),
         x && x.c(),
         (Pe = D()),
-        (Se = L("main")),
-        (F = L("ul"));
+        (Se = R("main")),
+        (F = R("ul"));
       for (let E = 0; E < Z.length; E += 1) Z[E].c();
       (he = D()),
         ee && ee.c(),
@@ -5544,7 +5535,7 @@ function ki(s) {
         g(b, O),
         g(b, q),
         g(q, v),
-        g(q, R),
+        g(q, L),
         g(q, M),
         g(p, K),
         te && te.m(p, null),
@@ -5768,7 +5759,7 @@ function Li(s, e, t) {
         label: "+ Shift, Switch tabs.",
       },
     ],
-    R = () => {
+    L = () => {
       t(6, (w = !w));
     },
     S = () => t(6, (w = !1));
@@ -5850,7 +5841,7 @@ function Li(s, e, t) {
       i,
       o,
       n,
-      R,
+      L,
       S,
       M,
       K,
@@ -5868,7 +5859,7 @@ class Ri extends J {
   }
 }
 const Oi = "@greenbot/cli",
-  Pi = "0.21.0",
+  Pi = "0.22.0",
   Si = ["greenbot", "cli", "package updater"],
   Ei = "An interactive package updater for npm based applications",
   Mi = "https://github.com/alanrsoares/greenbot",
@@ -5948,24 +5939,24 @@ function Ui(s) {
     P = re(q, s, s[0], null);
   return {
     c() {
-      (e = L("div")),
-        (t = L("header")),
-        (n = L("nav")),
-        (r = L("h1")),
-        (i = L("div")),
+      (e = R("div")),
+        (t = R("header")),
+        (n = R("nav")),
+        (r = R("h1")),
+        (i = R("div")),
         w && w.c(),
         (o = D()),
-        (l = L("div")),
+        (l = R("div")),
         (l.textContent = "_greenbot"),
         (a = D()),
         O && O.c(),
         (u = D()),
-        (c = L("main")),
+        (c = R("main")),
         P && P.c(),
         (y = D()),
-        (d = L("footer")),
-        (h = L("div")),
-        (f = L("span")),
+        (d = R("footer")),
+        (h = R("div")),
+        (f = R("span")),
         (f.textContent = `npm-greenbot@v${$i.version}`),
         m(i, "class", "w-12"),
         m(r, "class", "flex items-center gap-2 whitespace-nowrap p-2"),
@@ -5980,8 +5971,8 @@ function Ui(s) {
         m(h, "class", "max-w-xl m-auto text-center"),
         m(e, "class", "layout svelte-1m49ym4");
     },
-    m(v, R) {
-      A(v, e, R),
+    m(v, L) {
+      A(v, e, L),
         g(e, t),
         g(t, n),
         g(n, r),
@@ -6000,19 +5991,19 @@ function Ui(s) {
         g(h, f),
         (p = !0);
     },
-    p(v, [R]) {
+    p(v, [L]) {
       w &&
         w.p &&
-        (!p || R & 1) &&
-        oe(w, b, v, v[0], p ? ie(b, v[0], R, ji) : le(v[0]), bn),
+        (!p || L & 1) &&
+        oe(w, b, v, v[0], p ? ie(b, v[0], L, ji) : le(v[0]), bn),
         O &&
           O.p &&
-          (!p || R & 1) &&
-          oe(O, k, v, v[0], p ? ie(k, v[0], R, Ni) : le(v[0]), gn),
+          (!p || L & 1) &&
+          oe(O, k, v, v[0], p ? ie(k, v[0], L, Ni) : le(v[0]), gn),
         P &&
           P.p &&
-          (!p || R & 1) &&
-          oe(P, q, v, v[0], p ? ie(q, v[0], R, null) : le(v[0]), null);
+          (!p || L & 1) &&
+          oe(P, q, v, v[0], p ? ie(q, v[0], L, null) : le(v[0]), null);
     },
     i(v) {
       p || (_(w, v), _(O, v), _(P, v), (p = !0));
@@ -6045,10 +6036,10 @@ function zi(s) {
     (t = new ts({ props: { class: "h-6 w-6" } })),
     {
       c() {
-        (e = L("a")),
+        (e = R("a")),
           N(t.$$.fragment),
           (n = D()),
-          (r = L("div")),
+          (r = R("div")),
           (i = j(s[0])),
           (o = j(" @ ")),
           (l = j(s[1])),
@@ -6117,7 +6108,7 @@ function _n(s) {
     l;
   return {
     c() {
-      (e = L("button")),
+      (e = R("button")),
         (n = j(t)),
         (r = D()),
         m(e, "data-value", (i = s[3].value)),
@@ -6153,7 +6144,7 @@ function Zi(s) {
   for (let r = 0; r < t.length; r += 1) n[r] = _n(yn(s, t, r));
   return {
     c() {
-      e = L("div");
+      e = R("div");
       for (let r = 0; r < n.length; r += 1) n[r].c();
       m(e, "class", "container svelte-u0zq3l");
     },
@@ -6262,11 +6253,11 @@ function vn(s) {
     (n = new Xi({ props: { animated: !0 } })),
     {
       c() {
-        (e = L("div")),
-          (t = L("div")),
+        (e = R("div")),
+          (t = R("div")),
           N(n.$$.fragment),
           (r = D()),
-          (i = L("span")),
+          (i = R("span")),
           (i.textContent = "Loading dependencies"),
           m(t, "class", "h-4 w-4"),
           m(
@@ -6345,7 +6336,7 @@ function xi(s) {
     i = s[1].data && wn(s);
   return {
     c() {
-      (e = L("div")),
+      (e = R("div")),
         r && r.c(),
         (t = D()),
         i && i.c(),
@@ -6451,7 +6442,7 @@ function to(s) {
     n = s[1].data && Cn(s);
   return {
     c() {
-      (e = L("div")), n && n.c(), m(e, "slot", "version");
+      (e = R("div")), n && n.c(), m(e, "slot", "version");
     },
     m(r, i) {
       A(r, e, i), n && n.m(e, null), (t = !0);

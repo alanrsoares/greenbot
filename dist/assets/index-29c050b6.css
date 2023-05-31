@@ -404,9 +404,6 @@ video {
 .h-6 {
   height: 1.5rem;
 }
-.h-text {
-  height: 1em;
-}
 .min-h-\[32rem\] {
   min-height: 32rem;
 }
