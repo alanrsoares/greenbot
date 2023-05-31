@@ -17,3 +17,31 @@ export interface PackageInfo {
   latest: string;
   meta: FullMetadata;
 }
+
+/**
+ * Result of a bundlephobia API call.
+ */
+export type BundlephobiaReport = {
+  name: string;
+  description: string;
+  version: string;
+  size: number;
+  gzip: number;
+  repository: string;
+  scoped: boolean;
+  hasJSModule: boolean;
+  hasJSNext: boolean;
+  isModuleType: boolean;
+  hasSideEffects: boolean;
+  assets: {
+    gzip: number;
+    name: string;
+    size: number;
+    type: string;
+  }[];
+  dependencyCount: number;
+  dependencySizes: {
+    approximateSize: number;
+    name: string;
+  }[];
+};

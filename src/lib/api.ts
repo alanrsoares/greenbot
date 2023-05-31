@@ -1,24 +1,28 @@
 import ky from "ky";
-import type { Package, PackageInfo } from "~/domain/types";
+import type { BundlephobiaReport, Package, PackageInfo } from "~/domain/types";
 
-const client = ky.create({
+const greenbotClient = ky.create({
   prefixUrl: "http://localhost:5001/",
 });
 
-export async function getPackage() {
-  const result = await client.get("package").json<Package>();
+const bundlephobiaClient = ky.create({
+  prefixUrl: "https://bundlephobia.com/",
+});
 
-  return result;
+export function getPackage() {
+  return greenbotClient.get("package").json<Package>();
 }
 
-export async function upgradePackages(
-  input: PackageInfo[]
-): Promise<PackageInfo[]> {
-  const result = await client
+export function upgradePackages(input: PackageInfo[]): Promise<PackageInfo[]> {
+  return greenbotClient
     .post("upgrade-packages", {
       json: input,
     })
     .json<PackageInfo[]>();
+}
 
-  return result;
+export function getBundlephobiaReport(name: string) {
+  return bundlephobiaClient
+    .get(`api/size?package=${name}`)
+    .json<BundlephobiaReport>();
 }

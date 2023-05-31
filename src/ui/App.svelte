@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { UseQueryResult } from "@sveltestack/svelte-query";
+  import type {
+    CreateQueryResult,
+    QueryObserverResult,
+  } from "@tanstack/svelte-query";
   import type { FullMetadata } from "package-json";
 
   import type { Package, TabKind } from "~/domain/types";
@@ -35,7 +38,9 @@
     return { name, version, latest: resolutions[name], meta: meta[name] };
   }
 
-  function getCurrentMood(result?: UseQueryResult<Package, unknown>): Mood {
+  function getCurrentMood(
+    result?: QueryObserverResult<Package, unknown>
+  ): Mood {
     if (result.isLoading) {
       return "asleep";
     }
@@ -93,7 +98,7 @@
   <div class="w-full grid gap-4">
     {#if $packageQuery.isLoading}
       <div
-        class="border-2 border-slate-900 bg-slate-900/60  rounded-3xl flex justify-center items-center overflow-hidden p-8  gap-2"
+        class="border-2 border-slate-900 bg-slate-900/60 rounded-3xl flex justify-center items-center overflow-hidden p-8 gap-2"
       >
         <div class="h-4 w-4">
           <Spinner animated />

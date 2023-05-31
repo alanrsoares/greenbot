@@ -1,5 +1,6 @@
 export const PAGE_SIZE = 10;
 
-export const QUERIES = {
-  package: "package",
+export const QUERY_KEYS = {
+  package: ["package"],
+  bundlephobiaReport: (name: string) => ["bundlephobiaReport", name],
 };

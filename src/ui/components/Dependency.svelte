@@ -1,19 +1,24 @@
 <script lang="ts">
+  import ky from "ky";
   import type { FullMetadata } from "package-json";
   import { onDestroy, onMount } from "svelte";
   import FaBalanceScale from "svelte-icons/fa/FaBalanceScale.svelte";
-  import FaBug from "svelte-icons/fa/FaBug.svelte";
-  import FaGithub from "svelte-icons/fa/FaGithub.svelte";
-  import FaGlobe from "svelte-icons/fa/FaGlobe.svelte";
-  import FaNpm from "svelte-icons/fa/FaNpm.svelte";
-  import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
-  import { useQuery, useQueryClient } from "@sveltestack/svelte-query";
+  import {
+    FaBug,
+    FaGithub,
+    FaGlobe,
+    FaNpm,
+    FaRegCheckCircle,
+  } from "svelte-icons/fa";
+
+  import { createQuery, useQueryClient } from "@tanstack/svelte-query";
 
   import type { Package, PackageInfo } from "~/domain/types";
-  import { QUERIES } from "~/domain/constants";
+  import { QUERY_KEYS } from "~/domain/constants";
   import { ellipsis } from "~/lib/helpers";
   import {
     updatePackageQueryCache,
+    useBundlephobiaReportQuery,
     useUpgradePackagesMutation,
   } from "~/lib/hooks";
 
@@ -45,11 +50,11 @@
       const updated = await $upgradePackagesMutation.mutateAsync(packages);
 
       queryClient.setQueryData<Package>(
-        [QUERIES.package],
+        [QUERY_KEYS.package],
         updatePackageQueryCache(updated)
       );
 
-      await queryClient.refetchQueries([QUERIES.package]);
+      await queryClient.refetchQueries([QUERY_KEYS.package]);
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
     }
@@ -72,12 +77,7 @@
     }
   }
 
-  const bundlephobiaQuery = useQuery(["bundlephobia", name], async () => {
-    const response = await fetch(
-      `https://bundlephobia.com/api/size?package=${name}&record=true`
-    );
-    return await response.json();
-  });
+  const bundlephobiaQuery = useBundlephobiaReportQuery(name);
 
   onMount(() => {
     window.addEventListener("keydown", handleKeyDown);

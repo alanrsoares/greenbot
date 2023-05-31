@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useQueryClient } from "@sveltestack/svelte-query";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { partition, prop } from "rambda";
   import FaArrowUp from "svelte-icons/fa/FaArrowUp.svelte";
   import FaRegCheckCircle from "svelte-icons/fa/FaRegCheckCircle.svelte";
@@ -7,7 +7,7 @@
   import GoInfo from "svelte-icons/go/GoInfo.svelte";
   import GoX from "svelte-icons/go/GoX.svelte";
 
-  import { PAGE_SIZE, QUERIES } from "~/domain/constants";
+  import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
   import type { Package, PackageInfo, TabKind } from "~/domain/types";
   import { clickOutside } from "~/lib/directives";
   import { isLatestVersion } from "~/lib/helpers";
@@ -42,11 +42,11 @@
       const updated = await $upgradePackagesMutation.mutateAsync(packages);
 
       queryClient.setQueryData<Package>(
-        [QUERIES.package],
+        [QUERY_KEYS.package],
         updatePackageQueryCache(updated)
       );
 
-      await queryClient.refetchQueries([QUERIES.package]);
+      await queryClient.refetchQueries([QUERY_KEYS.package]);
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
     }

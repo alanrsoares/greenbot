@@ -1,19 +1,19 @@
 import {
-  useMutation,
-  useQuery,
-  type UseMutationOptions,
-} from "@sveltestack/svelte-query";
+  createMutation,
+  createQuery,
+  type CreateMutationOptions,
+} from "@tanstack/svelte-query";
 import { onDestroy, onMount } from "svelte";
 
-import { QUERIES } from "~/domain/constants";
+import { QUERY_KEYS } from "~/domain/constants";
 import type { Package, PackageInfo } from "~/domain/types";
 
 import * as api from "./api";
 import { rawVersion } from "./helpers";
 
 export const useUpgradePackagesMutation = (
-  options?: UseMutationOptions<PackageInfo[], unknown, PackageInfo[], void>
-) => useMutation(api.upgradePackages, options);
+  options?: CreateMutationOptions<PackageInfo[], unknown, PackageInfo[], void>
+) => createMutation(api.upgradePackages, options);
 
 export const updatePackageQueryCache =
   (updated: PackageInfo[]) => (current: Package) => {
@@ -31,7 +31,17 @@ export const updatePackageQueryCache =
     return current;
   };
 
-export const usePackageQuery = () => useQuery(QUERIES.package, api.getPackage);
+export const usePackageQuery = () =>
+  createQuery(QUERY_KEYS.package, api.getPackage);
+
+export const useBundlephobiaReportQuery = (name: string) =>
+  createQuery(
+    QUERY_KEYS.bundlephobiaReport(name),
+    () => api.getBundlephobiaReport(name),
+    {
+      enabled: Boolean(name),
+    }
+  );
 
 export function useKeyDown(onKeyDown: (e: KeyboardEvent) => void) {
   onMount(() => {
