@@ -30,7 +30,7 @@
     "@types/cors": "^2.8.13",
     "autoprefixer": "^10.4.14",
     "broadcast-channel": "^4.20.2",
-    "cssnano": "^5.1.15",
+    "cssnano": "^5.1.0",
     "husky": "^8.0.3",
     "postcss": "^8.4.24",
     "postcss-load-config": "^4.0.1",

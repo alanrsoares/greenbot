@@ -24,7 +24,7 @@
       {/if}
     </div>
     <div class="h-6 w-6 bg-gray-800 rounded-full p-1 text-granny-smith-apple">
-      <ArrowUpIcon class="h-5 w-5" />
+      <ArrowUpIcon class="h-4 w-4" />
     </div>
   </button>
 </template>

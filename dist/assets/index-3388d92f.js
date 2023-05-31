@@ -4171,7 +4171,7 @@ function ui(s) {
   return (
     (n = h(s)),
     (r = d[n] = y[n](s)),
-    (l = new xn({ props: { class: "h-5 w-5" } })),
+    (l = new xn({ props: { class: "h-4 w-4" } })),
     {
       c() {
         (e = R("button")),
@@ -5859,7 +5859,7 @@ class Ri extends J {
   }
 }
 const Oi = "@greenbot/cli",
-  Pi = "0.22.0",
+  Pi = "0.22.1",
   Si = ["greenbot", "cli", "package updater"],
   Ei = "An interactive package updater for npm based applications",
   Mi = "https://github.com/alanrsoares/greenbot",
@@ -5882,7 +5882,7 @@ const Oi = "@greenbot/cli",
     "@types/cors": "^2.8.13",
     autoprefixer: "^10.4.14",
     "broadcast-channel": "^4.20.2",
-    cssnano: "^5.1.15",
+    cssnano: "^5.1.0",
     husky: "^8.0.3",
     postcss: "^8.4.24",
     "postcss-load-config": "^4.0.1",
