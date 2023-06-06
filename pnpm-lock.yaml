@@ -1,4 +1,8 @@
-lockfileVersion: "6.0"
+lockfileVersion: "6.1"
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 dependencies:
   "@tanstack/svelte-query":
@@ -35,8 +39,8 @@ dependencies:
     specifier: ^6.3.5
     version: 6.3.5
   typewriter-effect:
-    specifier: ^2.19.0
-    version: 2.19.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^2.20.1
+    version: 2.20.1(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   "@sveltejs/vite-plugin-svelte":
@@ -85,8 +89,8 @@ devDependencies:
     specifier: ^3.3.2
     version: 3.3.2
   tslib:
-    specifier: ^2.5.2
-    version: 2.5.2
+    specifier: ^2.5.3
+    version: 2.5.3
   typescript:
     specifier: ^4.9.5
     version: 4.9.5
@@ -803,20 +807,6 @@ packages:
       unload: 2.4.1
     dev: true
 
-  /browserslist@4.21.4:
-    resolution:
-      {
-        integrity: sha512-CBHJJdDmgjl3daYjN5Cp5kbTf1mUhZoS+beLklHIvkOWscs83YAhLlF3Wsh/lciQYAcbBJgTOD44VtG31ZM4Hw==,
-      }
-    engines: { node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7 }
-    hasBin: true
-    dependencies:
-      caniuse-lite: 1.0.30001449
-      electron-to-chromium: 1.4.276
-      node-releases: 2.0.6
-      update-browserslist-db: 1.0.10(browserslist@4.21.4)
-    dev: true
-
   /browserslist@4.21.5:
     resolution:
       {
@@ -902,17 +892,10 @@ packages:
         integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==,
       }
     dependencies:
-      browserslist: 4.21.4
-      caniuse-lite: 1.0.30001449
+      browserslist: 4.21.5
+      caniuse-lite: 1.0.30001488
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
-    dev: true
-
-  /caniuse-lite@1.0.30001449:
-    resolution:
-      {
-        integrity: sha512-CPB+UL9XMT/Av+pJxCKGhdx+yg1hzplvFJQlJ2n68PyQGMz9L/E2zCyLdOL8uasbouTUgnPl+y0tccI/se+BEw==,
-      }
     dev: true
 
   /caniuse-lite@1.0.30001488:
@@ -1200,7 +1183,7 @@ packages:
       postcss: ^8.2.15
     dependencies:
       cssnano-preset-default: 5.2.14(postcss@8.4.24)
-      lilconfig: 2.0.6
+      lilconfig: 2.1.0
       postcss: 8.4.24
       yaml: 1.10.2
     dev: true
@@ -1366,13 +1349,6 @@ packages:
   /ee-first@1.1.1:
     resolution: { integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0= }
     dev: false
-
-  /electron-to-chromium@1.4.276:
-    resolution:
-      {
-        integrity: sha512-EpuHPqu8YhonqLBXHoU6hDJCD98FCe6KDoet3/gY1qsQ6usjJoHqBH2YIVs8FXaAtHwVL8Uqa/fsYao/vq9VWQ==,
-      }
-    dev: true
 
   /electron-to-chromium@1.4.400:
     resolution:
@@ -2350,13 +2326,6 @@ packages:
       }
     dev: true
 
-  /node-releases@2.0.6:
-    resolution:
-      {
-        integrity: sha512-PiVXnNuFm5+iYkLBNeq5211hvO38y63T0i2KKh2KnUs3RpzJ+JtODFjkD8yjLwnDkTYF1eKXheUwdssR+NRZdg==,
-      }
-    dev: true
-
   /normalize-path@3.0.0:
     resolution:
       {
@@ -2648,7 +2617,7 @@ packages:
       postcss: ^8.2.2
     dependencies:
       postcss: 8.4.24
-      postcss-selector-parser: 6.0.10
+      postcss-selector-parser: 6.0.11
       postcss-value-parser: 4.2.0
     dev: true
 
@@ -2661,7 +2630,7 @@ packages:
     peerDependencies:
       postcss: ^8.2.15
     dependencies:
-      browserslist: 4.21.4
+      browserslist: 4.21.5
       caniuse-api: 3.0.0
       colord: 2.9.2
       postcss: 8.4.24
@@ -2677,7 +2646,7 @@ packages:
     peerDependencies:
       postcss: ^8.2.15
     dependencies:
-      browserslist: 4.21.4
+      browserslist: 4.21.5
       postcss: 8.4.24
       postcss-value-parser: 4.2.0
     dev: true
@@ -2801,11 +2770,11 @@ packages:
     peerDependencies:
       postcss: ^8.2.15
     dependencies:
-      browserslist: 4.21.4
+      browserslist: 4.21.5
       caniuse-api: 3.0.0
       cssnano-utils: 3.1.0(postcss@8.4.24)
       postcss: 8.4.24
-      postcss-selector-parser: 6.0.10
+      postcss-selector-parser: 6.0.11
     dev: true
 
   /postcss-minify-font-values@5.1.0(postcss@8.4.24):
@@ -2845,7 +2814,7 @@ packages:
     peerDependencies:
       postcss: ^8.2.15
     dependencies:
-      browserslist: 4.21.4
+      browserslist: 4.21.5
       cssnano-utils: 3.1.0(postcss@8.4.24)
       postcss: 8.4.24
       postcss-value-parser: 4.2.0
@@ -2861,7 +2830,7 @@ packages:
       postcss: ^8.2.15
     dependencies:
       postcss: 8.4.24
-      postcss-selector-parser: 6.0.10
+      postcss-selector-parser: 6.0.11
     dev: true
 
   /postcss-nested@6.0.1(postcss@8.4.24):
@@ -2963,7 +2932,7 @@ packages:
     peerDependencies:
       postcss: ^8.2.15
     dependencies:
-      browserslist: 4.21.4
+      browserslist: 4.21.5
       postcss: 8.4.24
       postcss-value-parser: 4.2.0
     dev: true
@@ -3018,7 +2987,7 @@ packages:
     peerDependencies:
       postcss: ^8.2.15
     dependencies:
-      browserslist: 4.21.4
+      browserslist: 4.21.5
       caniuse-api: 3.0.0
       postcss: 8.4.24
     dev: true
@@ -3034,17 +3003,6 @@ packages:
     dependencies:
       postcss: 8.4.24
       postcss-value-parser: 4.2.0
-    dev: true
-
-  /postcss-selector-parser@6.0.10:
-    resolution:
-      {
-        integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==,
-      }
-    engines: { node: ">=4" }
-    dependencies:
-      cssesc: 3.0.0
-      util-deprecate: 1.0.2
     dev: true
 
   /postcss-selector-parser@6.0.11:
@@ -3082,7 +3040,7 @@ packages:
       postcss: ^8.2.15
     dependencies:
       postcss: 8.4.24
-      postcss-selector-parser: 6.0.10
+      postcss-selector-parser: 6.0.11
     dev: true
 
   /postcss-value-parser@4.2.0:
@@ -3679,7 +3637,7 @@ packages:
     peerDependencies:
       postcss: ^8.2.15
     dependencies:
-      browserslist: 4.21.4
+      browserslist: 4.21.5
       postcss: 8.4.24
       postcss-selector-parser: 6.0.11
     dev: true
@@ -3936,10 +3894,10 @@ packages:
       typescript: 4.9.5
     dev: true
 
-  /tslib@2.5.2:
+  /tslib@2.5.3:
     resolution:
       {
-        integrity: sha512-5svOrSA2w3iGFDs1HibEVBGbDrAY82bFQ3HZ3ixB+88nsbsWQoKqDRb5UBYAUPEzbBn6dAp5gRNXglySbx1MlA==,
+        integrity: sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==,
       }
     dev: true
 
@@ -3963,10 +3921,10 @@ packages:
     hasBin: true
     dev: true
 
-  /typewriter-effect@2.19.0(react-dom@18.2.0)(react@18.2.0):
+  /typewriter-effect@2.20.1(react-dom@18.2.0)(react@18.2.0):
     resolution:
       {
-        integrity: sha512-rhUX1ukmAXNFWUnMFx8CDU1uLWJQ7pRYzDU7WfHJRq43i6SmWSP9vFiUsOGfXINodUAgZiJ5xnzwLciHxZDGDg==,
+        integrity: sha512-3yQW4fUzCuIEgGHA5k+2Y2RzdsHUC9pPJpRahDREfloDpoPiMLj4GjMcuobdKD4CQ0pRBW4DD3pdNz7ZhfR96g==,
       }
     peerDependencies:
       react: ^17.x || ^18.x
@@ -3992,20 +3950,6 @@ packages:
       }
     engines: { node: ">= 0.8" }
     dev: false
-
-  /update-browserslist-db@1.0.10(browserslist@4.21.4):
-    resolution:
-      {
-        integrity: sha512-OztqDenkfFkbSG+tRxBeAnCVPckDBcvibKd35yDONx6OU8N7sqgwc7rCbkJ/WcYtVRZ4ba68d6byhC21GFh7sQ==,
-      }
-    hasBin: true
-    peerDependencies:
-      browserslist: ">= 4.21.0"
-    dependencies:
-      browserslist: 4.21.4
-      escalade: 3.1.1
-      picocolors: 1.0.0
-    dev: true
 
   /update-browserslist-db@1.0.10(browserslist@4.21.5):
     resolution:

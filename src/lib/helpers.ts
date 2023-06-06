@@ -21,3 +21,11 @@ export const uuidv4 = () => {
     return v.toString(16);
   });
 };
+
+export const mapObject = <T, U>(
+  obj: Record<string, T>,
+  fn: (value: T, key: string) => U
+) =>
+  Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [key, fn(value, key)])
+  );

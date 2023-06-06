@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FullMetadata } from "package-json";
   import { onDestroy, onMount } from "svelte";
+  import SvelteMarkdown from "svelte-markdown";
 
   import {
     BugIcon,
@@ -11,11 +12,11 @@
     ScaleIcon,
   } from "lucide-svelte";
 
-  import { createQuery, useQueryClient } from "@tanstack/svelte-query";
+  import { useQueryClient } from "@tanstack/svelte-query";
 
   import type { Package, PackageInfo } from "~/domain/types";
   import { QUERY_KEYS } from "~/domain/constants";
-  import { ellipsis } from "~/lib/helpers";
+  import { ellipsis, mapObject } from "~/lib/helpers";
   import {
     updatePackageQueryCache,
     useBundlephobiaReportQuery,
@@ -32,29 +33,21 @@
   export let meta: FullMetadata;
   export let expandedRowIndex = -1;
 
-  let isLoading = false;
-
-  const upgradePackagesMutation = useUpgradePackagesMutation({
-    onMutate() {
-      isLoading = true;
-    },
-    onSettled() {
-      isLoading = false;
-    },
-  });
-
   const queryClient = useQueryClient();
+
+  const upgradePackagesMutation = useUpgradePackagesMutation();
 
   async function handleUpgradePackages(packages: PackageInfo[]) {
     try {
       const updated = await $upgradePackagesMutation.mutateAsync(packages);
 
+      // apply optimistic update
       queryClient.setQueryData<Package>(
-        [QUERY_KEYS.package],
+        QUERY_KEYS.package,
         updatePackageQueryCache(updated)
       );
 
-      await queryClient.refetchQueries([QUERY_KEYS.package]);
+      // await queryClient.refetchQueries(QUERY_KEYS.package);
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
     }
@@ -122,16 +115,16 @@
       <div class="grid place-items-end gap-2 items-center">
         {#if isLatest}
           <div class="flex items-center gap-2 justify-end py-2">
-            <div>
+            <span>
               {version}
-            </div>
-            <CheckCircleIcon class="h-4 w-4 ml-1" />
+            </span>
+            <CheckCircleIcon class="h-4 w-4" />
           </div>
         {:else}
           <div class="py-1">
             <UpgradeButton
-              disabled={$upgradePackagesMutation.isLoading && isLoading}
-              isLoading={$upgradePackagesMutation.isLoading && isLoading}
+              disabled={$upgradePackagesMutation.isLoading}
+              isLoading={$upgradePackagesMutation.isLoading}
               on:click={(e) => {
                 e.stopPropagation();
                 handleUpgradePackages([{ name, version, latest, meta }]);
@@ -146,7 +139,7 @@
 
     {#if isExpanded}
       <div class="text-granny-smith-apple/90 max-w-md p-4 py-2 font-medium">
-        {meta.description}
+        <SvelteMarkdown source={meta.description ?? ""} />
       </div>
       <div
         class="px-2 pt-2 py-4 flex justify-between items-center border-t mx-2 border-granny-smith-apple/60"

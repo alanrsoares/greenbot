@@ -37,8 +37,9 @@
     try {
       const updated = await $upgradePackagesMutation.mutateAsync(packages);
 
+      // apply optimistic update
       queryClient.setQueryData<Package>(
-        [QUERY_KEYS.package],
+        QUERY_KEYS.package,
         updatePackageQueryCache(updated)
       );
 

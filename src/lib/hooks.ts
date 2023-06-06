@@ -16,19 +16,24 @@ export const useUpgradePackagesMutation = (
 ) => createMutation(api.upgradePackages, options);
 
 export const updatePackageQueryCache =
-  (updated: PackageInfo[]) => (current: Package) => {
+  (updated: PackageInfo[]) => (prev: Package) => {
+    const next = structuredClone(prev) as Package;
+
     for (let item of updated) {
       const { qualifier } = rawVersion(item.version);
       const latestVersion = `${qualifier}${item.latest}`;
-      if (current.dependencies && item.name in current.dependencies) {
-        current.dependencies[item.name] = latestVersion;
+
+      if (next.dependencies && item.name in next.dependencies) {
+        console.log("updating dependency", item.name, "to", latestVersion);
+        next.dependencies[item.name] = latestVersion;
       }
-      if (current.devDependencies && item.name in current.devDependencies) {
-        current.devDependencies[item.name] = latestVersion;
+      if (next.devDependencies && item.name in next.devDependencies) {
+        console.log("updating devDependency", item.name, "to", latestVersion);
+        next.devDependencies[item.name] = latestVersion;
       }
     }
 
-    return current;
+    return next;
   };
 
 export const usePackageQuery = () =>
