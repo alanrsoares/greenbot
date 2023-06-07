@@ -1,6 +1,13 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
+  "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "target": "esnext",
     "module": "esnext",
     "resolveJsonModule": true,
@@ -9,7 +16,8 @@
     "checkJs": true,
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "ignoreDeprecations": "5.0"
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
 }

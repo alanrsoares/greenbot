@@ -7,6 +7,6 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [svelte(), tsconfigPaths()],
   optimizeDeps: {
-    exclude: ["@sveltestack/svelte-query"],
+    exclude: ["@sveltestack/svelte-query", "svelte-markdown"],
   },
 });
