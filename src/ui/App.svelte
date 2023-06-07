@@ -1,11 +1,8 @@
 <script lang="ts">
-  import type {
-    CreateQueryResult,
-    QueryObserverResult,
-  } from "@tanstack/svelte-query";
+  import type { QueryObserverResult } from "@tanstack/svelte-query";
   import type { FullMetadata } from "package-json";
 
-  import type { Package, TabKind } from "~/domain/types";
+  import type { Package, PackageInfo, TabKind } from "~/domain/types";
 
   import { isLatestVersion } from "~/lib/helpers";
   import { usePackageQuery } from "~/lib/hooks";
@@ -34,14 +31,19 @@
     [name, version]: [string, string],
     resolutions: Record<string, string>,
     meta: Record<string, FullMetadata>
-  ) {
-    return { name, version, latest: resolutions[name], meta: meta[name] };
+  ): PackageInfo {
+    return {
+      name,
+      version,
+      latest: name in resolutions ? resolutions[name] : version,
+      meta: name in meta ? meta[name] : undefined,
+    };
   }
 
   function getCurrentMood(
     result?: QueryObserverResult<Package, unknown>
   ): Mood {
-    if (result.isLoading) {
+    if (!result || result.isLoading) {
       return "asleep";
     }
     if (result.error) {
@@ -73,7 +75,7 @@
   $: mood = getCurrentMood($packageQuery);
 
   $: tabEntries =
-    $packageQuery.isLoading || $packageQuery.error
+    $packageQuery.isLoading || $packageQuery.error || !$packageQuery.data
       ? []
       : getFilteredEntries(
           Object.entries($packageQuery.data[selectedTab] ?? {}),
@@ -81,7 +83,11 @@
         );
 
   $: entries = tabEntries.map((pair) =>
-    toPackageInfo(pair, $packageQuery.data.resolutions, $packageQuery.data.meta)
+    toPackageInfo(
+      pair,
+      $packageQuery.data?.resolutions ?? {},
+      $packageQuery.data?.meta ?? {}
+    )
   );
 </script>
 

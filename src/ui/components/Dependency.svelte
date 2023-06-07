@@ -27,10 +27,10 @@
 
   export let name = "";
   export let version = "";
-  export let latest = "";
+  export let latest: string | undefined = "";
   export let index = 0;
   export let isLatest = false;
-  export let meta: FullMetadata;
+  export let meta: FullMetadata | undefined;
   export let expandedRowIndex = -1;
 
   const queryClient = useQueryClient();
@@ -137,7 +137,7 @@
       </div>
     </div>
 
-    {#if isExpanded}
+    {#if isExpanded && meta}
       <div class="text-granny-smith-apple/90 max-w-md p-4 py-2 font-medium">
         <SvelteMarkdown source={meta.description ?? ""} />
       </div>

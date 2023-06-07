@@ -3,7 +3,7 @@ export const rawVersion = (version: string) => ({
   qualifier: isNaN(Number(version[0])) ? version[0] : undefined,
 });
 
-export const isLatestVersion = (version: string, latest: string) =>
+export const isLatestVersion = (version: string, latest?: string) =>
   rawVersion(version).version === latest;
 
 export const ellipsis = (max: number, str: string) =>

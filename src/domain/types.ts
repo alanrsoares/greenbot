@@ -14,8 +14,8 @@ export interface Package {
 export interface PackageInfo {
   name: string;
   version: string;
-  latest: string;
-  meta: FullMetadata;
+  latest: string | undefined;
+  meta: FullMetadata | undefined;
 }
 
 /**
