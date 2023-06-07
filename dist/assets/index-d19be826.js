@@ -10671,7 +10671,7 @@ class qa extends j {
   }
 }
 const Ia = "@greenbot/cli",
-  Ma = "0.22.2",
+  Ma = "0.23.0",
   Da = ["greenbot", "cli", "package updater"],
   za = "An interactive package updater for npm based applications",
   Na = "https://github.com/alanrsoares/greenbot",
@@ -10933,8 +10933,8 @@ function rs(i) {
         k(e, s),
         l ||
           ((o = we(e, "click", function () {
-            et(i[2].bind(this, i[3])) &&
-              i[2].bind(this, i[3]).apply(this, arguments);
+            et(i[2].bind(null, i[3])) &&
+              i[2].bind(null, i[3]).apply(this, arguments);
           })),
           (l = !0));
     },

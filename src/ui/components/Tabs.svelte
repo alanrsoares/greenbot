@@ -16,7 +16,7 @@
     <button
       data-value={tab.value}
       class:bg-castleton-green={selectedTab === tab.value}
-      on:click={onChange.bind(this, tab)}
+      on:click={onChange.bind(null, tab)}
     >
       {tab.label}
     </button>

@@ -2,6 +2,7 @@ import {
   createMutation,
   createQuery,
   type CreateMutationOptions,
+  Updater,
 } from "@tanstack/svelte-query";
 import { onDestroy, onMount } from "svelte";
 
@@ -16,7 +17,8 @@ export const useUpgradePackagesMutation = (
 ) => createMutation(api.upgradePackages, options);
 
 export const updatePackageQueryCache =
-  (updated: PackageInfo[]) => (prev: Package) => {
+  (updated: PackageInfo[]): Updater<Package | undefined, Package> =>
+  (prev) => {
     const next = structuredClone(prev) as Package;
 
     for (let item of updated) {

@@ -16,7 +16,7 @@
 
   import type { Package, PackageInfo } from "~/domain/types";
   import { QUERY_KEYS } from "~/domain/constants";
-  import { ellipsis, mapObject } from "~/lib/helpers";
+  import { ellipsis } from "~/lib/helpers";
   import {
     updatePackageQueryCache,
     useBundlephobiaReportQuery,
