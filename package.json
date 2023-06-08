@@ -45,6 +45,7 @@
     "vite-tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.9",
     "@tanstack/svelte-query": "^4.29.11",
     "animate.css": "^4.1.1",
     "body-parser": "^1.20.2",

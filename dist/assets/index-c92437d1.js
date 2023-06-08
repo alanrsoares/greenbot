@@ -10671,7 +10671,7 @@ class qa extends j {
   }
 }
 const Ia = "@greenbot/cli",
-  Ma = "0.23.1",
+  Ma = "0.23.2",
   Da = ["greenbot", "cli", "package updater"],
   za = "An interactive package updater for npm based applications",
   Na = "https://github.com/alanrsoares/greenbot",
@@ -10709,10 +10709,13 @@ const Ia = "@greenbot/cli",
     "vite-tsconfig-paths": "^4.2.0",
   },
   Ka = {
+    "@tailwindcss/typography": "^0.5.9",
     "@tanstack/svelte-query": "^4.29.11",
+    "animate.css": "^4.1.1",
     "body-parser": "^1.20.2",
     chalk: "^4.1.2",
     cors: "^2.8.5",
+    daisyui: "^3.0.20",
     express: "^4.18.2",
     ky: "^0.33.3",
     "lucide-svelte": "^0.229.0",
