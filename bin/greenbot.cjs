@@ -211,7 +211,9 @@ function tryListen(port, tries = 0) {
       `hit ${chalk.yellow("Ctrl+C")} to stop.\n`
     );
 
-    open(url).catch(() => {});
+    open(url).catch(() => {
+      console.log(chalk.yellow(`[greenbot] Could not open browser at ${url}`));
+    });
   });
 }
 
