@@ -1,0 +1,44 @@
+{
+  "name": "@greenbot/cli",
+  "version": "1.0.0",
+  "description": "",
+  "files": [
+    "./build",
+    "./index.js"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/module/*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh",
+    "compile": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@inquirer/prompts": "^2.1.1",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.1",
+    "@types/node": "^20.2.5",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.3"
+  }
+}
