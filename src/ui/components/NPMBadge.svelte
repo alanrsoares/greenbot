@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { PackageIcon } from "lucide-svelte";
+  import { Package } from "~/domain/types";
+  import PackageManagerIcon from "./PackageManagerIcon.svelte";
   export let name = "";
   export let version = "";
+  export let manager: Package["packageManager"] = "npm";
 </script>
 
 <a
@@ -9,8 +11,10 @@
   href={`https://www.npmjs.com/package/${name}`}
   rel="noopener noreferrer"
 >
-  <PackageIcon class="h-6 w-6" />
-  <div class="font-mono font-medium">
+  <div class="rounded-full -translate-x-2 bg-black/25 p-2.5">
+    <PackageManagerIcon kind={manager} class="h-4 w-4" />
+  </div>
+  <div class="font-mono font-medium -translate-x-2">
     {name} @ {version}
   </div>
 </a>

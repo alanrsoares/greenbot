@@ -9,6 +9,7 @@ export interface Package {
   devDependencies?: Record<string, string>;
   resolutions: Record<string, string>;
   meta: Record<string, FullMetadata>;
+  packageManager: "npm" | "yarn" | "pnpm";
 }
 
 export interface PackageInfo {

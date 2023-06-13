@@ -13,6 +13,26 @@ const { indexBy, prop } = require("rambda");
 
 const { version } = require("../package.json");
 
+const PACKAGE_LOCK_FILES = ["yarn.lock", "package-lock.json", "pnpm-lock.yaml"];
+
+/**
+ * getPackageManager - infer package manager
+ * @returns {Promise<"yarn" | "npm" | "pnpm">}
+ */
+async function getPackageManager() {
+  const [hasYarnLock, hasPackageLock, hasPnpmLock] = await Promise.all(
+    PACKAGE_LOCK_FILES.map((file) =>
+      fs.readFile(file, "utf8").catch(() => false)
+    )
+  );
+
+  if (hasYarnLock) return "yarn";
+  if (hasPackageLock) return "npm";
+  if (hasPnpmLock) return "pnpm";
+
+  return "npm";
+}
+
 /**
  * indexEntries - index entries by name
  *
@@ -161,12 +181,17 @@ app
     );
 
     const resolved = await Promise.all(promises);
+    const packageManager = await getPackageManager();
 
     res.json({
       ...response,
       resolutions: indexEntries(resolved),
       meta: indexBy(prop("name"), resolved.map(prop("meta"))),
+      packageManager,
     });
+  })
+  .get("/packages", async (_req, res) => {
+    const { dependencies, devDependencies } = await readPackageJson();
   })
   .post("/upgrade", async (req, res) => {
     const { name, version, latest } = req.body;

@@ -98,6 +98,7 @@
       <NPMBadge
         name={$packageQuery.data.name}
         version={$packageQuery.data.version}
+        manager={$packageQuery.data.packageManager}
       />
     {/if}
   </div>

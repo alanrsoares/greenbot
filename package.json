@@ -51,7 +51,7 @@
     "body-parser": "^1.20.2",
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
-    "daisyui": "^3.0.20",
+    "daisyui": "^3.1.0",
     "express": "^4.18.2",
     "ky": "^0.33.3",
     "lucide-svelte": "^0.229.0",
