@@ -210,15 +210,19 @@ app
     const indexedWorkspaces = await Promise.all(
       workspaces.map(async (workspace) => {
         const workspacePath = path.resolve(workspace);
-        const subfolders = await fs.readdir(workspacePath).catch(() => []);
+        const validSubdirs = await fs
+          .readdir(workspacePath, { withFileTypes: true })
+          .catch(() => [])
+          .then((entries) => entries.filter((entry) => entry.isDirectory()));
 
         const packages = await Promise.all(
-          subfolders.map(async (folder) => {
+          validSubdirs.map(async (dir) => {
             const packageJsonPath = path.resolve(
               workspacePath,
-              folder,
+              dir.name,
               "package.json"
             );
+
             const { name, version, dependencies, devDependencies } = await fs
               .readFile(packageJsonPath, "utf8")
               .then(JSON.parse);
