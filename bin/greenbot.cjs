@@ -10,6 +10,7 @@ const chalk = require("chalk");
 const open = require("open");
 const fs = require("fs/promises");
 const { indexBy, prop } = require("rambda");
+const yaml = require("js-yaml");
 
 const { version } = require("../package.json");
 
@@ -61,7 +62,7 @@ const DEFAULT_PORT = 5001;
 /**
  * readPackageJson - read package.json file
  *
- * @returns {Promise<{dependencies: Record<string, string>; devDependencies?: Record<string,string>}>}
+ * @returns {Promise<{dependencies: Record<string, string>; devDependencies?: Record<string,string>; workspaces?: string[]}>}
  */
 async function readPackageJson() {
   try {
@@ -167,12 +168,10 @@ app
     res.json(result);
   })
   .get("/package", async (_req, res) => {
-    const { dependencies, devDependencies, ...file } = await readPackageJson();
+    const response = await readPackageJson();
 
-    const response = { dependencies, devDependencies, ...file };
-
-    const dependencyEntries = Object.entries(dependencies ?? {});
-    const devDependencyEntries = Object.entries(devDependencies ?? {});
+    const dependencyEntries = Object.entries(response.dependencies ?? {});
+    const devDependencyEntries = Object.entries(response.devDependencies ?? {});
 
     const allEntries = [...dependencyEntries, ...devDependencyEntries];
 
@@ -183,11 +182,67 @@ app
     const resolved = await Promise.all(promises);
     const packageManager = await getPackageManager();
 
+    /**
+     * @type {string[]}
+     */
+    let workspaces = [];
+
+    switch (packageManager) {
+      case "yarn":
+      case "npm":
+        if (response.workspaces) {
+          workspaces = response.workspaces;
+        }
+        break;
+      case "pnpm":
+        const rawYaml = await fs
+          .readFile("pnpm-workspace.yaml", "utf8")
+          .catch(() => null);
+        if (rawYaml) {
+          const parsed = yaml.load(rawYaml);
+          workspaces = parsed.packages
+            .filter((x) => !x.startsWith("!"))
+            .map((x) => x.replace("/*", ""));
+        }
+        break;
+    }
+
+    const indexedWorkspaces = await Promise.all(
+      workspaces.map(async (workspace) => {
+        const workspacePath = path.resolve(workspace);
+        const subfolders = await fs.readdir(workspacePath).catch(() => []);
+
+        const packages = await Promise.all(
+          subfolders.map(async (folder) => {
+            const packageJsonPath = path.resolve(
+              workspacePath,
+              folder,
+              "package.json"
+            );
+            const { name, version, dependencies, devDependencies } = await fs
+              .readFile(packageJsonPath, "utf8")
+              .then(JSON.parse);
+
+            return { name, version, dependencies, devDependencies };
+          })
+        );
+
+        return [workspace, packages];
+      })
+    ).then((x) =>
+      // filter out empty workspaces and transform to object
+      Object.fromEntries(x.filter(([_, packages]) => packages.length))
+    );
+
+    const isMonorepo = Boolean(workspaces.length);
+
     res.json({
       ...response,
       resolutions: indexEntries(resolved),
       meta: indexBy(prop("name"), resolved.map(prop("meta"))),
       packageManager,
+      isMonorepo,
+      workspaces: isMonorepo ? indexedWorkspaces : null,
     });
   })
   .get("/packages", async (_req, res) => {

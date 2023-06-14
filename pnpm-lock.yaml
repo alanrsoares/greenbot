@@ -31,12 +31,15 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.18.2
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
       ky:
         specifier: ^0.33.3
         version: 0.33.3
       lucide-svelte:
-        specifier: ^0.229.0
-        version: 0.229.0(svelte@3.59.1)
+        specifier: ^0.244.0
+        version: 0.244.0(svelte@3.59.1)
       open:
         specifier: ^8.4.2
         version: 8.4.2
@@ -47,8 +50,8 @@ importers:
         specifier: ^7.5.0
         version: 7.5.0
       replace-in-file:
-        specifier: ^6.3.5
-        version: 6.3.5
+        specifier: ^7.0.1
+        version: 7.0.1
       svelte-markdown:
         specifier: ^0.2.3
         version: 0.2.3(svelte@3.59.1)
@@ -919,6 +922,13 @@ packages:
         integrity: sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==,
       }
 
+  /argparse@2.0.1:
+    resolution:
+      {
+        integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==,
+      }
+    dev: false
+
   /array-differ@3.0.0:
     resolution:
       {
@@ -1048,7 +1058,6 @@ packages:
       }
     dependencies:
       balanced-match: 1.0.2
-    dev: true
 
   /braces@3.0.2:
     resolution:
@@ -1096,10 +1105,10 @@ packages:
     engines: { node: ">=10.6.0" }
     dev: false
 
-  /cacheable-request@7.0.2:
+  /cacheable-request@7.0.4:
     resolution:
       {
-        integrity: sha512-pouW8/FmiPQbuGpkXQ9BAPv/Mo5xDGANgSNXzTzJ8DrKGuXOssM4wIQRjfanNRh3Yu5cfYPvcorqbhg2KIJtew==,
+        integrity: sha512-v+p6ongsrp0yTGbJXjgxPow2+DL93DASP4kXCDKb8/bwRtt9OEF3whggkkDkGNzgcWy2XaF4a8nZglC7uElscg==,
       }
     engines: { node: ">=8" }
     dependencies:
@@ -1218,11 +1227,12 @@ packages:
     engines: { node: ">= 12" }
     dev: false
 
-  /cliui@7.0.4:
+  /cliui@8.0.1:
     resolution:
       {
-        integrity: sha512-OcRE68cOsVMXp1Yvonl/fzkQOyjLSu/8bhPDfQt0e0/Eb283TKP20Fs2MqoPsr9SwA595rRCA+QMzYc9nBP+JQ==,
+        integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==,
       }
+    engines: { node: ">=12" }
     dependencies:
       string-width: 4.2.3
       strip-ansi: 6.0.1
@@ -2064,6 +2074,21 @@ packages:
       minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
+    dev: true
+
+  /glob@8.1.0:
+    resolution:
+      {
+        integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==,
+      }
+    engines: { node: ">=12" }
+    dependencies:
+      fs.realpath: 1.0.0
+      inflight: 1.0.6
+      inherits: 2.0.4
+      minimatch: 5.1.6
+      once: 1.4.0
+    dev: false
 
   /globrex@0.1.2:
     resolution:
@@ -2084,7 +2109,7 @@ packages:
       "@types/cacheable-request": 6.0.3
       "@types/responselike": 1.0.0
       cacheable-lookup: 5.0.4
-      cacheable-request: 7.0.2
+      cacheable-request: 7.0.4
       decompress-response: 6.0.0
       http2-wrapper: 1.0.3
       lowercase-keys: 2.0.0
@@ -2338,6 +2363,16 @@ packages:
       }
     dev: false
 
+  /js-yaml@4.1.0:
+    resolution:
+      {
+        integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==,
+      }
+    hasBin: true
+    dependencies:
+      argparse: 2.0.1
+    dev: false
+
   /json-buffer@3.0.1:
     resolution:
       {
@@ -2471,10 +2506,10 @@ packages:
     engines: { node: 14 || >=16.14 }
     dev: true
 
-  /lucide-svelte@0.229.0(svelte@3.59.1):
+  /lucide-svelte@0.244.0(svelte@3.59.1):
     resolution:
       {
-        integrity: sha512-+E4Wf3KZYlrZt8Psjg1L0NKLptRmYFhLII4GrzDCU2XKbpYjvcSWeYOmLfej26abg+Ha9M2nZmDTfwKNqo6ZUQ==,
+        integrity: sha512-FOzIF+1EUHllYLmSCLo0UFqyI6+796lcBLKnA7wz21TELGETlR/xzJDEiU7YlS8ybRau2t3lzFv8h4Wj8z3oDQ==,
       }
     peerDependencies:
       svelte: ^3.49.0
@@ -2632,6 +2667,16 @@ packages:
       }
     dependencies:
       brace-expansion: 1.1.11
+
+  /minimatch@5.1.6:
+    resolution:
+      {
+        integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==,
+      }
+    engines: { node: ">=10" }
+    dependencies:
+      brace-expansion: 2.0.1
+    dev: false
 
   /minimatch@9.0.1:
     resolution:
@@ -3681,17 +3726,17 @@ packages:
       rc: 1.2.8
     dev: false
 
-  /replace-in-file@6.3.5:
+  /replace-in-file@7.0.1:
     resolution:
       {
-        integrity: sha512-arB9d3ENdKva2fxRnSjwBEXfK1npgyci7ZZuwysgAp7ORjHSyxz6oqIjTEv8R0Ydl4Ll7uOAZXL4vbkhGIizCg==,
+        integrity: sha512-KbhgPq04eA+TxXuUxpgWIH9k/TjF+28ofon2PXP7vq6izAILhxOtksCVcLuuQLtyjouBaPdlH6RJYYcSPVxCOA==,
       }
     engines: { node: ">=10" }
     hasBin: true
     dependencies:
       chalk: 4.1.2
-      glob: 7.2.3
-      yargs: 17.5.1
+      glob: 8.1.0
+      yargs: 17.7.2
     dev: false
 
   /require-directory@2.1.1:
@@ -4544,26 +4589,26 @@ packages:
       }
     engines: { node: ">= 14" }
 
-  /yargs-parser@21.0.1:
+  /yargs-parser@21.1.1:
     resolution:
       {
-        integrity: sha512-9BK1jFpLzJROCI5TzwZL/TU4gqjK5xiHV/RfWLOahrjAko/e4DJkRDZQXfvqAsiZzzYhgAzbgz6lg48jcm4GLg==,
+        integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==,
       }
     engines: { node: ">=12" }
     dev: false
 
-  /yargs@17.5.1:
+  /yargs@17.7.2:
     resolution:
       {
-        integrity: sha512-t6YAJcxDkNX7NFYiVtKvWUz8l+PaKTLiL63mJYWR2GnHq2gjEWISzsLp9wg3aY36dY1j+gfIEL3pIF+XlJJfbA==,
+        integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==,
       }
     engines: { node: ">=12" }
     dependencies:
-      cliui: 7.0.4
+      cliui: 8.0.1
       escalade: 3.1.1
       get-caller-file: 2.0.5
       require-directory: 2.1.1
       string-width: 4.2.3
       y18n: 5.0.8
-      yargs-parser: 21.0.1
+      yargs-parser: 21.1.1
     dev: false
