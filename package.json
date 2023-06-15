@@ -11,7 +11,8 @@
   "license": "MIT",
   "files": [
     "dist/",
-    "bin/"
+    "bin/",
+    "scripts/"
   ],
   "bin": "./bin/greenbot.cjs",
   "type": "module",
@@ -22,19 +23,22 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "preversion": "yarn build",
     "release": "npm publish && git push && git push --tags",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "node scripts/postinstall.cjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.1",
     "@tsconfig/strictest": "^2.0.1",
     "@types/cors": "^2.8.13",
     "autoprefixer": "^10.4.14",
+    "chalk": "^4.1.2",
     "cssnano": "^6.0.1",
     "husky": "^8.0.3",
     "postcss": "^8.4.24",
     "postcss-load-config": "^4.0.1",
     "prettier": "^2.8.8",
     "pretty-quick": "^3.1.3",
+    "strip-ansi": "^6.0.0",
     "svelte": "^3.59.1",
     "svelte-check": "^3.4.3",
     "svelte-preprocess": "^5.0.4",
@@ -49,7 +53,6 @@
     "@tanstack/svelte-query": "^4.29.11",
     "animate.css": "^4.1.1",
     "body-parser": "^1.20.2",
-    "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "daisyui": "^3.1.0",
     "express": "^4.18.2",
