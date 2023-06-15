@@ -24,7 +24,7 @@ const PACKAGE_LOCK_FILES = ["yarn.lock", "package-lock.json", "pnpm-lock.yaml"];
 
 const REPOSITORY_URL = "https://github.com/alanrsoares/greenbot";
 
-const pad = (n = 0) => " ".repeat(n);
+const pad = (n = 0, char = " ") => char.repeat(n);
 
 /**
  * inferPackageManager - infer package manager
@@ -68,11 +68,10 @@ function renderBox(lines = [], { color = chalk.green, padding = 1 } = {}) {
 
   const border = h.repeat(maxLength);
 
-  const py = [...new Array(padding / 2)].fill(`${v}${pad(maxLength)}${v}`);
+  const py = `\n${v}${pad(maxLength)}${v}`.repeat(padding / 2);
 
   console.log(`
-${tl}${border}${tr}
-${py.join("\n")}
+${tl}${border}${tr}${py}
 ${lines
   .map((line) => {
     const [short, long] = [maxLength, stripAnsi(line).length].sort();
@@ -94,10 +93,8 @@ ${lines
     }
     return withBounds(`${line}${pad(Math.max(rPad, 0))}`);
   })
-  .join("\n")}
-${py.join("\n")}
-${bl}${border}${br}
-  `);
+  .join("\n")}${py}
+${bl}${border}${br}`);
 }
 
 /**
