@@ -9,15 +9,22 @@ const bundlephobiaClient = ky.create({
   prefixUrl: "https://bundlephobia.com/",
 });
 
-export function getPackage() {
-  return greenbotClient.get("package").json<Package>();
+export function getPackage(path?: string) {
+  const searchParams = path ? { path } : undefined;
+
+  return greenbotClient.get("package", { searchParams }).json<Package>();
 }
 
-export function upgradePackages(input: PackageInfo[]): Promise<PackageInfo[]> {
+export type UpgradePackagesInput = {
+  packages: PackageInfo[];
+  path?: string;
+};
+
+export function upgradePackages(
+  input: UpgradePackagesInput
+): Promise<PackageInfo[]> {
   return greenbotClient
-    .post("upgrade-packages", {
-      json: input,
-    })
+    .post("upgrade-packages", { json: input })
     .json<PackageInfo[]>();
 }
 

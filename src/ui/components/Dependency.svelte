@@ -32,6 +32,7 @@
   export let isLatest = false;
   export let meta: FullMetadata | undefined;
   export let expandedRowIndex = -1;
+  export let selectedPackagePath = "";
 
   const queryClient = useQueryClient();
 
@@ -39,15 +40,16 @@
 
   async function handleUpgradePackages(packages: PackageInfo[]) {
     try {
-      const updated = await $upgradePackagesMutation.mutateAsync(packages);
+      const updated = await $upgradePackagesMutation.mutateAsync({
+        packages,
+        path: selectedPackagePath,
+      });
 
       // apply optimistic update
       queryClient.setQueryData<Package>(
-        QUERY_KEYS.package,
+        QUERY_KEYS.package(selectedPackagePath),
         updatePackageQueryCache(updated)
       );
-
-      // await queryClient.refetchQueries(QUERY_KEYS.package);
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
     }

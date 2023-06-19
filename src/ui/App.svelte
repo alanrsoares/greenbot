@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { QueryObserverResult } from "@tanstack/svelte-query";
   import type { FullMetadata } from "package-json";
+  import { onMount } from "svelte";
 
   import type { Package, PackageInfo, TabKind } from "~/domain/types";
 
@@ -15,6 +16,32 @@
   import Spinner from "~/ui/components/Spinner.svelte";
 
   let selectedTab: TabKind = "dependencies";
+  let selectedPackagePath: string = "";
+
+  // sync url with selectedPackagePath
+  $: if (selectedPackagePath !== null) {
+    const params = new URLSearchParams(window.location.search);
+
+    if (selectedPackagePath) {
+      params.set("path", selectedPackagePath);
+    } else {
+      params.delete("path");
+    }
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${params.toString()}`
+    );
+  }
+
+  onMount(() => {
+    const params = new URLSearchParams(window.location.search);
+    const path = params.get("path");
+
+    if (path !== null) {
+      selectedPackagePath = path;
+    }
+  });
 
   function handleTabCchange({ value }: TabItem) {
     selectedTab = value as TabKind;
@@ -70,7 +97,7 @@
     return "awake";
   }
 
-  const packageQuery = usePackageQuery();
+  $: packageQuery = usePackageQuery(selectedPackagePath);
 
   $: mood = getCurrentMood($packageQuery);
 
@@ -114,6 +141,19 @@
       </div>
     {/if}
     {#if $packageQuery.data}
+      {#if $packageQuery.data.workspaces.length}
+        <div class="flex justify-end">
+          <label>
+            {"workspace"}
+            <select class="select select-sm" bind:value={selectedPackagePath}>
+              <option value="">root</option>
+              {#each $packageQuery.data.workspaces as workspace}
+                <option value={workspace.path}>{workspace.name}</option>
+              {/each}
+            </select>
+          </label>
+        </div>
+      {/if}
       <Tabs
         onChange={handleTabCchange}
         {selectedTab}
@@ -122,7 +162,7 @@
           { value: "devDependencies", label: "Dev Dependencies" },
         ]}
       />
-      <Dependencies bind:selectedTab {entries} />
+      <Dependencies bind:selectedTab bind:selectedPackagePath {entries} />
     {/if}
   </div>
 </Layout>

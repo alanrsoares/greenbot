@@ -21,6 +21,12 @@
    * bound selectedTab
    */
   export let selectedTab: TabKind = "dependencies";
+
+  /**
+   * bound selectedPackagePath
+   */
+  export let selectedPackagePath: string = "";
+
   export let entries: PackageInfo[] = [];
 
   let pageIndex = 0;
@@ -35,15 +41,18 @@
 
   async function handleUpgradePackages(packages: PackageInfo[]) {
     try {
-      const updated = await $upgradePackagesMutation.mutateAsync(packages);
+      const updated = await $upgradePackagesMutation.mutateAsync({
+        packages,
+        path: selectedPackagePath,
+      });
 
       // apply optimistic update
       queryClient.setQueryData<Package>(
-        QUERY_KEYS.package,
+        QUERY_KEYS.package(selectedPackagePath),
         updatePackageQueryCache(updated)
       );
 
-      await queryClient.refetchQueries([QUERY_KEYS.package]);
+      await queryClient.refetchQueries(QUERY_KEYS.package(selectedPackagePath));
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
     }
@@ -274,6 +283,7 @@
             {latest}
             {isLatest}
             {meta}
+            bind:selectedPackagePath
             bind:expandedRowIndex
           />
         {/each}

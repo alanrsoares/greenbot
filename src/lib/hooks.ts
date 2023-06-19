@@ -13,13 +13,18 @@ import * as api from "./api";
 import { rawVersion } from "./helpers";
 
 export const useUpgradePackagesMutation = (
-  options?: CreateMutationOptions<PackageInfo[], unknown, PackageInfo[], void>
+  options?: CreateMutationOptions<
+    PackageInfo[],
+    unknown,
+    api.UpgradePackagesInput,
+    void
+  >
 ) => createMutation(api.upgradePackages, options);
 
 export const updatePackageQueryCache =
   (updated: PackageInfo[]): Updater<Package | undefined, Package> =>
   (prev) => {
-    const next = structuredClone(prev) as Package;
+    const next = structuredClone(prev ?? {}) as Package;
 
     for (let item of updated) {
       const { qualifier } = rawVersion(item.version);
@@ -38,8 +43,10 @@ export const updatePackageQueryCache =
     return next;
   };
 
-export const usePackageQuery = () =>
-  createQuery(QUERY_KEYS.package, api.getPackage);
+export const usePackageQuery = (path: string) => {
+  console.log("usePackageQuery", { path });
+  return createQuery(QUERY_KEYS.package(path), api.getPackage.bind(null, path));
+};
 
 export const useBundlephobiaReportQuery = (name: string) =>
   createQuery(

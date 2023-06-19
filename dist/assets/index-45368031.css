@@ -643,6 +643,40 @@ html {
 .range:focus {
   outline: none;
 }
+.select {
+  --tw-border-opacity: 0;
+  --tw-bg-opacity: 1;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 0),
+    linear-gradient(135deg, currentColor 50%, transparent 0);
+  background-position: calc(100% - 20px) calc(1px + 50%),
+    calc(100% - 16px) calc(1px + 50%);
+  background-repeat: no-repeat;
+  background-size: 4px 4px, 4px 4px;
+  border-color: hsl(var(--bc) / var(--tw-border-opacity));
+  border-radius: var(--rounded-btn, 0.5rem);
+  border-width: 1px;
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  height: 3rem;
+  line-height: 1.25rem;
+  line-height: 2;
+  min-height: 3rem;
+  padding-left: 1rem;
+  padding-right: 2.5rem;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.select[multiple] {
+  height: auto;
+}
 .swap {
   cursor: pointer;
   display: inline-grid;
@@ -874,6 +908,43 @@ html {
     transform: translateY(0);
   }
 }
+.select:focus {
+  outline-color: hsl(var(--bc) / 0.2);
+  outline-offset: 2px;
+  outline-style: solid;
+  outline-width: 2px;
+}
+.select-disabled,
+.select:disabled,
+.select[disabled] {
+  --tw-border-opacity: 1;
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 0.2;
+  background-color: hsl(var(--b2) / var(--tw-bg-opacity));
+  border-color: hsl(var(--b2) / var(--tw-border-opacity));
+  cursor: not-allowed;
+}
+.select-disabled::-moz-placeholder,
+.select:disabled::-moz-placeholder,
+.select[disabled]::-moz-placeholder {
+  --tw-placeholder-opacity: 0.2;
+  color: hsl(var(--bc) / var(--tw-placeholder-opacity));
+}
+.select-disabled::placeholder,
+.select:disabled::placeholder,
+.select[disabled]::placeholder {
+  --tw-placeholder-opacity: 0.2;
+  color: hsl(var(--bc) / var(--tw-placeholder-opacity));
+}
+.select-multiple,
+.select[multiple],
+.select[size].select:not([size="1"]) {
+  background-image: none;
+  padding-right: 1rem;
+}
+[dir="rtl"] .select {
+  background-position: 12px calc(1px + 50%), 16px calc(1px + 50%);
+}
 .tab.tab-active:not(.tab-disabled):not([disabled]) {
   --tw-border-opacity: 1;
   --tw-text-opacity: 1;
@@ -909,6 +980,18 @@ html {
     opacity: 1;
     transform: scale(1);
   }
+}
+.select-sm {
+  font-size: 0.875rem;
+  height: 2rem;
+  line-height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 2rem;
+}
+[dir="rtl"] .select-sm {
+  padding-left: 2rem;
+  padding-right: 0.75rem;
 }
 .sr-only {
   clip: rect(0, 0, 0, 0);
