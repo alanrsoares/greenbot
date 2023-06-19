@@ -10717,7 +10717,7 @@ class Na extends B {
   }
 }
 const Fa = "@greenbot/cli",
-  Qa = "0.25.0",
+  Qa = "0.25.3",
   Ua = ["greenbot", "cli", "package updater"],
   ja = "An interactive package updater for npm based applications",
   Ba = "https://github.com/alanrsoares/greenbot",
