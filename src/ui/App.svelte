@@ -141,7 +141,7 @@
       </div>
     {/if}
     {#if $packageQuery.data}
-      {#if $packageQuery.data.workspaces.length}
+      {#if $packageQuery.data.workspaces?.length}
         <div class="flex justify-end">
           <label>
             {"workspace"}

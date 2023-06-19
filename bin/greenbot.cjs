@@ -226,7 +226,7 @@ async function main(port, tries = 0) {
     );
 
   CONTEXT.workspaces = flatWorkspaces;
-  CONTEXT.isMonorepo = Boolean(workspaces.length);
+  CONTEXT.isMonorepo = Boolean(workspaces?.length);
   CONTEXT.packageManager = packageManager;
 
   app.listen(port, (err) => {
