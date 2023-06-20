@@ -45,6 +45,6 @@
     @apply min-h-screen text-granny-smith-apple flex flex-col;
   }
   .layout-main {
-    @apply grid place-items-center py-12 w-full max-w-xl mx-auto flex-1;
+    @apply py-12 w-full max-w-xl mx-auto flex-1;
   }
 </style>

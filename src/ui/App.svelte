@@ -27,6 +27,12 @@
     } else {
       params.delete("path");
     }
+    // update url witout reloading
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${params.toString()}`
+    );
   }
 
   onMount(() => {
