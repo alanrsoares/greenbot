@@ -2,10 +2,10 @@
 
 interactive npm dependency updater
 
-* 💅 beutiful web UI to update your dependencies
-* ⌨️ keyboard accessible
-* 🏗️ multi package meanager support (npm, yarn, pnpm)
-* 📦 monorepo support. greenbot infers your monorepo packages
+- 💅 beutiful web UI to update your dependencies
+- ⌨️ keyboard accessible
+- 🏗️ multi package meanager support (npm, yarn, pnpm)
+- 📦 monorepo support. greenbot infers your monorepo packages
 
 ## Quick start
 
