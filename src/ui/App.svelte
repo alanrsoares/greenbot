@@ -27,11 +27,6 @@
     } else {
       params.delete("path");
     }
-    window.history.replaceState(
-      {},
-      "",
-      `${window.location.pathname}?${params.toString()}`
-    );
   }
 
   onMount(() => {
