@@ -15,7 +15,7 @@
   import { useQueryClient } from "@tanstack/svelte-query";
 
   import type { Package, PackageInfo } from "~/domain/types";
-  import { QUERY_KEYS } from "~/domain/constants";
+  import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
   import { ellipsis } from "~/lib/helpers";
   import {
     updatePackageQueryCache,
@@ -63,9 +63,6 @@
     }
   }
 
-  const MAX_LENGTH = 36;
-  const STAGGER_TIME = 1 / 30; // 30fps
-
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === "Escape") {
       expandedRowIndex = -1;
@@ -84,13 +81,16 @@
 
   $: isExpanded = expandedRowIndex === index;
   $: isBlurred = !isExpanded && expandedRowIndex !== -1;
+
+  const MAX_LENGTH = 36;
+  const STAGGER_TIME = 1 / 30; // 30fps
 </script>
 
 <li
   class="animate-fadeIn transition-opacity"
   on:click={handleToggleExpandedRow}
   on:keydown={handleToggleExpandedRow}
-  class:border-t={index !== 0}
+  class:border-b={index !== PAGE_SIZE - 1}
   style={`animation-delay: ${(index + 1) * STAGGER_TIME}s; opacity: ${
     isBlurred ? 0.4 : 1
   }!important;`}
