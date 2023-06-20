@@ -247,7 +247,7 @@
   <section
     class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2"
   >
-    <div class="relative">
+    <div class="relative group">
       <input
         bind:this={inputRef}
         type="search"
@@ -261,8 +261,10 @@
           isSearchFocused = false;
         }}
       />
-      <kbd class="kbd absolute right-2 top-2">
-        <span class="text-sm font-mono">
+      <kbd
+        class="kbd absolute right-2 top-2 transition-opacity opacity-50 group-hover:opacity-100"
+      >
+        <span class="text-xs font-mono">
           {#if IS_MAC}
             ⌘&plus;K
           {:else}
