@@ -35,6 +35,10 @@
   let isHelpVisible = false;
   let isSearchFocused = false;
 
+  let inputRef: HTMLInputElement | null = null;
+
+  const IS_MAC = navigator.userAgent.includes("Mac OS X");
+
   const upgradePackagesMutation = useUpgradePackagesMutation();
 
   const queryClient = useQueryClient();
@@ -68,6 +72,17 @@
             selectedTab === "dependencies" ? "devDependencies" : "dependencies";
           pageIndex = 0;
           expandedRowIndex = -1;
+          break;
+      }
+    }
+
+    if (event.ctrlKey || event.metaKey) {
+      switch (event.key) {
+        case "k":
+          event.preventDefault();
+          if (!isSearchFocused && inputRef) {
+            inputRef.focus();
+          }
           break;
       }
     }
@@ -114,6 +129,7 @@
           event.preventDefault();
           isHelpVisible = !isHelpVisible;
         }
+        break;
     }
   });
 
@@ -231,8 +247,9 @@
   <section
     class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2"
   >
-    <div class="">
+    <div class="relative">
       <input
+        bind:this={inputRef}
         type="search"
         class="search-input"
         placeholder="package name or version"
@@ -244,6 +261,15 @@
           isSearchFocused = false;
         }}
       />
+      <kbd class="kbd absolute right-2 top-2">
+        <span class="text-sm font-mono">
+          {#if IS_MAC}
+            ⌘&plus;K
+          {:else}
+            Ctrl&plus;K
+          {/if}
+        </span>
+      </kbd>
     </div>
     <header
       class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2"
@@ -285,6 +311,10 @@
             {meta}
             bind:selectedPackagePath
             bind:expandedRowIndex
+            class={index !== pageEntries.length - 1 &&
+            index !== expandedRowIndex
+              ? "border-b"
+              : ""}
           />
         {/each}
       </ul>

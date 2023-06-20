@@ -15,7 +15,7 @@
   import { useQueryClient } from "@tanstack/svelte-query";
 
   import type { Package, PackageInfo } from "~/domain/types";
-  import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
+  import { QUERY_KEYS } from "~/domain/constants";
   import { ellipsis } from "~/lib/helpers";
   import {
     updatePackageQueryCache,
@@ -87,10 +87,9 @@
 </script>
 
 <li
-  class="animate-fadeIn transition-opacity"
+  class={"animate-fadeIn transition-opacity ".concat($$props["class"])}
   on:click={handleToggleExpandedRow}
   on:keydown={handleToggleExpandedRow}
-  class:border-b={index !== PAGE_SIZE - 1}
   style={`animation-delay: ${(index + 1) * STAGGER_TIME}s; opacity: ${
     isBlurred ? 0.4 : 1
   }!important;`}
