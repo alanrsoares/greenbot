@@ -10787,7 +10787,7 @@ class Ha extends B {
   }
 }
 const Ka = "@greenbot/cli",
-  Ga = "0.26.3",
+  Ga = "0.26.4",
   Va = ["greenbot", "cli", "package updater"],
   Wa = "An interactive package updater for npm based applications",
   xa = "https://github.com/alanrsoares/greenbot",
@@ -10832,7 +10832,7 @@ const Ka = "@greenbot/cli",
     "animate.css": "^4.1.1",
     "body-parser": "^1.20.2",
     cors: "^2.8.5",
-    daisyui: "^3.1.5",
+    daisyui: "^3.1.6",
     express: "^4.18.2",
     "js-yaml": "^4.1.0",
     ky: "^0.33.3",

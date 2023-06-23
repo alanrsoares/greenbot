@@ -23,8 +23,8 @@ importers:
         specifier: ^2.8.5
         version: 2.8.5
       daisyui:
-        specifier: ^3.1.5
-        version: 3.1.5(postcss@8.4.24)
+        specifier: ^3.1.6
+        version: 3.1.6(postcss@8.4.24)
       express:
         specifier: ^4.18.2
         version: 4.18.2
@@ -1563,10 +1563,10 @@ packages:
       css-tree: 2.2.1
     dev: true
 
-  /daisyui@3.1.5(postcss@8.4.24):
+  /daisyui@3.1.6(postcss@8.4.24):
     resolution:
       {
-        integrity: sha512-3nk5L//IU31ISzsonKEFG8ris8hS/MRAc+PrOTOyRbssjv1fYmNKSdIrOhG6op2ED3RyJL4p6I81JUwd7RWqTw==,
+        integrity: sha512-P/2WUn4ZImEc2IfPSYw3qPCUnnJNju0P6ii0fUqtTURUj0oda6L0tm4EzrUmB2EbqB6grZ9nKHPTSniKaPYp1w==,
       }
     engines: { node: ">=16.9.0" }
     peerDependencies:

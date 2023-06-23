@@ -809,24 +809,35 @@ html {
     .menu
       li:not(.menu-title):not(.disabled)
       > :not(ul):not(details):not(.menu-title)
-  ):not(.active).focus,
+  ):is(summary):not(.active):focus-visible,
 :where(
     .menu
       li:not(.menu-title):not(.disabled)
       > :not(ul):not(details):not(.menu-title)
-  ):not(.active):focus,
+  ):not(summary):not(.active).focus,
+:where(
+    .menu
+      li:not(.menu-title):not(.disabled)
+      > :not(ul):not(details):not(.menu-title)
+  ):not(summary):not(.active):focus,
 :where(
     .menu
       li:not(.menu-title):not(.disabled)
       > details
       > summary:not(.menu-title)
-  ):not(.active).focus,
+  ):is(summary):not(.active):focus-visible,
 :where(
     .menu
       li:not(.menu-title):not(.disabled)
       > details
       > summary:not(.menu-title)
-  ):not(.active):focus {
+  ):not(summary):not(.active).focus,
+:where(
+    .menu
+      li:not(.menu-title):not(.disabled)
+      > details
+      > summary:not(.menu-title)
+  ):not(summary):not(.active):focus {
   --tw-text-opacity: 1;
   background-color: hsl(var(--bc) / 0.1);
   color: hsl(var(--bc) / var(--tw-text-opacity));
