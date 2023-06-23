@@ -37,8 +37,6 @@
 
   let inputRef: HTMLInputElement | null = null;
 
-  const IS_MAC = navigator.userAgent.includes("Mac OS X");
-
   const upgradePackagesMutation = useUpgradePackagesMutation();
 
   const queryClient = useQueryClient();
@@ -72,17 +70,6 @@
             selectedTab === "dependencies" ? "devDependencies" : "dependencies";
           pageIndex = 0;
           expandedRowIndex = -1;
-          break;
-      }
-    }
-
-    if (event.ctrlKey || event.metaKey) {
-      switch (event.key) {
-        case "k":
-          event.preventDefault();
-          if (!isSearchFocused && inputRef) {
-            inputRef.focus();
-          }
           break;
       }
     }
@@ -128,6 +115,12 @@
         if (!isSearchFocused) {
           event.preventDefault();
           isHelpVisible = !isHelpVisible;
+        }
+        break;
+      case "/":
+        if (!isSearchFocused && inputRef) {
+          event.preventDefault();
+          inputRef.focus();
         }
         break;
     }
@@ -252,7 +245,7 @@
         bind:this={inputRef}
         type="search"
         class="search-input"
-        placeholder="package name or version"
+        placeholder="search package by name or version"
         bind:value={searchTerm}
         on:focus={() => {
           isSearchFocused = true;
@@ -261,17 +254,13 @@
           isSearchFocused = false;
         }}
       />
-      <kbd
-        class="kbd absolute right-2 top-2 transition-opacity opacity-50 group-hover:opacity-100"
-      >
-        <span class="text-xs font-mono">
-          {#if IS_MAC}
-            ⌘&plus;K
-          {:else}
-            Ctrl&plus;K
-          {/if}
-        </span>
-      </kbd>
+      {#if !isSearchFocused || !searchTerm}
+        <kbd
+          class="kbd absolute right-2 top-2 transition-opacity opacity-50 group-hover:opacity-100"
+        >
+          <span class="text-xs font-mono"> / </span>
+        </kbd>
+      {/if}
     </div>
     <header
       class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2"
