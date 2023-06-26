@@ -1,7 +1,7 @@
 node_modules/
 
 # build artifacts
-build/
 dist/
+build/
 *.js
 *.d.ts
