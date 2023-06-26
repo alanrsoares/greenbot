@@ -117,6 +117,22 @@ const rawVersion = (version) => ({
   qualifier: isNaN(Number(version[0])) ? version[0] : undefined,
 });
 
+const isNumber = (n) => !isNaN(Number(n));
+
+/*
+ * isValidSemVer - check if version is a valid semver
+ *
+ * @param version {string} - version string
+ * @returns {boolean} - true if valid semver
+ */
+const isValidSemVer = (version = "") => {
+  const raw = rawVersion(version);
+  return (
+    raw.version.split(".").length === 3 &&
+    raw.version.split(".").every(isNumber)
+  );
+};
+
 /**
  * fetchNPMPackageMeta - fetch package.json from npm
  *
@@ -125,6 +141,13 @@ const rawVersion = (version) => ({
  * @returns {Promise<{name:string; version: string; latest: string, latestOutOfRange: string, meta: import("package-json").FullMetadata}>}
  */
 const fetchNPMPackageMeta = async (name, version = "latest") => {
+  if (!isValidSemVer(version)) {
+    return {
+      name,
+      version,
+      latest: version,
+    };
+  }
   try {
     const options = { version, fullMetadata: true };
 
