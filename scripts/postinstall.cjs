@@ -5,7 +5,6 @@ const {
   inferPackageManager,
   REPOSITORY_URL,
   renderBox,
-  pad,
   version,
   name,
   fetchNPMPackageMeta,
