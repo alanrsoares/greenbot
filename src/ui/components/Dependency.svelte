@@ -86,7 +86,9 @@
   const STAGGER_TIME = 1 / 30; // 30fps
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-to-interactive-role -->
 <li
+  role="button"
   class={"animate-fadeIn transition-opacity ".concat($$props["class"])}
   on:click={handleToggleExpandedRow}
   on:keydown={handleToggleExpandedRow}
