@@ -10,7 +10,7 @@
     PackageIcon,
     CheckCircleIcon,
     ScaleIcon,
-  } from "lucide-svelte";
+  } from "~/lib/icons";
 
   import { useQueryClient } from "@tanstack/svelte-query";
 

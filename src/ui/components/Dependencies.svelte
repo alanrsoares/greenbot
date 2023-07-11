@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useQueryClient } from "@tanstack/svelte-query";
   import { partition, prop } from "rambda";
-  import { ArrowUpIcon, InfoIcon, XIcon, CheckCircleIcon } from "lucide-svelte";
+  import { ArrowUpIcon, InfoIcon, XIcon, CheckCircleIcon } from "~/lib/icons";
 
   import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
   import type { Package, PackageInfo, TabKind } from "~/domain/types";

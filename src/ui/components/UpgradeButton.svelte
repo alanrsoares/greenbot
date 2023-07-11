@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowUpIcon } from "lucide-svelte";
+  import { ArrowUpIcon } from "~/lib/icons";
 
   export let isLoading = false;
   export let disabled = false;
