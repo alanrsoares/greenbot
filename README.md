@@ -1,6 +1,8 @@
 # Greenbot
 
-interactive npm dependency updater
+[![npm downloads](https://img.shields.io/npm/dt/@greenbot/cli.svg)](https://npmjs.org/@greenbot/cli)
+
+Interactive npm dependency updater
 
 - 💅 beutiful web UI to update your dependencies
 - ⌨️ keyboard accessible
