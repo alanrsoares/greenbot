@@ -21,8 +21,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "preversion": "yarn build",
-    "release": "npm publish && git push && git push --tags",
+    "postversion": "pnpm build git add . && git commit --amend --no-edit",
+    "release": "pnpm publish && git push && git push --tags",
     "prepare": "husky install",
     "postinstall": "node scripts/postinstall.cjs"
   },
