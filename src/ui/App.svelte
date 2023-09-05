@@ -1,20 +1,19 @@
 <script lang="ts">
-  import type { QueryObserverResult } from "@tanstack/svelte-query";
   import type { FullMetadata } from "package-json";
   import { onMount } from "svelte";
 
-  import type { Package, PackageInfo, TabKind } from "~/domain/types";
+  import type { PackageInfo, TabKind } from "~/domain/types";
 
-  import { isLatestVersion } from "~/lib/helpers";
-  import { usePackageQuery } from "~/lib/hooks";
+  import { useCurrentMood, usePackageQuery } from "~/lib/hooks";
 
-  import Bot, { type Mood } from "~/ui/components/Bot.svelte";
+  import Bot from "~/ui/components/Bot.svelte";
   import Dependencies from "~/ui/components/Dependencies.svelte";
   import Layout from "~/ui/components/Layout.svelte";
   import NPMBadge from "~/ui/components/NPMBadge.svelte";
-  import Tabs, { type TabItem } from "~/ui/components/Tabs.svelte";
+  import Tabs from "~/ui/components/Tabs.svelte";
   import Spinner from "~/ui/components/Spinner.svelte";
   import WorkspacePicker from "./components/WorkspacePicker.svelte";
+  import { getFilteredEntries } from "~/lib/helpers";
 
   let selectedTab: TabKind = "dependencies";
   let selectedPackagePath: string = "";
@@ -45,17 +44,6 @@
     }
   });
 
-  function handleTabCchange({ value }: TabItem) {
-    selectedTab = value as TabKind;
-  }
-
-  function getFilteredEntries(
-    entries: [string, string][],
-    resolutions: Record<string, string>
-  ) {
-    return entries.filter(([name, version]) => resolutions[name] !== version);
-  }
-
   function toPackageInfo(
     [name, version]: [string, string],
     resolutions: Record<string, string>,
@@ -69,39 +57,9 @@
     };
   }
 
-  function getCurrentMood(
-    result?: QueryObserverResult<Package, unknown>
-  ): Mood {
-    if (!result || result.isLoading) {
-      return "asleep";
-    }
-    if (result.error) {
-      return "dead";
-    }
-    if (result.data) {
-      const { dependencies, devDependencies, resolutions } = result.data;
-
-      const allEntries = Object.entries({
-        ...dependencies,
-        ...devDependencies,
-      });
-
-      const outdatedPackagesCount = getFilteredEntries(
-        allEntries,
-        result.data.resolutions
-      ).filter(
-        ([name, version]) => !isLatestVersion(version, resolutions[name])
-      ).length;
-
-      return outdatedPackagesCount ? "angry" : "happy";
-    }
-
-    return "awake";
-  }
-
   $: packageQuery = usePackageQuery(selectedPackagePath);
 
-  $: mood = getCurrentMood($packageQuery);
+  $: mood = useCurrentMood($packageQuery);
 
   $: tabEntries =
     $packageQuery.isLoading || $packageQuery.error || !$packageQuery.data
@@ -148,8 +106,7 @@
         bind:selectedPackagePath
       />
       <Tabs
-        onChange={handleTabCchange}
-        {selectedTab}
+        bind:selectedTab
         tabs={[
           { value: "dependencies", label: "Dependencies" },
           { value: "devDependencies", label: "Dev Dependencies" },

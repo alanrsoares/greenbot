@@ -29,3 +29,10 @@ export const mapObject = <T, U>(
   Object.fromEntries(
     Object.entries(obj).map(([key, value]) => [key, fn(value, key)])
   );
+
+export function getFilteredEntries(
+  entries: [string, string][],
+  resolutions: Record<string, string>
+) {
+  return entries.filter(([name, version]) => resolutions[name] !== version);
+}

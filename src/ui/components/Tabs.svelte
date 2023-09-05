@@ -8,7 +8,6 @@
 <script lang="ts">
   export let selectedTab = "";
   export let tabs: TabItem[] = [];
-  export let onChange: (tab: TabItem) => void;
 </script>
 
 <div class="container">
@@ -16,7 +15,9 @@
     <button
       data-value={tab.value}
       class:bg-castleton-green={selectedTab === tab.value}
-      on:click={onChange.bind(null, tab)}
+      on:click={() => {
+        selectedTab = tab.value;
+      }}
     >
       {tab.label}
     </button>
