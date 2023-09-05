@@ -1,5 +1,6 @@
 <script lang="ts">
   import { range } from "rambda";
+  import { ChevronLeftIcon, ChevronRightIcon } from "~/lib/icons";
 
   export let pages = 0;
   export let pageIndex = 0;
@@ -26,7 +27,7 @@
       on:click={handlePreviousPageClick}
       disabled={pageIndex === 0}
     >
-      ◄
+      <ChevronLeftIcon class="w-4 h-4" />
     </button>
   </li>
   {#each range(0, pages) as index}
@@ -47,7 +48,7 @@
       on:click={handleNextPageClick}
       disabled={pageIndex === pages - 1}
     >
-      ►
+      <ChevronRightIcon class="w-4 h-4" />
     </button>
   </li>
 </ul>
