@@ -14,7 +14,7 @@
   import NPMBadge from "~/ui/components/NPMBadge.svelte";
   import Tabs, { type TabItem } from "~/ui/components/Tabs.svelte";
   import Spinner from "~/ui/components/Spinner.svelte";
-  import { ChevronLeftIcon, ChevronRightIcon } from "~/lib/icons";
+  import WorkspacePicker from "./components/WorkspacePicker.svelte";
 
   let selectedTab: TabKind = "dependencies";
   let selectedPackagePath: string = "";
@@ -118,27 +118,6 @@
       $packageQuery.data?.meta ?? {}
     )
   );
-
-  $: onWorkspaceChange = (shift: 1 | -1) => () => {
-    if (!$packageQuery.data?.workspaces) return;
-
-    const { workspaces } = $packageQuery.data;
-
-    console.log({ selectedPackagePath });
-
-    const index =
-      selectedPackagePath === ""
-        ? 0
-        : workspaces.findIndex((x) => x.path === selectedPackagePath) ?? -1;
-
-    if (index >= 0) {
-      const nextPackagePath =
-        workspaces[(index + shift) % workspaces.length]?.path ?? "";
-
-      selectedPackagePath =
-        nextPackagePath === selectedPackagePath ? "" : nextPackagePath;
-    }
-  };
 </script>
 
 <Layout>
@@ -164,6 +143,10 @@
       </div>
     {/if}
     {#if $packageQuery.data}
+      <WorkspacePicker
+        workspaces={$packageQuery.data.workspaces}
+        bind:selectedPackagePath
+      />
       <Tabs
         onChange={handleTabCchange}
         {selectedTab}
@@ -173,32 +156,6 @@
         ]}
       />
       <Dependencies bind:selectedTab bind:selectedPackagePath {entries} />
-      {#if $packageQuery.data.workspaces?.length}
-        <div class="bg-base-300 p-3 rounded-2xl mx-auto max-w-md w-full">
-          <div class="flex flex-1 justify-evenly">
-            <button
-              on:click={onWorkspaceChange(-1)}
-              disabled={!$packageQuery.data.workspaces?.length}
-            >
-              <ChevronLeftIcon class="w-4 h-4" />
-            </button>
-            <label class="grid place-items-center">
-              <select class="select select-sm" bind:value={selectedPackagePath}>
-                <option value="">root</option>
-                {#each $packageQuery.data.workspaces as workspace}
-                  <option value={workspace.path}>{workspace.name}</option>
-                {/each}
-              </select>
-            </label>
-            <button
-              on:click={onWorkspaceChange(1)}
-              disabled={!$packageQuery.data.workspaces?.length}
-            >
-              <ChevronRightIcon class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      {/if}
     {/if}
   </div>
 </Layout>
