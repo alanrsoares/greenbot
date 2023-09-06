@@ -32,7 +32,7 @@
   export let isLatest = false;
   export let meta: FullMetadata | undefined;
   export let expandedRowIndex = -1;
-  export let selectedPackagePath = "";
+  export let selectedWorkspace = "";
 
   const queryClient = useQueryClient();
 
@@ -42,12 +42,12 @@
     try {
       const updated = await $upgradePackagesMutation.mutateAsync({
         packages,
-        path: selectedPackagePath,
+        path: selectedWorkspace,
       });
 
       // apply optimistic update
       queryClient.setQueryData<Package>(
-        QUERY_KEYS.package(selectedPackagePath),
+        QUERY_KEYS.package(selectedWorkspace),
         updatePackageQueryCache(updated)
       );
     } catch (error) {

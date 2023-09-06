@@ -4,32 +4,15 @@
 
   import { ChevronLeftIcon, ChevronRightIcon } from "~/lib/icons";
 
-  export let selectedPackagePath: string = "";
+  export let selectedWorkspace: string = "";
   export let workspaces: Package["workspaces"] = [];
-
-  // sync url with selectedPackagePath
-  $: if (selectedPackagePath !== null) {
-    const params = new URLSearchParams(window.location.search);
-
-    if (selectedPackagePath) {
-      params.set("path", selectedPackagePath);
-    } else {
-      params.delete("path");
-    }
-    // update url witout reloading
-    window.history.replaceState(
-      {},
-      "",
-      `${window.location.pathname}?${params.toString()}`
-    );
-  }
 
   onMount(() => {
     const params = new URLSearchParams(window.location.search);
     const path = params.get("path");
 
     if (path !== null) {
-      selectedPackagePath = path;
+      selectedWorkspace = path;
     }
   });
 
@@ -37,16 +20,16 @@
     if (!workspaces) return;
 
     const index =
-      selectedPackagePath === ""
+      selectedWorkspace === ""
         ? 0
-        : workspaces.findIndex((x) => x.path === selectedPackagePath) ?? -1;
+        : workspaces.findIndex((x) => x.path === selectedWorkspace) ?? -1;
 
     if (index >= 0) {
-      const nextPackagePath =
+      const nextWorkspace =
         workspaces[(index + shift) % workspaces.length]?.path ?? "";
 
-      selectedPackagePath =
-        nextPackagePath === selectedPackagePath ? "" : nextPackagePath;
+      selectedWorkspace =
+        nextWorkspace === selectedWorkspace ? "" : nextWorkspace;
     }
   };
 </script>
@@ -58,7 +41,7 @@
         <ChevronLeftIcon class="w-4 h-4" />
       </button>
       <label class="grid place-items-center">
-        <select class="select select-sm" bind:value={selectedPackagePath}>
+        <select class="select select-sm" bind:value={selectedWorkspace}>
           <option value="">root</option>
           {#each workspaces as workspace}
             <option value={workspace.path}>{workspace.name}</option>

@@ -45,10 +45,11 @@ export const updatePackageQueryCache =
     return next;
   };
 
-export const usePackageQuery = (path: string) => {
-  console.log("usePackageQuery", { path });
-  return createQuery(QUERY_KEYS.package(path), api.getPackage.bind(null, path));
-};
+export const useWorkspacesQuery = () =>
+  createQuery(QUERY_KEYS.workspaces, api.getWorkspaces);
+
+export const usePackageQuery = (path: string) =>
+  createQuery(QUERY_KEYS.package(path), api.getPackage.bind(null, path));
 
 export const useBundlephobiaReportQuery = (name: string) =>
   createQuery(

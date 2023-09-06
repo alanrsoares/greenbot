@@ -15,6 +15,10 @@ export function getPackage(path?: string) {
   return greenbotClient.get("package", { searchParams }).json<Package>();
 }
 
+export function getWorkspaces() {
+  return greenbotClient.get("workspaces").json<Package["workspaces"]>();
+}
+
 export type UpgradePackagesInput = {
   packages: PackageInfo[];
   path?: string;

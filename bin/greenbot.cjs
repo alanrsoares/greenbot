@@ -111,6 +111,9 @@ app
 
     res.json(result);
   })
+  .get("/workspaces", async (_, res) => {
+    res.json(CONTEXT.isMonorepo ? CONTEXT.workspaces : null);
+  })
   .get("/package", async (req, res) => {
     const packageJsonPath = gePackageJsonPath(req.query);
 

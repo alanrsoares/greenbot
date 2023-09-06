@@ -4,7 +4,11 @@
 
   import type { PackageInfo, TabKind } from "~/domain/types";
 
-  import { useCurrentMood, usePackageQuery } from "~/lib/hooks";
+  import {
+    useCurrentMood,
+    usePackageQuery,
+    useWorkspacesQuery,
+  } from "~/lib/hooks";
 
   import Bot from "~/ui/components/Bot.svelte";
   import Dependencies from "~/ui/components/Dependencies.svelte";
@@ -15,15 +19,16 @@
   import WorkspacePicker from "./components/WorkspacePicker.svelte";
   import { getFilteredEntries } from "~/lib/helpers";
 
+  // app state
   let selectedTab: TabKind = "dependencies";
-  let selectedPackagePath: string = "";
+  let selectedWorkspace: string = "";
 
-  // sync url with selectedPackagePath
-  $: if (selectedPackagePath !== null) {
+  // sync url with selectedWorkspace
+  $: if (selectedWorkspace !== null) {
     const params = new URLSearchParams(window.location.search);
 
-    if (selectedPackagePath) {
-      params.set("path", selectedPackagePath);
+    if (selectedWorkspace) {
+      params.set("path", selectedWorkspace);
     } else {
       params.delete("path");
     }
@@ -40,7 +45,7 @@
     const path = params.get("path");
 
     if (path !== null) {
-      selectedPackagePath = path;
+      selectedWorkspace = path;
     }
   });
 
@@ -57,7 +62,9 @@
     };
   }
 
-  $: packageQuery = usePackageQuery(selectedPackagePath);
+  $: workspacesQuery = useWorkspacesQuery();
+
+  $: packageQuery = usePackageQuery(selectedWorkspace);
 
   $: mood = useCurrentMood($packageQuery);
 
@@ -90,6 +97,12 @@
     {/if}
   </div>
   <div class="w-full grid gap-4">
+    {#if $workspacesQuery.data}
+      <WorkspacePicker
+        workspaces={$workspacesQuery.data}
+        bind:selectedWorkspace
+      />
+    {/if}
     {#if $packageQuery.isLoading}
       <div
         class="border-2 border-slate-900 bg-slate-900/60 rounded-3xl flex justify-center items-center overflow-hidden p-8 gap-2"
@@ -101,10 +114,6 @@
       </div>
     {/if}
     {#if $packageQuery.data}
-      <WorkspacePicker
-        workspaces={$packageQuery.data.workspaces}
-        bind:selectedPackagePath
-      />
       <Tabs
         bind:selectedTab
         tabs={[
@@ -112,7 +121,7 @@
           { value: "devDependencies", label: "Dev Dependencies" },
         ]}
       />
-      <Dependencies bind:selectedTab bind:selectedPackagePath {entries} />
+      <Dependencies bind:selectedTab bind:selectedWorkspace {entries} />
     {/if}
   </div>
 </Layout>
