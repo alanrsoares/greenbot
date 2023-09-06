@@ -8,8 +8,8 @@ importers:
   .:
     dependencies:
       "@tailwindcss/typography":
-        specifier: ^0.5.9
-        version: 0.5.9(tailwindcss@3.3.3)
+        specifier: ^0.5.10
+        version: 0.5.10(tailwindcss@3.3.3)
       "@tanstack/svelte-query":
         specifier: ^4.33.0
         version: 4.33.0(svelte@4.2.0)
@@ -23,8 +23,8 @@ importers:
         specifier: ^2.8.5
         version: 2.8.5
       daisyui:
-        specifier: ^3.6.4
-        version: 3.6.4
+        specifier: ^3.6.5
+        version: 3.6.5
       express:
         specifier: ^4.18.2
         version: 4.18.2
@@ -66,8 +66,8 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       "@types/cors":
-        specifier: ^2.8.13
-        version: 2.8.13
+        specifier: ^2.8.14
+        version: 2.8.14
       autoprefixer:
         specifier: ^10.4.15
         version: 10.4.15(postcss@8.4.29)
@@ -127,17 +127,17 @@ importers:
         version: 4.1.2
     devDependencies:
       "@tsconfig/strictest":
-        specifier: ^2.0.1
-        version: 2.0.1
+        specifier: ^2.0.2
+        version: 2.0.2
       "@types/node":
-        specifier: ^20.4.7
-        version: 20.4.7
+        specifier: ^20.5.9
+        version: 20.5.9
       rimraf:
         specifier: ^5.0.1
         version: 5.0.1
       typescript:
-        specifier: ^5.1.6
-        version: 5.1.6
+        specifier: ^5.2.2
+        version: 5.2.2
 
 packages:
   /@alloc/quick-lru@5.2.0:
@@ -456,7 +456,7 @@ packages:
     dependencies:
       "@inquirer/type": 1.1.1
       "@types/mute-stream": 0.0.1
-      "@types/node": 20.4.7
+      "@types/node": 20.5.9
       "@types/wrap-ansi": 3.0.0
       ansi-escapes: 4.3.2
       chalk: 4.1.2
@@ -479,7 +479,7 @@ packages:
     dependencies:
       "@inquirer/type": 1.1.1
       "@types/mute-stream": 0.0.1
-      "@types/node": 20.4.7
+      "@types/node": 20.5.9
       "@types/wrap-ansi": 3.0.0
       ansi-escapes: 4.3.2
       chalk: 4.1.2
@@ -747,10 +747,10 @@ packages:
       defer-to-connect: 2.0.1
     dev: false
 
-  /@tailwindcss/typography@0.5.9(tailwindcss@3.3.3):
+  /@tailwindcss/typography@0.5.10(tailwindcss@3.3.3):
     resolution:
       {
-        integrity: sha512-t8Sg3DyynFysV9f4JDOVISGsjazNb48AeIYQwcL+Bsq5uf4RYL75C1giZ43KISjeDGBaTN3Kxh7Xj/vRSMJUUg==,
+        integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==,
       }
     peerDependencies:
       tailwindcss: ">=3.0.0 || insiders"
@@ -789,13 +789,6 @@ packages:
     engines: { node: ">=10.13.0" }
     dev: true
 
-  /@tsconfig/strictest@2.0.1:
-    resolution:
-      {
-        integrity: sha512-7JHHCbyCsGUxLd0pDbp24yz3zjxw2t673W5oAP6HCEdr/UUhaRhYd3SSnUsGCk+VnPVJVA4mXROzbhI+nyIk+w==,
-      }
-    dev: true
-
   /@tsconfig/strictest@2.0.2:
     resolution:
       {
@@ -811,17 +804,17 @@ packages:
     dependencies:
       "@types/http-cache-semantics": 4.0.1
       "@types/keyv": 3.1.4
-      "@types/node": 20.5.8
+      "@types/node": 20.5.9
       "@types/responselike": 1.0.0
     dev: false
 
-  /@types/cors@2.8.13:
+  /@types/cors@2.8.14:
     resolution:
       {
-        integrity: sha512-RG8AStHlUiV5ysZQKq97copd2UmVYw3/pRMLefISZ3S1hK104Cwm7iLQ3fTKx+lsUH2CE8FlLaYeEA2LSeqYUA==,
+        integrity: sha512-RXHUvNWYICtbP6s18PnOCaqToK8y14DnLd75c6HfyKf228dxy7pHNOQkxPtvXKp/hINFMDjbYzsj63nnpPMSRQ==,
       }
     dependencies:
-      "@types/node": 20.5.8
+      "@types/node": 20.5.9
     dev: true
 
   /@types/estree@1.0.1:
@@ -843,7 +836,7 @@ packages:
         integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==,
       }
     dependencies:
-      "@types/node": 20.5.8
+      "@types/node": 20.5.9
     dev: false
 
   /@types/marked@4.3.1:
@@ -866,19 +859,13 @@ packages:
         integrity: sha512-0yQLzYhCqGz7CQPE3iDmYjhb7KMBFOP+tBkyw+/Y2YyDI5wpS7itXXxneN1zSsUwWx3Ji6YiVYrhAnpQGS/vkw==,
       }
     dependencies:
-      "@types/node": 20.4.7
+      "@types/node": 20.5.9
     dev: false
 
-  /@types/node@20.4.7:
+  /@types/node@20.5.9:
     resolution:
       {
-        integrity: sha512-bUBrPjEry2QUTsnuEjzjbS7voGWCc30W0qzgMf90GPeDGFRakvrz47ju+oqDAKCXLUCe39u57/ORMl/O/04/9g==,
-      }
-
-  /@types/node@20.5.8:
-    resolution:
-      {
-        integrity: sha512-eajsR9aeljqNhK028VG0Wuw+OaY5LLxYmxeoXynIoE6jannr9/Ucd1LL0hSSoafk5LTYG+FfqsyGt81Q6Zkybw==,
+        integrity: sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==,
       }
 
   /@types/pug@2.0.6:
@@ -894,7 +881,7 @@ packages:
         integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==,
       }
     dependencies:
-      "@types/node": 20.5.8
+      "@types/node": 20.5.9
     dev: false
 
   /@types/wrap-ansi@3.0.0:
@@ -1594,10 +1581,10 @@ packages:
       css-tree: 2.2.1
     dev: true
 
-  /daisyui@3.6.4:
+  /daisyui@3.6.5:
     resolution:
       {
-        integrity: sha512-8cFEkA2CaTKLUBvEU+9cTx6uvLSN2ZUq9fXxMkdiRS7QM79jBFv3klNkbUaPslmVh0eoeeCk0o98sjmfQ7/Cgg==,
+        integrity: sha512-1yPTKlCf1usfSsUaTvu5l/Fi8TEchy8H9/rAtvPMwWd++ifl56ASnaDQfHZhl9lnPtCWj/mWicrwL7aaNz53KA==,
       }
     engines: { node: ">=16.9.0" }
     dependencies:
@@ -4532,15 +4519,6 @@ packages:
       media-typer: 0.3.0
       mime-types: 2.1.35
     dev: false
-
-  /typescript@5.1.6:
-    resolution:
-      {
-        integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==,
-      }
-    engines: { node: ">=14.17" }
-    hasBin: true
-    dev: true
 
   /typescript@5.2.2:
     resolution:
