@@ -846,7 +846,7 @@ packages:
       }
     dependencies:
       "@types/jsonfile": 6.1.1
-      "@types/node": 20.5.9
+      "@types/node": 18.17.14
     dev: true
 
   /@types/http-cache-semantics@4.0.1:
@@ -862,7 +862,7 @@ packages:
         integrity: sha512-GSgiRCVeapDN+3pqA35IkQwasaCh/0YFH5dEF6S88iDvEn901DjOeH3/QPY+XYP1DFzDZPvIvfeEgk+7br5png==,
       }
     dependencies:
-      "@types/node": 20.5.9
+      "@types/node": 18.17.14
     dev: true
 
   /@types/keyv@3.1.4:

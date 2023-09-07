@@ -24,8 +24,8 @@
     "postversion": "pnpm build && git add . && git commit --amend --no-edit",
     "release": "pnpm publish && git push && git push --tags",
     "prepare": "husky install",
-    "prebuild": "node scripts/prebuild.cjs",
-    "postinstall": "node scripts/postinstall.mjs"
+    "prebuild": "node scripts/prebuild.mjs",
+    "postinstall": "node scripts/postinstall.cjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.5",
