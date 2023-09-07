@@ -65,8 +65,10 @@ The CLI executable is located at `./bin/greenbot.cjs`
 
 ### Web UI
 
-![Web UI Screenshot 1](https://github.com/alanrsoares/greenbot/assets/273334/bf39f60f-19f1-4467-a09d-75d2f22028b0)
-![Web UI Screenshot 2](https://github.com/alanrsoares/greenbot/assets/273334/0e7720a7-0689-4632-8195-b046b2ce2f16)
+![Web UI Screenshot 1](https://github.com/alanrsoares/greenbot/assets/273334/66ddde3c-0844-4440-8295-9ba6ad8334f9)
+
+![Web UI Screenshot 2](https://github.com/alanrsoares/greenbot/assets/273334/5d78ce0b-7f68-40e5-ae2d-d66994571059)
+
 
 ## License
 
