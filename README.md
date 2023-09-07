@@ -16,7 +16,7 @@ Use your favorite package manager to run greenbot
 | package manager | command               |
 | --------------- | --------------------- |
 | npm             | `npx @greenbot`       |
-| pnpm            | `pnpx  @greenbot/cli` |
+| pnpm            | `pnpx @greenbot/cli` |
 
 With `yarn` you need to install it as a global dependency:
 
