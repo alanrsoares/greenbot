@@ -25,7 +25,11 @@ import {
 const PACKAGE_JSON_PATH =
   process.argv.length === 3 ? process.argv[2] : "package.json";
 
-const STATIC_PATH = resolve(process.cwd(), "dist");
+const cwd = process.cwd();
+
+const STATIC_PATH = cwd.endsWith("/greenbot")
+  ? resolve(cwd, "dist")
+  : resolve(cwd, "node_modules/greenbot/dist");
 
 const CONTEXT = {
   packageManager: null,
