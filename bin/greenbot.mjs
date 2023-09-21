@@ -25,7 +25,7 @@ import {
 const PACKAGE_JSON_PATH =
   process.argv.length === 3 ? process.argv[2] : "package.json";
 
-const STATIC_PATH = resolve(process.cwd(), "..", "dist");
+const STATIC_PATH = resolve(process.cwd(), "dist");
 
 const CONTEXT = {
   packageManager: null,
