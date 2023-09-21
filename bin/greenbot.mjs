@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
-const express = require("express");
-const cors = require("cors");
-const { json } = require("body-parser");
-const path = require("path");
-const replaceInFile = require("replace-in-file");
-const chalk = require("chalk");
-const open = require("open");
-const fs = require("fs/promises");
-const { indexBy, prop } = require("rambda");
-const yaml = require("js-yaml");
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import { resolve } from "path";
+import replaceInFile from "replace-in-file";
+import chalk from "chalk";
+import open from "open";
+import { readFile, readdir } from "fs/promises";
+import { indexBy, prop } from "rambda";
+import { load } from "js-yaml";
 
-const {
+import {
   GREENBOT_TAG,
   DEFAULT_PORT,
   indexEntries,
@@ -19,13 +19,13 @@ const {
   rawVersion,
   fetchNPMPackageMeta,
   renderBox,
-  name,
-} = require("./shared.cjs");
+  packageName,
+} from "./shared.mjs";
 
 const PACKAGE_JSON_PATH =
   process.argv.length === 3 ? process.argv[2] : "package.json";
 
-const STATIC_PATH = path.resolve(__dirname, "..", "dist");
+const STATIC_PATH = resolve(process.cwd(), "..", "dist");
 
 const CONTEXT = {
   packageManager: null,
@@ -40,7 +40,7 @@ const CONTEXT = {
  */
 async function readPackageJson(path = PACKAGE_JSON_PATH) {
   try {
-    const raw = await fs.readFile(path, "utf8");
+    const raw = await readFile(path, "utf8");
     return JSON.parse(raw);
   } catch (error) {
     return { dependencies: {}, devDependencies: {} };
@@ -97,7 +97,7 @@ const gePackageJsonPath = ({ path = "" }) =>
 
 app
   .use(cors({ origin: "*" }))
-  .use(json())
+  .use(bodyParser.json())
   .use(express.static(STATIC_PATH))
   .get("/info/:name/:version?", async (req, res) => {
     const { name, version } = req.params;
@@ -178,11 +178,11 @@ async function main(port, tries = 0) {
       }
       break;
     case "pnpm":
-      const rawYaml = await fs
-        .readFile("pnpm-workspace.yaml", "utf8")
-        .catch(() => null);
+      const rawYaml = await readFile("pnpm-workspace.yaml", "utf8").catch(
+        () => null
+      );
       if (rawYaml) {
-        const parsed = yaml.load(rawYaml);
+        const parsed = load(rawYaml);
         workspaces = parsed.packages
           .filter((x) => !x.startsWith("!"))
           .map((x) => x.replace("/*", ""));
@@ -192,23 +192,23 @@ async function main(port, tries = 0) {
 
   const deepWorkspaces = await Promise.all(
     workspaces.map(async (workspace) => {
-      const workspacePath = path.resolve(workspace);
-      const validSubdirs = await fs
-        .readdir(workspacePath, { withFileTypes: true })
+      const workspacePath = resolve(workspace);
+      const validSubdirs = await readdir(workspacePath, { withFileTypes: true })
         .catch(() => [])
         .then((entries) => entries.filter((entry) => entry.isDirectory()));
 
       const packageNames = await Promise.all(
         validSubdirs.map(async (dir) => {
-          const packageJsonPath = path.resolve(
+          const packageJsonPath = resolve(
             workspacePath,
             dir.name,
             "package.json"
           );
 
-          const { name, version } = await fs
-            .readFile(packageJsonPath, "utf8")
-            .then(JSON.parse);
+          const { name, version } = await readFile(
+            packageJsonPath,
+            "utf8"
+          ).then(JSON.parse);
 
           return { name, version, dir: dir.name };
         })
@@ -247,7 +247,7 @@ async function main(port, tries = 0) {
       [
         ...GREENBOT_TAG.map((x) => chalk.green(x)),
         "",
-        (ctx) => ctx.center(chalk.bold.yellow(name)),
+        (ctx) => ctx.center(chalk.bold.yellow(packageName)),
         "",
         (ctx) => ctx.center(`Started listening at ${chalk.blue(url)}`),
         "",

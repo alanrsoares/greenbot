@@ -1,13 +1,15 @@
-const fs = require("fs/promises");
-const stripAnsi = require("strip-ansi");
-const chalk = require("chalk");
-const packageJson = require("package-json");
+import { readFile } from "fs/promises";
+import stripAnsi from "strip-ansi";
+import chalk from "chalk";
+import packageJson from "package-json";
 
-const { version, name } = require("../package.json");
+const { default: pkg } = await import("../package.json", {
+  assert: { type: "json" },
+});
 
-const vTag = chalk.cyan(`v${version}`);
+const vTag = chalk.cyan(`v${pkg.version}`);
 
-const GREENBOT_TAG = `
+export const GREENBOT_TAG = `
 ░██████╗░██████╗░███████╗███████╗███╗░░██╗██████╗░░█████╗░████████╗
 ██╔════╝░██╔══██╗██╔════╝██╔════╝████╗░██║██╔══██╗██╔══██╗╚══██╔══╝
 ██║░░██╗░██████╔╝█████╗░░█████╗░░██╔██╗██║██████╦╝██║░░██║░░░██║░░░
@@ -18,11 +20,12 @@ const GREENBOT_TAG = `
   .trim()
   .split("\n");
 
-const DEFAULT_PORT = 5001;
+export const DEFAULT_PORT = 5001;
+export const REPOSITORY_URL = "https://github.com/alanrsoares/greenbot";
+export const packageName = pkg.name;
+export const packageVersion = pkg.version;
 
 const PACKAGE_LOCK_FILES = ["yarn.lock", "package-lock.json", "pnpm-lock.yaml"];
-
-const REPOSITORY_URL = "https://github.com/alanrsoares/greenbot";
 
 const pad = (n = 0, char = " ") => char.repeat(n);
 
@@ -31,11 +34,9 @@ const pad = (n = 0, char = " ") => char.repeat(n);
  *
  * @returns {Promise<"yarn" | "npm" | "pnpm">}
  */
-async function inferPackageManager() {
+export async function inferPackageManager() {
   const [hasYarnLock, hasPackageLock, hasPnpmLock] = await Promise.all(
-    PACKAGE_LOCK_FILES.map((file) =>
-      fs.readFile(file, "utf8").catch(() => false)
-    )
+    PACKAGE_LOCK_FILES.map((file) => readFile(file, "utf8").catch(() => false))
   );
 
   if (hasYarnLock) return "yarn";
@@ -49,7 +50,10 @@ async function inferPackageManager() {
  *
  * @param {(string | (ctx: { center: (str: string) => string }) => string)[]} lines
  */
-function renderBox(lines = [], { color = chalk.green, padding = 1 } = {}) {
+export function renderBox(
+  lines = [],
+  { color = chalk.green, padding = 1 } = {}
+) {
   const maxLineLength = lines.reduce(
     (max, line) => Math.max(max, stripAnsi(line).length),
     0
@@ -103,7 +107,7 @@ ${bl}${border}${br}`);
  * @param xs {{name:string; latest:string;}[]}
  * @returns {Record<string,string>}
  */
-const indexEntries = (xs) =>
+export const indexEntries = (xs) =>
   xs.reduce((acc, { name, latest }) => ({ ...acc, [name]: latest }), {});
 
 /**
@@ -112,7 +116,7 @@ const indexEntries = (xs) =>
  * @param version {string}
  * @returns {{version:string; qualifier: string | undefined}}
  */
-const rawVersion = (version) => ({
+export const rawVersion = (version) => ({
   version: version.replace(/[\^~]/, ""),
   qualifier: isNaN(Number(version[0])) ? version[0] : undefined,
 });
@@ -140,7 +144,7 @@ const isValidSemVer = (version = "") => {
  * @param version {string}
  * @returns {Promise<{name:string; version: string; latest: string, latestOutOfRange: string, meta: import("package-json").FullMetadata}>}
  */
-const fetchNPMPackageMeta = async (name, version = "latest") => {
+export const fetchNPMPackageMeta = async (name, version = "latest") => {
   if (!isValidSemVer(version)) {
     return {
       name,
@@ -164,9 +168,7 @@ const fetchNPMPackageMeta = async (name, version = "latest") => {
       latestOutOfRange: outOfRange.version,
     };
   } catch (error) {
-    console.log(
-      chalk.red(`[greenbot] Could not fetch latest version for ${name}`)
-    );
+    console.log(red(`[greenbot] Could not fetch latest version for ${name}`));
 
     return {
       name,
@@ -174,20 +176,4 @@ const fetchNPMPackageMeta = async (name, version = "latest") => {
       latest: version,
     };
   }
-};
-
-module.exports = {
-  GREENBOT_TAG,
-  DEFAULT_PORT,
-  REPOSITORY_URL,
-  PACKAGE_LOCK_FILES,
-  version,
-  inferPackageManager,
-  renderBox,
-  pad,
-  version,
-  name,
-  indexEntries,
-  rawVersion,
-  fetchNPMPackageMeta,
 };

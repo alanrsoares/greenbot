@@ -1,20 +1,20 @@
-const chalk = require("chalk");
+import chalk from "chalk";
 
-const {
+import {
   GREENBOT_TAG,
   inferPackageManager,
   REPOSITORY_URL,
   renderBox,
-  version,
-  name,
+  packageVersion,
+  packageName,
   fetchNPMPackageMeta,
-} = require("../bin/shared.cjs");
+} from "../bin/shared.mjs";
 
 async function main() {
   // check for latest version on npm
-  const { latest } = await fetchNPMPackageMeta(name);
+  const { latest } = await fetchNPMPackageMeta(packageName);
 
-  if (version == latest) {
+  if (packageVersion == latest) {
     // nothing to see here
     return;
   }
@@ -22,22 +22,22 @@ async function main() {
   const releaseUrl = `${REPOSITORY_URL}/releases/tag/v${latest}`;
 
   const updateLine = chalk.bold(
-    `📦 Update available! ${chalk.red(version)} → ${chalk.green(latest)}`
+    `📦 Update available! ${chalk.red(packageVersion)} → ${chalk.green(latest)}`
   );
 
   const packageManager = await inferPackageManager();
 
   const installCommands = {
-    npm: `npm i ${name}@latest`,
-    yarn: `yarn add ${name}@latest`,
-    pnpm: `pnpm add ${name}@latest`,
+    npm: `npm i ${packageName}@latest`,
+    yarn: `yarn add ${packageName}@latest`,
+    pnpm: `pnpm add ${packageName}@latest`,
   };
 
   renderBox(
     [
       ...GREENBOT_TAG.map((x) => chalk.bold.green(x)),
       "",
-      (ctx) => ctx.center(chalk.bold.yellow(name)),
+      (ctx) => ctx.center(chalk.bold.yellow(packageName)),
       "",
       (ctx) => ctx.center(updateLine),
       "",
