@@ -17,10 +17,11 @@
 
 ### Run Greenbot with your favorite package manager
 
-| Package Manager | Command              |
-| --------------- | -------------------- |
-| npm             | `npx @greenbot`      |
-| pnpm            | `pnpx @greenbot/cli` |
+| Package Manager | Command                      |
+| --------------- | ---------------------------- |
+| npm             | `npx @greenbot@latest`       |
+| pnpm            | `pnpx @greenbot/cli@latest`  |
+| bun             | `bun x @greenbot/cli@latest` |
 
 📌 For `yarn`, you'll need to install it globally:
 
@@ -68,7 +69,6 @@ The CLI executable is located at `./bin/greenbot.cjs`
 ![Web UI Screenshot 1](https://github.com/alanrsoares/greenbot/assets/273334/66ddde3c-0844-4440-8295-9ba6ad8334f9)
 
 ![Web UI Screenshot 2](https://github.com/alanrsoares/greenbot/assets/273334/5d78ce0b-7f68-40e5-ae2d-d66994571059)
-
 
 ## License
 
