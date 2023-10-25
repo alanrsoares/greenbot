@@ -30,10 +30,10 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.6",
     "@tsconfig/strictest": "^2.0.2",
-    "@types/cors": "^2.8.14",
+    "@types/cors": "^2.8.15",
     "autoprefixer": "^10.4.16",
     "chalk": "^4.1.2",
-    "concurrently": "^8.2.1",
+    "concurrently": "^8.2.2",
     "cssnano": "^6.0.1",
     "husky": "^8.0.3",
     "postcss": "^8.4.31",
@@ -43,10 +43,10 @@
     "strip-ansi": "^6.0.1",
     "svelte-check": "^3.5.2",
     "svelte-preprocess": "^5.0.4",
-    "tailwindcss": "^3.3.3",
+    "tailwindcss": "^3.3.5",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2",
-    "vite": "^4.4.11",
+    "vite": "^4.5.0",
     "vite-tsconfig-paths": "^4.2.1",
     "zx": "^7.2.3"
   },
@@ -56,7 +56,7 @@
     "animate.css": "^4.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "daisyui": "^3.9.2",
+    "daisyui": "^3.9.3",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
     "ky": "^0.33.3",
@@ -65,7 +65,7 @@
     "package-json": "^7.0.0",
     "rambda": "^7.5.0",
     "replace-in-file": "^7.0.1",
-    "svelte": "^4.2.1",
+    "svelte": "^4.2.2",
     "svelte-markdown": "^0.2.3",
     "typewriter-effect": "^2.21.0"
   }
