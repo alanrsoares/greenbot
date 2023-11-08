@@ -60,7 +60,7 @@
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
     "ky": "^0.33.3",
-    "lucide-svelte": "^0.292.0",
+    "lucide-svelte": "^0.244.0",
     "open": "^8.4.2",
     "package-json": "^7.0.0",
     "rambda": "^7.5.0",

@@ -35,8 +35,8 @@ importers:
         specifier: ^0.33.3
         version: 0.33.3
       lucide-svelte:
-        specifier: ^0.292.0
-        version: 0.292.0(svelte@4.2.2)
+        specifier: ^0.244.0
+        version: 0.244.0(svelte@4.2.2)
       open:
         specifier: ^8.4.2
         version: 8.4.2
@@ -2874,13 +2874,13 @@ packages:
     engines: { node: 14 || >=16.14 }
     dev: true
 
-  /lucide-svelte@0.292.0(svelte@4.2.2):
+  /lucide-svelte@0.244.0(svelte@4.2.2):
     resolution:
       {
-        integrity: sha512-bnTpg9pbm6pQDc+YiLK2yxtRFk2Cc+hbzwjAPaV85k56x10CJ9LsXjon6wRrlNTSdxJR7GOsRjz0A5ZNu3Z7dg==,
+        integrity: sha512-FOzIF+1EUHllYLmSCLo0UFqyI6+796lcBLKnA7wz21TELGETlR/xzJDEiU7YlS8ybRau2t3lzFv8h4Wj8z3oDQ==,
       }
     peerDependencies:
-      svelte: ">=3 <5"
+      svelte: ^3.49.0
     dependencies:
       svelte: 4.2.2
     dev: false
