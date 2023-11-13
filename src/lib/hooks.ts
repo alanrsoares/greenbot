@@ -21,7 +21,11 @@ export const useUpgradePackagesMutation = (
     api.UpgradePackagesInput,
     void
   >
-) => createMutation(api.upgradePackages, options);
+) =>
+  createMutation({
+    ...options,
+    mutationFn: api.upgradePackages,
+  });
 
 export const updatePackageQueryCache =
   (updated: PackageInfo[]): Updater<Package | undefined, Package> =>
@@ -46,19 +50,23 @@ export const updatePackageQueryCache =
   };
 
 export const useWorkspacesQuery = () =>
-  createQuery(QUERY_KEYS.workspaces, api.getWorkspaces);
+  createQuery({
+    queryKey: QUERY_KEYS.workspaces,
+    queryFn: api.getWorkspaces,
+  });
 
 export const usePackageQuery = (path: string) =>
-  createQuery(QUERY_KEYS.package(path), api.getPackage.bind(null, path));
+  createQuery({
+    queryKey: QUERY_KEYS.package(path),
+    queryFn: api.getPackage.bind(null, path),
+  });
 
 export const useBundlephobiaReportQuery = (name: string) =>
-  createQuery(
-    QUERY_KEYS.bundlephobiaReport(name),
-    () => api.getBundlephobiaReport(name),
-    {
-      enabled: Boolean(name),
-    }
-  );
+  createQuery({
+    queryKey: QUERY_KEYS.bundlephobiaReport(name),
+    queryFn: () => api.getBundlephobiaReport(name),
+    enabled: Boolean(name),
+  });
 
 export function useKeyDown(onKeyDown: (e: KeyboardEvent) => void) {
   onMount(() => {

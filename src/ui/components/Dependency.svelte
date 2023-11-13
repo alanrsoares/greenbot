@@ -126,8 +126,8 @@
         {:else}
           <div class="py-1">
             <UpgradeButton
-              disabled={$upgradePackagesMutation.isLoading}
-              isLoading={$upgradePackagesMutation.isLoading}
+              disabled={$upgradePackagesMutation.isPending}
+              isLoading={$upgradePackagesMutation.isPending}
               on:click={(e) => {
                 e.stopPropagation();
                 handleUpgradePackages([{ name, version, latest, meta }]);
