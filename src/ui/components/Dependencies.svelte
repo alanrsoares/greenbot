@@ -54,7 +54,9 @@
         updatePackageQueryCache(updated)
       );
 
-      await queryClient.refetchQueries(QUERY_KEYS.package(selectedWorkspace));
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEYS.package(selectedWorkspace),
+      });
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
     }
@@ -189,14 +191,17 @@
       label: "+ Shift, Switch tabs.",
     },
   ];
+
+  const hideHelp = () => {
+    isHelpVisible = false;
+  };
 </script>
 
 <div class="relative">
   <aside
     class="absolute right-0 top-8 transition-all duration-300 ease-in"
     class:translate-x-64={isHelpVisible}
-    use:clickOutside
-    on:outsideclick={() => (isHelpVisible = false)}
+    use:clickOutside={hideHelp}
   >
     <button
       class="help-trigger"
@@ -282,8 +287,8 @@
         {#if !isAllUpToDate}
           <UpgradeButton
             on:click={() => handleUpgradePackages(outdatedPackages)}
-            disabled={$upgradePackagesMutation.isLoading}
-            isLoading={$upgradePackagesMutation.isLoading}
+            disabled={$upgradePackagesMutation.isPending}
+            isLoading={$upgradePackagesMutation.isPending}
           >
             Upgrade all
           </UpgradeButton>
