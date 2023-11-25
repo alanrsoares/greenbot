@@ -14,7 +14,7 @@
 
   import { useQueryClient } from "@tanstack/svelte-query";
 
-  import type { Package, PackageInfo } from "~/domain/types";
+  import type { Package, PackageInfo, TabKind } from "~/domain/types";
   import { QUERY_KEYS } from "~/domain/constants";
   import { ellipsis } from "~/lib/helpers";
   import {
@@ -29,10 +29,12 @@
   export let version = "";
   export let latest: string | undefined = "";
   export let index = 0;
+  export let pageIndex = 0;
   export let isLatest = false;
   export let meta: FullMetadata | undefined;
   export let expandedRowIndex = -1;
   export let selectedWorkspace = "";
+  export let selectedTab: TabKind = "dependencies";
 
   const queryClient = useQueryClient();
 
@@ -47,7 +49,11 @@
 
       // apply optimistic update
       queryClient.setQueryData<Package>(
-        QUERY_KEYS.package(selectedWorkspace),
+        QUERY_KEYS.package({
+          path: selectedWorkspace,
+          pageIndex,
+          selectedTab,
+        }),
         updatePackageQueryCache(updated)
       );
     } catch (error) {

@@ -10,6 +10,8 @@ export interface Package {
   resolutions: Record<string, string>;
   meta: Record<string, FullMetadata>;
   packageManager: "npm" | "yarn" | "pnpm";
+  pages: number;
+  totalEntries: number;
   workspaces:
     | null
     | {

@@ -22,9 +22,10 @@
   // app state
   let selectedTab: TabKind = "dependencies";
   let selectedWorkspace: string = "";
+  let pageIndex = 0;
 
   // sync url with selectedWorkspace
-  $: if (selectedWorkspace !== null) {
+  $: if (selectedWorkspace !== null || pageIndex || selectedTab) {
     const params = new URLSearchParams(window.location.search);
 
     if (selectedWorkspace) {
@@ -32,6 +33,10 @@
     } else {
       params.delete("path");
     }
+
+    params.set("page", pageIndex.toString());
+    params.set("tab", selectedTab);
+
     // update url witout reloading
     window.history.replaceState(
       {},
@@ -46,6 +51,18 @@
 
     if (path !== null) {
       selectedWorkspace = path;
+    }
+
+    const page = params.get("page");
+
+    if (page !== null) {
+      pageIndex = parseInt(page, 10);
+    }
+
+    const tab = params.get("tab");
+
+    if (tab !== null) {
+      selectedTab = tab as TabKind;
     }
   });
 
@@ -64,7 +81,11 @@
 
   $: workspacesQuery = useWorkspacesQuery();
 
-  $: packageQuery = usePackageQuery(selectedWorkspace);
+  $: packageQuery = usePackageQuery({
+    path: selectedWorkspace,
+    pageIndex,
+    selectedTab,
+  });
 
   $: mood = useCurrentMood($packageQuery);
 
@@ -121,7 +142,14 @@
           { value: "devDependencies", label: "Dev Dependencies" },
         ]}
       />
-      <Dependencies bind:selectedTab bind:selectedWorkspace {entries} />
+      <Dependencies
+        bind:selectedTab
+        bind:selectedWorkspace
+        bind:pageIndex
+        pages={$packageQuery.data.pages}
+        totalEntries={$packageQuery.data.totalEntries}
+        {entries}
+      />
     {/if}
   </div>
 </Layout>

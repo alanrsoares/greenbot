@@ -34,5 +34,9 @@ export function getFilteredEntries(
   entries: [string, string][],
   resolutions: Record<string, string>
 ) {
-  return entries.filter(([name, version]) => resolutions[name] !== version);
+  return entries.filter(([name, version]) => {
+    const resolution = resolutions[name];
+
+    return resolution && resolution !== version;
+  });
 }
