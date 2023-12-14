@@ -116,31 +116,22 @@ app
   })
   .get("/package", async (req, res) => {
     const packageJsonPath = gePackageJsonPath(req.query);
-    const pageIndex = Number(req.query.pageIndex ?? 0);
-    const pageSize = Number(req.query.pageSize ?? 10);
-    const selectedTab = req.query.selectedTab ?? "dependencies";
+
     const response = await readPackageJson(packageJsonPath);
 
     const dependencyEntries = Object.entries(response.dependencies ?? {});
     const devDependencyEntries = Object.entries(response.devDependencies ?? {});
 
-    const allEntries =
-      selectedTab === "dependencies" ? dependencyEntries : devDependencyEntries;
+    const allEntries = [...dependencyEntries, ...devDependencyEntries];
 
-    const pages = Math.ceil(allEntries.length / pageSize);
-
-    const promises = allEntries
-      .slice(pageIndex * pageSize, pageIndex * pageSize + pageSize)
-      .map(([packageName, version]) =>
-        fetchNPMPackageMeta(packageName, version)
-      );
+    const promises = allEntries.map(([packageName, version]) =>
+      fetchNPMPackageMeta(packageName, version)
+    );
 
     const resolved = await Promise.all(promises);
 
     res.json({
       ...response,
-      pages,
-      totalEntries: allEntries.length,
       resolutions: indexEntries(resolved),
       meta: indexBy(prop("name"), resolved.map(prop("meta"))),
       packageManager: CONTEXT.packageManager,

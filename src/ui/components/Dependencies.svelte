@@ -3,7 +3,7 @@
   import { partition, prop } from "rambda";
   import { ArrowUpIcon, InfoIcon, XIcon, CheckCircleIcon } from "~/lib/icons";
 
-  import { QUERY_KEYS } from "~/domain/constants";
+  import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
   import type { Package, PackageInfo, TabKind } from "~/domain/types";
   import { clickOutside } from "~/lib/directives";
   import { isLatestVersion } from "~/lib/helpers";
@@ -27,16 +27,9 @@
    */
   export let selectedWorkspace: string = "";
 
-  /**
-   * bound pageIndex
-   */
-  export let pageIndex = 0;
-
-  export let pages = 0;
-
   export let entries: PackageInfo[] = [];
-  export let totalEntries = 0;
 
+  let pageIndex = 0;
   let expandedRowIndex = -1;
   let searchTerm = "";
   let isHelpVisible = false;
@@ -55,19 +48,15 @@
         path: selectedWorkspace,
       });
 
-      const queryKey = QUERY_KEYS.package({
-        path: selectedWorkspace,
-        pageIndex,
-        selectedTab,
-      });
-
       // apply optimistic update
       queryClient.setQueryData<Package>(
-        queryKey,
+        QUERY_KEYS.package(selectedWorkspace),
         updatePackageQueryCache(updated)
       );
 
-      await queryClient.refetchQueries({ queryKey });
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEYS.package(selectedWorkspace),
+      });
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
     }
@@ -144,7 +133,7 @@
       name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       version.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  $: pages = Math.ceil(filteredEntries.length / PAGE_SIZE);
   $: displayEntries = filteredEntries
     .map((x) => ({
       ...x,
@@ -156,8 +145,8 @@
       }
       return a.isLatest && !b.isLatest ? 1 : -1;
     });
-
-  $: pageEntries = displayEntries;
+  $: startIndex = pageIndex * PAGE_SIZE;
+  $: pageEntries = displayEntries.slice(startIndex, startIndex + PAGE_SIZE);
   $: [upToDatePackages, outdatedPackages] = partition<
     PackageInfo & { isLatest: boolean }
   >(prop("isLatest"), displayEntries);
@@ -287,7 +276,7 @@
           <span
             class="text-xs tracking-wider bg-castleton-green px-2 py-1 rounded-full"
           >
-            {upToDatePackages.length}/{totalEntries}
+            {upToDatePackages.length}/{entries.length}
           </span>
         </div>
         {#if isAllUpToDate}
@@ -311,13 +300,11 @@
         {#each pageEntries as { name, version, latest, isLatest, meta }, index}
           <Dependency
             {index}
-            {pageIndex}
             {name}
             {version}
             {latest}
             {isLatest}
             {meta}
-            {selectedTab}
             bind:selectedWorkspace
             bind:expandedRowIndex
             class={index !== pageEntries.length - 1 &&
