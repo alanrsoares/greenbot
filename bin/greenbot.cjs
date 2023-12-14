@@ -116,13 +116,20 @@ app
   })
   .get("/package", async (req, res) => {
     const packageJsonPath = gePackageJsonPath(req.query);
+    const selectedTab = String(req.query.tab);
 
     const response = await readPackageJson(packageJsonPath);
 
     const dependencyEntries = Object.entries(response.dependencies ?? {});
     const devDependencyEntries = Object.entries(response.devDependencies ?? {});
 
-    const allEntries = [...dependencyEntries, ...devDependencyEntries];
+    console.log({
+      selectedTab,
+      packageJsonPath,
+    });
+
+    const allEntries =
+      selectedTab === "dependencies" ? dependencyEntries : devDependencyEntries;
 
     const promises = allEntries.map(([packageName, version]) =>
       fetchNPMPackageMeta(packageName, version)

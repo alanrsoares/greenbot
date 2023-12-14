@@ -55,10 +55,10 @@ export const useWorkspacesQuery = () =>
     queryFn: api.getWorkspaces,
   });
 
-export const usePackageQuery = (path: string) =>
+export const usePackageQuery = (input: api.GetPackageInput) =>
   createQuery({
-    queryKey: QUERY_KEYS.package(path),
-    queryFn: api.getPackage.bind(null, path),
+    queryKey: QUERY_KEYS.package(input),
+    queryFn: api.getPackage.bind(null, input),
   });
 
 export const useBundlephobiaReportQuery = (name: string) =>

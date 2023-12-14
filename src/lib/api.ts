@@ -1,5 +1,10 @@
 import ky from "ky";
-import type { BundlephobiaReport, Package, PackageInfo } from "~/domain/types";
+import type {
+  BundlephobiaReport,
+  Package,
+  PackageInfo,
+  TabKind,
+} from "~/domain/types";
 
 const greenbotClient = ky.create({
   prefixUrl: "http://localhost:5001/",
@@ -9,8 +14,21 @@ const bundlephobiaClient = ky.create({
   prefixUrl: "https://bundlephobia.com/",
 });
 
-export function getPackage(path?: string) {
-  const searchParams = path ? { path } : undefined;
+export type GetPackageInput = {
+  path?: string;
+  tab?: TabKind;
+};
+
+export function getPackage(input: GetPackageInput) {
+  const searchParams = new URLSearchParams();
+
+  if (input.path) {
+    searchParams.set("path", input.path);
+  }
+
+  if (input.tab) {
+    searchParams.set("tab", input.tab);
+  }
 
   return greenbotClient.get("package", { searchParams }).json<Package>();
 }

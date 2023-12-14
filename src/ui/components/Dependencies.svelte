@@ -50,12 +50,18 @@
 
       // apply optimistic update
       queryClient.setQueryData<Package>(
-        QUERY_KEYS.package(selectedWorkspace),
+        QUERY_KEYS.package({
+          path: selectedWorkspace,
+          tab: selectedTab,
+        }),
         updatePackageQueryCache(updated)
       );
 
       await queryClient.refetchQueries({
-        queryKey: QUERY_KEYS.package(selectedWorkspace),
+        queryKey: QUERY_KEYS.package({
+          path: selectedWorkspace,
+          tab: selectedTab,
+        }),
       });
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });

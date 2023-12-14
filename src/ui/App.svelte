@@ -19,19 +19,24 @@
   import WorkspacePicker from "./components/WorkspacePicker.svelte";
   import { getFilteredEntries } from "~/lib/helpers";
 
+  const params = new URLSearchParams(window.location.search);
+
   // app state
-  let selectedTab: TabKind = "dependencies";
-  let selectedWorkspace: string = "";
+  let selectedTab: TabKind = (params.get("tab") as TabKind) ?? "dependencies";
+  let selectedWorkspace: string = params.get("path") ?? "";
 
   // sync url with selectedWorkspace
-  $: if (selectedWorkspace !== null) {
+  $: if (selectedWorkspace !== null || selectedTab !== null) {
     const params = new URLSearchParams(window.location.search);
 
-    if (selectedWorkspace) {
+    if (selectedWorkspace && selectedWorkspace !== params.get("path")) {
       params.set("path", selectedWorkspace);
-    } else {
-      params.delete("path");
     }
+
+    if (selectedTab && selectedTab !== params.get("tab")) {
+      params.set("tab", selectedTab);
+    }
+
     // update url witout reloading
     window.history.replaceState(
       {},
@@ -64,7 +69,10 @@
 
   $: workspacesQuery = useWorkspacesQuery();
 
-  $: packageQuery = usePackageQuery(selectedWorkspace);
+  $: packageQuery = usePackageQuery({
+    path: selectedWorkspace,
+    tab: selectedTab,
+  });
 
   $: mood = useCurrentMood($packageQuery);
 
