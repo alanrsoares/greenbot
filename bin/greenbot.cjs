@@ -123,11 +123,6 @@ app
     const dependencyEntries = Object.entries(response.dependencies ?? {});
     const devDependencyEntries = Object.entries(response.devDependencies ?? {});
 
-    console.log({
-      selectedTab,
-      packageJsonPath,
-    });
-
     const allEntries =
       selectedTab === "dependencies" ? dependencyEntries : devDependencyEntries;
 
