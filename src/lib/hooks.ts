@@ -8,7 +8,7 @@ import {
 import { onDestroy, onMount } from "svelte";
 
 import { QUERY_KEYS } from "~/domain/constants";
-import type { Package, PackageInfo } from "~/domain/types";
+import type { Package, PackageInfo, TabKind } from "~/domain/types";
 
 import * as api from "./api";
 import { getFilteredEntries, isLatestVersion, rawVersion } from "./helpers";
@@ -79,7 +79,8 @@ export function useKeyDown(onKeyDown: (e: KeyboardEvent) => void) {
 }
 
 export function useCurrentMood(
-  result?: QueryObserverResult<Package, unknown>
+  result?: QueryObserverResult<Package, unknown>,
+  selectedTab?: TabKind
 ): Mood {
   if (!result || result.isLoading) {
     return "asleep";
@@ -90,10 +91,9 @@ export function useCurrentMood(
   if (result.data) {
     const { dependencies, devDependencies, resolutions } = result.data;
 
-    const allEntries = Object.entries({
-      ...dependencies,
-      ...devDependencies,
-    });
+    const allEntries = Object.entries(
+      (selectedTab === "dependencies" ? dependencies : devDependencies) ?? {}
+    );
 
     const outdatedPackagesCount = getFilteredEntries(
       allEntries,
@@ -102,7 +102,7 @@ export function useCurrentMood(
       ([name, version]) => !isLatestVersion(version, resolutions[name])
     ).length;
 
-    return outdatedPackagesCount ? "angry" : "happy";
+    return outdatedPackagesCount > 0 ? "angry" : "happy";
   }
 
   return "awake";

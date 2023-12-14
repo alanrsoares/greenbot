@@ -54,18 +54,16 @@
     }
   });
 
-  function toPackageInfo(
-    [name, version]: [string, string],
-    resolutions: Record<string, string>,
-    meta: Record<string, FullMetadata>
-  ): PackageInfo {
-    return {
-      name,
-      version,
-      latest: name in resolutions ? resolutions[name] : version,
-      meta: name in meta ? meta[name] : undefined,
+  const toPackageInfo =
+    (resolutions: Record<string, string>, meta: Record<string, FullMetadata>) =>
+    ([name, version]: [string, string]): PackageInfo => {
+      return {
+        name,
+        version,
+        latest: name in resolutions ? resolutions[name] : version,
+        meta: name in meta ? meta[name] : undefined,
+      };
     };
-  }
 
   $: workspacesQuery = useWorkspacesQuery();
 
@@ -84,9 +82,8 @@
           $packageQuery.data.resolutions
         );
 
-  $: entries = tabEntries.map((pair) =>
+  $: entries = tabEntries.map(
     toPackageInfo(
-      pair,
       $packageQuery.data?.resolutions ?? {},
       $packageQuery.data?.meta ?? {}
     )
