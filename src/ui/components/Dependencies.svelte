@@ -312,6 +312,7 @@
             {isLatest}
             {meta}
             bind:selectedWorkspace
+            bind:selectedTab
             bind:expandedRowIndex
             class={index !== pageEntries.length - 1 &&
             index !== expandedRowIndex
