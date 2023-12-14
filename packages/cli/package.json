@@ -37,8 +37,8 @@
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.2",
-    "@types/node": "^20.9.0",
+    "@types/node": "^20.10.4",
     "rimraf": "^5.0.5",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   }
 }
