@@ -22,6 +22,28 @@ const {
   name,
 } = require("./shared.cjs");
 
+/**
+ * @typedef {Object} PackageJsonContent
+ * @property {Record<string, string>} dependencies
+ * @property {Record<string, string>} [devDependencies]
+ * @property {string[]} [workspaces]
+ */
+
+/**
+ * @typedef {Object} PackageVersionInfo
+ * @property {string} name
+ * @property {string} version
+ * @property {string} latest
+ */
+
+/**
+ * @typedef {Object} PackageMetaInfo
+ * @property {string} name
+ * @property {string} version
+ * @property {string} latest
+ * @property {any} meta
+ */
+
 const PACKAGE_JSON_PATH =
   process.argv.length === 3 ? process.argv[2] : "package.json";
 
@@ -36,7 +58,7 @@ const CONTEXT = {
 /**
  * readPackageJson - read package.json file
  *
- * @returns {Promise<{dependencies: Record<string, string>; devDependencies?: Record<string,string>; workspaces?: string[]}>}
+ * @returns {Promise<PackageJsonContent>}
  */
 async function readPackageJson(path = PACKAGE_JSON_PATH) {
   try {
@@ -48,7 +70,9 @@ async function readPackageJson(path = PACKAGE_JSON_PATH) {
 }
 
 /**
- * @param package {{name: string; version: string; latest: string}}
+ * upgradeVersion - upgrade version in package.json
+ *
+ * @param package {PackageVersionInfo}
  */
 async function upgradeVersion(
   { name, version, latest },
@@ -66,8 +90,9 @@ async function upgradeVersion(
 }
 
 /**
+ * upgradeVersions - upgrade versions in package.json
  *
- * @param packages {Array<{name: string; version: string; latest: string}>}
+ * @param packages {PackageVersionInfo[]}
  * @returns
  */
 async function upgradeVersions(packages = [], path = PACKAGE_JSON_PATH) {
@@ -130,7 +155,27 @@ app
       fetchNPMPackageMeta(packageName, version)
     );
 
-    const resolved = await Promise.all(promises);
+    /**
+     * @type {PackageMetaInfo[]}
+     */
+    const resolved = await new Promise(async (resolve) => {
+      // resolve promises in chunks of 10
+      const result = [];
+      const chunkSize = 10;
+      const chunks = Math.ceil(promises.length / chunkSize);
+
+      for (let i = 0; i < chunks; i++) {
+        const chunk = promises.slice(i * chunkSize, (i + 1) * chunkSize);
+
+        const chunkresult = await Promise.all(chunk);
+
+        result.push(...chunkresult);
+
+        if (result.length === promises.length) {
+          resolve(result);
+        }
+      }
+    });
 
     res.json({
       ...response,
