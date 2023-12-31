@@ -108,6 +108,13 @@
         bind:selectedWorkspace
       />
     {/if}
+    <Tabs
+      bind:selectedTab
+      tabs={[
+        { value: "dependencies", label: "Dependencies" },
+        { value: "devDependencies", label: "Dev Dependencies" },
+      ]}
+    />
     {#if $packageQuery.isLoading}
       <div
         class="border-2 border-slate-900 bg-slate-900/60 rounded-3xl flex justify-center items-center overflow-hidden p-8 gap-2"
@@ -115,17 +122,14 @@
         <div class="h-4 w-4">
           <Spinner animated />
         </div>
-        <span>Loading dependencies</span>
+        <span
+          >Loading {selectedTab === "dependencies"
+            ? "dependencies"
+            : "dev dependencies"}...</span
+        >
       </div>
     {/if}
     {#if $packageQuery.data}
-      <Tabs
-        bind:selectedTab
-        tabs={[
-          { value: "dependencies", label: "Dependencies" },
-          { value: "devDependencies", label: "Dev Dependencies" },
-        ]}
-      />
       <Dependencies bind:selectedTab bind:selectedWorkspace {entries} />
     {/if}
   </div>

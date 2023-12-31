@@ -1,7 +1,13 @@
 <script lang="ts">
   import { useQueryClient } from "@tanstack/svelte-query";
   import { partition, prop } from "rambda";
-  import { ArrowUpIcon, InfoIcon, XIcon, CheckCircleIcon } from "~/lib/icons";
+  import {
+    ArrowUpIcon,
+    InfoIcon,
+    XIcon,
+    CheckCircleIcon,
+    AlertCircle,
+  } from "~/lib/icons";
 
   import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
   import type { Package, PackageInfo, TabKind } from "~/domain/types";
@@ -302,25 +308,36 @@
       </div>
     </header>
     <main class="min-h-[32rem] mx-2">
-      <ul class="grid">
-        {#each pageEntries as { name, version, latest, isLatest, meta }, index}
-          <Dependency
-            {index}
-            {name}
-            {version}
-            {latest}
-            {isLatest}
-            {meta}
-            bind:selectedWorkspace
-            bind:selectedTab
-            bind:expandedRowIndex
-            class={index !== pageEntries.length - 1 &&
-            index !== expandedRowIndex
-              ? "border-b"
-              : ""}
-          />
-        {/each}
-      </ul>
+      {#if !pageEntries.length}
+        <div class="flex items-center justify-center h-full group">
+          <div class="flex flex-col items-center justify-center gap-2">
+            <AlertCircle
+              class="h-10 w-10 text-base-content/80 group-hover:animate-pulse"
+            />
+            <span class="text-sm text-base-content/80">No packages found</span>
+          </div>
+        </div>
+      {:else}
+        <ul class="grid">
+          {#each pageEntries as { name, version, latest, isLatest, meta }, index}
+            <Dependency
+              {index}
+              {name}
+              {version}
+              {latest}
+              {isLatest}
+              {meta}
+              bind:selectedWorkspace
+              bind:selectedTab
+              bind:expandedRowIndex
+              class={index !== pageEntries.length - 1 &&
+              index !== expandedRowIndex
+                ? "border-b"
+                : ""}
+            />
+          {/each}
+        </ul>
+      {/if}
     </main>
     {#if pages > 1}
       <footer class="grid place-items-center">

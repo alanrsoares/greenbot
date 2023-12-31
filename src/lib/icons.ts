@@ -9,3 +9,4 @@ export { default as InfoIcon } from "lucide-svelte/dist/svelte/icons/info.svelte
 export { default as XIcon } from "lucide-svelte/dist/svelte/icons/x.svelte";
 export { default as ChevronLeftIcon } from "lucide-svelte/dist/svelte/icons/chevron-left.svelte";
 export { default as ChevronRightIcon } from "lucide-svelte/dist/svelte/icons/chevron-right.svelte";
+export { default as AlertCircle } from "lucide-svelte/dist/svelte/icons/alert-circle.svelte";
