@@ -11,8 +11,8 @@ importers:
         specifier: ^0.5.10
         version: 0.5.10(tailwindcss@3.3.6)
       "@tanstack/svelte-query":
-        specifier: ^5.13.4
-        version: 5.13.4(svelte@4.2.8)
+        specifier: ^5.17.0
+        version: 5.17.0(svelte@4.2.8)
       animate.css:
         specifier: ^4.1.1
         version: 4.1.1
@@ -47,14 +47,14 @@ importers:
         specifier: ^7.5.0
         version: 7.5.0
       replace-in-file:
-        specifier: ^7.0.2
-        version: 7.0.2
+        specifier: ^7.1.0
+        version: 7.1.0
       svelte:
         specifier: ^4.2.8
         version: 4.2.8
       svelte-markdown:
-        specifier: ^0.4.0
-        version: 0.4.0(svelte@4.2.8)
+        specifier: ^0.4.1
+        version: 0.4.1(svelte@4.2.8)
       typewriter-effect:
         specifier: ^2.21.0
         version: 2.21.0(react-dom@18.2.0)(react@18.2.0)
@@ -117,8 +117,8 @@ importers:
         specifier: ^5.0.9
         version: 5.0.9
       vite-tsconfig-paths:
-        specifier: ^4.2.2
-        version: 4.2.2(typescript@5.3.3)(vite@5.0.9)
+        specifier: ^4.2.3
+        version: 4.2.3(typescript@5.3.3)(vite@5.0.9)
       zx:
         specifier: ^7.2.3
         version: 7.2.3
@@ -136,8 +136,8 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       "@types/node":
-        specifier: ^20.10.4
-        version: 20.10.4
+        specifier: ^20.10.6
+        version: 20.10.6
       rimraf:
         specifier: ^5.0.5
         version: 5.0.5
@@ -472,7 +472,7 @@ packages:
     dependencies:
       "@inquirer/type": 1.1.1
       "@types/mute-stream": 0.0.1
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
       "@types/wrap-ansi": 3.0.0
       ansi-escapes: 4.3.2
       chalk: 4.1.2
@@ -495,7 +495,7 @@ packages:
     dependencies:
       "@inquirer/type": 1.1.1
       "@types/mute-stream": 0.0.1
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
       "@types/wrap-ansi": 3.0.0
       ansi-escapes: 4.3.2
       chalk: 4.1.2
@@ -921,22 +921,22 @@ packages:
       tailwindcss: 3.3.6
     dev: false
 
-  /@tanstack/query-core@5.13.4:
+  /@tanstack/query-core@5.17.0:
     resolution:
       {
-        integrity: sha512-8+rJucXvC/xlr4OrxHhEIob/cTlbT4fgmz1VsvB0D12FRStKaXeLORNGcOhSAynRd2NL74SV/Qq0IIb4DedLcA==,
+        integrity: sha512-LoBaPtbMY26kRS+ohII4thTsWkJJsXKGitOLikTo2aqPA4yy7cfFJITs8DRnuERT7tLF5xfG9Lnm33Vp/38Vmw==,
       }
     dev: false
 
-  /@tanstack/svelte-query@5.13.4(svelte@4.2.8):
+  /@tanstack/svelte-query@5.17.0(svelte@4.2.8):
     resolution:
       {
-        integrity: sha512-wR/jyZQ6/YOa+Tcz3Beb+DSgB518BUnDVP8E9NmGrSKbRmrV9QXrjr/BjW62LrIKWk0PPMTZ6fCvs+LJUm48bw==,
+        integrity: sha512-lcibEHE+XKjpIK2c5VA/DJ89N5lcwZ9bkABdkAwODJgg5eU9QjRQjABgRrKUhTtVg5ipbzDYugrGdVBqUuGS8g==,
       }
     peerDependencies:
       svelte: ^3.54.0 || ^4.0.0 || ^5.0.0-next.0
     dependencies:
-      "@tanstack/query-core": 5.13.4
+      "@tanstack/query-core": 5.17.0
       svelte: 4.2.8
     dev: false
 
@@ -963,7 +963,7 @@ packages:
     dependencies:
       "@types/http-cache-semantics": 4.0.3
       "@types/keyv": 3.1.4
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
       "@types/responselike": 1.0.2
     dev: false
 
@@ -989,7 +989,7 @@ packages:
       }
     dependencies:
       "@types/jsonfile": 6.1.3
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
     dev: true
 
   /@types/http-cache-semantics@4.0.3:
@@ -1005,7 +1005,7 @@ packages:
         integrity: sha512-/yqTk2SZ1wIezK0hiRZD7RuSf4B3whFxFamB1kGStv+8zlWScTMcHanzfc0XKWs5vA1TkHeckBlOyM8jxU8nHA==,
       }
     dependencies:
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
     dev: true
 
   /@types/keyv@3.1.4:
@@ -1014,7 +1014,7 @@ packages:
         integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==,
       }
     dependencies:
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
     dev: false
 
   /@types/marked@5.0.2:
@@ -1044,7 +1044,7 @@ packages:
         integrity: sha512-0yQLzYhCqGz7CQPE3iDmYjhb7KMBFOP+tBkyw+/Y2YyDI5wpS7itXXxneN1zSsUwWx3Ji6YiVYrhAnpQGS/vkw==,
       }
     dependencies:
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
     dev: false
 
   /@types/node@18.18.7:
@@ -1056,10 +1056,10 @@ packages:
       undici-types: 5.26.5
     dev: true
 
-  /@types/node@20.10.4:
+  /@types/node@20.10.6:
     resolution:
       {
-        integrity: sha512-D08YG6rr8X90YB56tSIuBaddy/UXAA9RKJoFvrsnogAum/0pmjkgi4+2nx96A330FmioegBWmEYQ+syqCFaveg==,
+        integrity: sha512-Vac8H+NlRNNlAmDfGUP7b5h/KA+AtWIzuXy0E6OyP8f1tCLYAtPvKRRDJjAPqhpCb0t6U2j7/xqAuLEebW2kiw==,
       }
     dependencies:
       undici-types: 5.26.5
@@ -1093,7 +1093,7 @@ packages:
         integrity: sha512-/4YQT5Kp6HxUDb4yhRkm0bJ7TbjvTddqX7PZ5hz6qV3pxSo72f/6YPRo+Mu2DU307tm9IioO69l7uAwn5XNcFA==,
       }
     dependencies:
-      "@types/node": 20.10.4
+      "@types/node": 20.10.6
     dev: false
 
   /@types/which@3.0.1:
@@ -4326,10 +4326,10 @@ packages:
       rc: 1.2.8
     dev: false
 
-  /replace-in-file@7.0.2:
+  /replace-in-file@7.1.0:
     resolution:
       {
-        integrity: sha512-tPG+Qmqf+x2Rf1WVdb/9B5tFIf6KJ5hs3fgxh1OTzPRUugPPvyAva7NvCJtnSpmyq6r+ABYcuUOqZkm6yzGSUw==,
+        integrity: sha512-1uZmJ78WtqNYCSuPC9IWbweXkGxPOtk2rKuar8diTw7naVIQZiE3Tm8ACx2PCMXDtVH6N+XxwaRY2qZ2xHPqXw==,
       }
     engines: { node: ">=10" }
     hasBin: true
@@ -4851,10 +4851,10 @@ packages:
       svelte: 4.2.8
     dev: true
 
-  /svelte-markdown@0.4.0(svelte@4.2.8):
+  /svelte-markdown@0.4.1(svelte@4.2.8):
     resolution:
       {
-        integrity: sha512-d8xYJoPhhiLn/tFrO54V5p22q2+I7It8w3CpTv+O+h99LlgehxK9XwdISVBl2aNcLbLX128Nz/vu7GScWhVZjw==,
+        integrity: sha512-pOlLY6EruKJaWI9my/2bKX8PdTeP5CM0s4VMmwmC2prlOkjAf+AOmTM4wW/l19Y6WZ87YmP8+ZCJCCwBChWjYw==,
       }
     peerDependencies:
       svelte: ^4.0.0
@@ -5173,10 +5173,10 @@ packages:
     engines: { node: ">= 0.8" }
     dev: false
 
-  /vite-tsconfig-paths@4.2.2(typescript@5.3.3)(vite@5.0.9):
+  /vite-tsconfig-paths@4.2.3(typescript@5.3.3)(vite@5.0.9):
     resolution:
       {
-        integrity: sha512-dq0FjyxHHDnp0uS3P12WEOX2W7NeuLzX9AWP38D7Zw2CTbFErapwQVlCiT5DMJcVWKQ1MMdTe92PZl/rBQ7qcw==,
+        integrity: sha512-xVsA2xe6QSlzBujtWF8q2NYexh7PAUYfzJ4C8Axpe/7d2pcERYxuxGgph9F4f0iQO36g5tyGq6eBUYIssdUrVw==,
       }
     peerDependencies:
       vite: "*"
