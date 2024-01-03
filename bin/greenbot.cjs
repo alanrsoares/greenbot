@@ -164,6 +164,10 @@ app
       const chunkSize = 10;
       const chunks = Math.ceil(promises.length / chunkSize);
 
+      if (!promises.length) {
+        return resolve([]);
+      }
+
       for (let i = 0; i < chunks; i++) {
         const chunk = promises.slice(i * chunkSize, (i + 1) * chunkSize);
 
