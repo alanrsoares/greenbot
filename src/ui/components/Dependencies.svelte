@@ -6,7 +6,7 @@
     InfoIcon,
     XIcon,
     CheckCircleIcon,
-    AlertCircle,
+    AlertCircleIcon,
   } from "~/lib/icons";
 
   import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
@@ -311,7 +311,7 @@
       {#if !pageEntries.length}
         <div class="flex items-center justify-center h-full group">
           <div class="flex flex-col items-center justify-center gap-2">
-            <AlertCircle
+            <AlertCircleIcon
               class="h-10 w-10 text-base-content/80 group-hover:animate-pulse"
             />
             <span class="text-sm text-base-content/80">No packages found</span>

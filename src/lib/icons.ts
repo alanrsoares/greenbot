@@ -1,4 +1,5 @@
 export {
+  AlertCircleIcon,
   BugIcon,
   GithubIcon,
   GlobeIcon,
