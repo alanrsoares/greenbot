@@ -1,12 +1,13 @@
-export { default as BugIcon } from "lucide-svelte/dist/svelte/icons/bug.svelte";
-export { default as GithubIcon } from "lucide-svelte/dist/svelte/icons/github.svelte";
-export { default as GlobeIcon } from "lucide-svelte/dist/svelte/icons/globe.svelte";
-export { default as PackageIcon } from "lucide-svelte/dist/svelte/icons/package.svelte";
-export { default as CheckCircleIcon } from "lucide-svelte/dist/svelte/icons/check-circle.svelte";
-export { default as ScaleIcon } from "lucide-svelte/dist/svelte/icons/scale.svelte";
-export { default as ArrowUpIcon } from "lucide-svelte/dist/svelte/icons/arrow-up.svelte";
-export { default as InfoIcon } from "lucide-svelte/dist/svelte/icons/info.svelte";
-export { default as XIcon } from "lucide-svelte/dist/svelte/icons/x.svelte";
-export { default as ChevronLeftIcon } from "lucide-svelte/dist/svelte/icons/chevron-left.svelte";
-export { default as ChevronRightIcon } from "lucide-svelte/dist/svelte/icons/chevron-right.svelte";
-export { default as AlertCircle } from "lucide-svelte/dist/svelte/icons/alert-circle.svelte";
+export {
+  BugIcon,
+  GithubIcon,
+  GlobeIcon,
+  PackageIcon,
+  CheckCircleIcon,
+  ScaleIcon,
+  ArrowUpIcon,
+  InfoIcon,
+  XIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "lucide-svelte";

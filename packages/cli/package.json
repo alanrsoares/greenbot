@@ -37,7 +37,11 @@
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.2",
+<<<<<<< HEAD
     "@types/node": "^20.10.6",
+=======
+    "@types/node": "^20.11.14",
+>>>>>>> 9775799 (chore: upgrade dependencies)
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }
