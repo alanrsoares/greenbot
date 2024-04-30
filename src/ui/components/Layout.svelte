@@ -4,17 +4,13 @@
 
 <div class="layout">
   <header class="border-b border-granny-smith-apple/50 bg-slate-900/60">
-    <nav
-      class="md:max-w-3xl max-w-xl w-full m-auto p-4 md:px-2 flex justify-between items-center"
-    >
+    <nav class="navbar">
       <h1 class="flex items-center gap-2 whitespace-nowrap p-2 relative group">
         <div class="w-12">
           <slot name="logo" />
         </div>
         <div>_greenbot</div>
-        <span
-          class="absolute right-2 bottom-2 text-xs font-semibold opacity-[calc(2/3)] text-white group-hover:text-inherit transition-colors"
-        >
+        <span class="version-badge">
           v{packageJson.version}
         </span>
       </h1>
@@ -46,5 +42,15 @@
   }
   .layout-main {
     @apply py-12 w-full max-w-xl mx-auto flex-1;
+  }
+
+  .version-badge {
+    @apply absolute right-2 bottom-2 text-xs font-semibold opacity-[calc(2/3)] text-white;
+    @apply group-hover:text-inherit transition-colors;
+  }
+
+  .navbar {
+    @apply max-w-xl w-full m-auto p-4 justify-between items-center;
+    @apply md:max-w-3xl md:px-2 flex;
   }
 </style>
