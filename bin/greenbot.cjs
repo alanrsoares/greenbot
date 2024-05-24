@@ -216,7 +216,7 @@ app
 
 const MAX_TRIES = 5;
 
-async function main(port, tries = 0) {
+async function main(port = DEFAULT_PORT, tries = 0) {
   const packageManager = await inferPackageManager();
   const response = await readPackageJson();
 
@@ -321,4 +321,4 @@ async function main(port, tries = 0) {
   });
 }
 
-main(DEFAULT_PORT);
+main();
