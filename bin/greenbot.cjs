@@ -106,13 +106,10 @@ async function upgradeVersion(
 /**
  * getWorkspaces - Retrieves the workspaces and their packages based on the package manager
  *
- * @param {string} packageManager - The package manager being used (yarn, npm, pnpm, bun)
- * @param {string} packageJsonPath - The path to the package.json file
+ * @param {PackageJsonContent} packageJson - The package.json content
  * @returns {Promise<WorkspaceInfo[]>} - A promise that resolves to an array of workspace information
  */
-async function getWorkspaces(packageManager, packageJsonPath) {
-  const response = await readPackageJson(packageJsonPath);
-
+async function getWorkspaces(pakcageJson) {
   /**
    * @type {string[]}
    */
@@ -122,8 +119,8 @@ async function getWorkspaces(packageManager, packageJsonPath) {
     case "yarn":
     case "npm":
     case "bun":
-      if (response.workspaces) {
-        workspaces = response.workspaces;
+      if (pakcageJson.workspaces) {
+        workspaces = pakcageJson.workspaces;
       }
       break;
     case "pnpm":
