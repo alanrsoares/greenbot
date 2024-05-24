@@ -20,7 +20,12 @@ const GREENBOT_TAG = `
 
 const DEFAULT_PORT = 5001;
 
-const PACKAGE_LOCK_FILES = ["yarn.lock", "package-lock.json", "pnpm-lock.yaml"];
+const PACKAGE_LOCK_FILES = [
+  "yarn.lock",
+  "package-lock.json",
+  "pnpm-lock.yaml",
+  "bun.lock",
+];
 
 const REPOSITORY_URL = "https://github.com/alanrsoares/greenbot";
 
@@ -29,14 +34,15 @@ const pad = (n = 0, char = " ") => char.repeat(n);
 /**
  * inferPackageManager - infer package manager
  *
- * @returns {Promise<"yarn" | "npm" | "pnpm">}
+ * @returns {Promise<"yarn" | "npm" | "pnpm" | "bun">}
  */
 async function inferPackageManager() {
-  const [hasYarnLock, hasPackageLock, hasPnpmLock] = await Promise.all(
-    PACKAGE_LOCK_FILES.map((file) =>
-      fs.readFile(file, "utf8").catch(() => false)
-    )
-  );
+  const [hasYarnLock, hasPackageLock, hasPnpmLock, hasBunLock] =
+    await Promise.all(
+      PACKAGE_LOCK_FILES.map((file) =>
+        fs.readFile(file, "utf8").catch(() => false)
+      )
+    );
 
   if (hasYarnLock) return "yarn";
   if (hasPackageLock) return "npm";

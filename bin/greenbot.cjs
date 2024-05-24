@@ -89,6 +89,10 @@ async function upgradeVersion(
   return { name, version, latest: `${qualifier}${latest}` };
 }
 
+function getWorkspaces() {
+  return CONTEXT.isMonorepo ? CONTEXT.workspaces : [];
+}
+
 /**
  * upgradeVersions - upgrade versions in package.json
  *
@@ -224,6 +228,7 @@ async function main(port, tries = 0) {
   switch (packageManager) {
     case "yarn":
     case "npm":
+    case "bun":
       if (response.workspaces) {
         workspaces = response.workspaces;
       }
