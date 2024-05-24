@@ -302,7 +302,7 @@ async function main(port = DEFAULT_PORT, tries = 0) {
   const packageManager = await inferPackageManager();
   const response = await readPackageJson();
 
-  const workspaces = await getWorkspaces(packageManager, PACKAGE_JSON_PATH);
+  const workspaces = await getWorkspaces(response);
   CONTEXT.workspaces = workspaces;
   CONTEXT.isMonorepo = Boolean(workspaces?.length);
   CONTEXT.packageManager = packageManager;
