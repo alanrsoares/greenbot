@@ -109,7 +109,7 @@ async function upgradeVersion(
  * @param {PackageJsonContent} packageJson - The package.json content
  * @returns {Promise<WorkspaceInfo[]>} - A promise that resolves to an array of workspace information
  */
-async function getWorkspaces(pakcageJson) {
+async function getWorkspaces(packageJson) {
   /**
    * @type {string[]}
    */
@@ -119,8 +119,8 @@ async function getWorkspaces(pakcageJson) {
     case "yarn":
     case "npm":
     case "bun":
-      if (pakcageJson.workspaces) {
-        workspaces = pakcageJson.workspaces;
+      if (packageJson.workspaces) {
+        workspaces = packageJson.workspaces;
       }
       break;
     case "pnpm":
