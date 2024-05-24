@@ -89,8 +89,93 @@ async function upgradeVersion(
   return { name, version, latest: `${qualifier}${latest}` };
 }
 
-function getWorkspaces() {
-  return CONTEXT.isMonorepo ? CONTEXT.workspaces : [];
+/**
+ * @typedef {Object} PackageInfo
+ * @property {string} name
+ * @property {string} version
+ * @property {string} dir
+ */
+
+/**
+ * @typedef {Object} WorkspaceInfo
+ * @property {string} path
+ * @property {string} name
+ * @property {string} version
+ */
+
+/**
+ * getWorkspaces - Retrieves the workspaces and their packages based on the package manager
+ *
+ * @param {string} packageManager - The package manager being used (yarn, npm, pnpm, bun)
+ * @param {string} packageJsonPath - The path to the package.json file
+ * @returns {Promise<WorkspaceInfo[]>} - A promise that resolves to an array of workspace information
+ */
+async function getWorkspaces(packageManager, packageJsonPath) {
+  const response = await readPackageJson(packageJsonPath);
+
+  /**
+   * @type {string[]}
+   */
+  let workspaces = [];
+
+  switch (packageManager) {
+    case "yarn":
+    case "npm":
+    case "bun":
+      if (response.workspaces) {
+        workspaces = response.workspaces;
+      }
+      break;
+    case "pnpm":
+      const rawYaml = await fs
+        .readFile("pnpm-workspace.yaml", "utf8")
+        .catch(() => null);
+      if (rawYaml) {
+        const parsed = yaml.load(rawYaml);
+        workspaces = parsed.packages
+          .filter((x) => !x.startsWith("!"))
+          .map((x) => x.replace("/*", ""));
+      }
+      break;
+  }
+
+  const deepWorkspaces = await Promise.all(
+    workspaces.map(async (workspace) => {
+      const workspacePath = path.resolve(workspace);
+      const validSubdirs = await fs
+        .readdir(workspacePath, { withFileTypes: true })
+        .catch(() => [])
+        .then((entries) => entries.filter((entry) => entry.isDirectory()));
+
+      const packageNames = await Promise.all(
+        validSubdirs.map(async (dir) => {
+          const packageJsonPath = path.resolve(
+            workspacePath,
+            dir.name,
+            "package.json"
+          );
+
+          const { name, version } = await fs
+            .readFile(packageJsonPath, "utf8")
+            .then(JSON.parse);
+
+          return { name, version, dir: dir.name };
+        })
+      );
+
+      return [workspace, packageNames];
+    })
+  );
+
+  return deepWorkspaces
+    .filter(([_, packages]) => packages.length)
+    .flatMap(([workspace, packages]) =>
+      packages.map((p) => ({
+        path: `${workspace}/${p.dir}`,
+        name: p.name,
+        version: p.version,
+      }))
+    );
 }
 
 /**
@@ -220,71 +305,8 @@ async function main(port = DEFAULT_PORT, tries = 0) {
   const packageManager = await inferPackageManager();
   const response = await readPackageJson();
 
-  /**
-   * @type {string[]}
-   */
-  let workspaces = [];
-
-  switch (packageManager) {
-    case "yarn":
-    case "npm":
-    case "bun":
-      if (response.workspaces) {
-        workspaces = response.workspaces;
-      }
-      break;
-    case "pnpm":
-      const rawYaml = await fs
-        .readFile("pnpm-workspace.yaml", "utf8")
-        .catch(() => null);
-      if (rawYaml) {
-        const parsed = yaml.load(rawYaml);
-        workspaces = parsed.packages
-          .filter((x) => !x.startsWith("!"))
-          .map((x) => x.replace("/*", ""));
-      }
-      break;
-  }
-
-  const deepWorkspaces = await Promise.all(
-    workspaces.map(async (workspace) => {
-      const workspacePath = path.resolve(workspace);
-      const validSubdirs = await fs
-        .readdir(workspacePath, { withFileTypes: true })
-        .catch(() => [])
-        .then((entries) => entries.filter((entry) => entry.isDirectory()));
-
-      const packageNames = await Promise.all(
-        validSubdirs.map(async (dir) => {
-          const packageJsonPath = path.resolve(
-            workspacePath,
-            dir.name,
-            "package.json"
-          );
-
-          const { name, version } = await fs
-            .readFile(packageJsonPath, "utf8")
-            .then(JSON.parse);
-
-          return { name, version, dir: dir.name };
-        })
-      );
-
-      return [workspace, packageNames];
-    })
-  );
-
-  const flatWorkspaces = deepWorkspaces
-    .filter(([_, packages]) => packages.length)
-    .flatMap(([workspace, packages]) =>
-      packages.map((p) => ({
-        path: `${workspace}/${p.dir}`,
-        name: p.name,
-        version: p.version,
-      }))
-    );
-
-  CONTEXT.workspaces = flatWorkspaces;
+  const workspaces = await getWorkspaces(packageManager, PACKAGE_JSON_PATH);
+  CONTEXT.workspaces = workspaces;
   CONTEXT.isMonorepo = Boolean(workspaces?.length);
   CONTEXT.packageManager = packageManager;
 
