@@ -107,9 +107,11 @@ async function upgradeVersion(
  * getWorkspaces - Retrieves the workspaces and their packages based on the package manager
  *
  * @param {PackageJsonContent} packageJson - The package.json content
+ * @param {"npm" | "pnpm" | "yarn" | "bun"} packageManager - The package manager
+ *
  * @returns {Promise<WorkspaceInfo[]>} - A promise that resolves to an array of workspace information
  */
-async function getWorkspaces(packageJson) {
+async function getWorkspaces(packageJson, packageManager) {
   /**
    * @type {string[]}
    */
@@ -301,7 +303,7 @@ const MAX_TRIES = 5;
 async function main(port = DEFAULT_PORT, tries = 0) {
   const packageManager = await inferPackageManager();
   const packageJson = await readPackageJson();
-  const workspaces = await getWorkspaces(packageJson);
+  const workspaces = await getWorkspaces(packageJson, packageManager);
 
   CONTEXT.workspaces = workspaces;
   CONTEXT.isMonorepo = Boolean(workspaces?.length);
