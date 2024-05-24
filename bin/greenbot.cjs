@@ -140,7 +140,10 @@ async function getWorkspaces(packageJson, packageManager) {
 
   const deepWorkspaces = await Promise.all(
     workspaces.map(async (workspace) => {
-      const workspacePath = path.resolve(workspace);
+      const cleanWorkspace = workspace.replace(/\/\*$/, "");
+
+      const workspacePath = path.resolve(cleanWorkspace);
+
       const validSubdirs = await fs
         .readdir(workspacePath, { withFileTypes: true })
         .catch(() => [])
@@ -162,11 +165,13 @@ async function getWorkspaces(packageJson, packageManager) {
         })
       );
 
-      return [workspace, packageNames];
+      return [cleanWorkspace, packageNames];
     })
   );
 
-  return deepWorkspaces
+  console.log({ deepWorkspaces });
+
+  const flatWorkspaces = deepWorkspaces
     .filter(([_, packages]) => packages.length)
     .flatMap(([workspace, packages]) =>
       packages.map((p) => ({
@@ -175,6 +180,10 @@ async function getWorkspaces(packageJson, packageManager) {
         version: p.version,
       }))
     );
+
+  console.log({ flatWorkspaces });
+
+  return flatWorkspaces;
 }
 
 /**
