@@ -157,22 +157,26 @@ async function getWorkspaces(packageJson, packageManager) {
             "package.json"
           );
 
-          const { name, version } = await fs
+          const pkg = await fs
             .readFile(packageJsonPath, "utf8")
-            .catch(() => ({ name: "", version: "" }))
+            .catch(() => null)
             .then(JSON.parse);
+
+          if (!pkg) {
+            return null;
+          }
+
+          const { name, version } = pkg;
 
           return { name, version, dir: dir.name };
         })
       );
 
-      const validPackages = packageNames.filter((x) => x.name);
+      const validPackages = packageNames.filter(Boolean);
 
       return [cleanWorkspace, validPackages];
     })
   );
-
-  console.log({ deepWorkspaces });
 
   const flatWorkspaces = deepWorkspaces
     .filter(([_, packages]) => packages.length)
@@ -183,8 +187,6 @@ async function getWorkspaces(packageJson, packageManager) {
         version: p.version,
       }))
     );
-
-  console.log({ flatWorkspaces });
 
   return flatWorkspaces;
 }
