@@ -36,9 +36,9 @@
     "chalk": "^4.1.2"
   },
   "devDependencies": {
-    "@tsconfig/strictest": "^2.0.3",
-    "@types/node": "^20.11.17",
-    "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "@tsconfig/strictest": "^2.0.5",
+    "@types/node": "^20.14.8",
+    "rimraf": "^5.0.7",
+    "typescript": "^5.5.2"
   }
 }
