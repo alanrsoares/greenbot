@@ -159,11 +159,12 @@ async function getWorkspaces(packageJson, packageManager) {
 
           const { name, version } = await fs
             .readFile(packageJsonPath, "utf8")
+            .catch(() => ({ name: "", version: "" }))
             .then(JSON.parse);
 
           return { name, version, dir: dir.name };
         })
-      );
+      ).filter((x) => x.name);
 
       return [cleanWorkspace, packageNames];
     })
