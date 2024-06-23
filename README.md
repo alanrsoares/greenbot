@@ -1,7 +1,7 @@
 # Greenbot
 
 [![npm downloads](https://img.shields.io/npm/dt/@greenbot/cli.svg)](https://npmjs.org/@greenbot/cli)
-![Version](https://img.shields.io/badge/version-0.33.5-blue)
+![Version](https://img.shields.io/badge/version-0.33.6-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > An interactive package updater for npm-based applications.
@@ -34,7 +34,7 @@ yarn global add @greenbot/cli
 
 ### Version
 
-Current Version: `0.33.5`
+Current Version: `0.33.6`
 
 ### Binaries
 
