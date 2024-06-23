@@ -164,9 +164,11 @@ async function getWorkspaces(packageJson, packageManager) {
 
           return { name, version, dir: dir.name };
         })
-      ).filter((x) => x.name);
+      );
 
-      return [cleanWorkspace, packageNames];
+      const validPackages = packageNames.filter((x) => x.name);
+
+      return [cleanWorkspace, validPackages];
     })
   );
 
