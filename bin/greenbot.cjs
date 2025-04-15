@@ -17,20 +17,6 @@ const registerRoutes = require("./routes.cjs");
 const { readPackageJson } = require("./utils.cjs");
 const { getWorkspaces } = require("./workspaces.cjs");
 
-/**
- * @typedef {Object} PackageJsonContent
- * @property {Record<string, string>} dependencies
- * @property {Record<string, string>} [devDependencies]
- * @property {string[]} [workspaces]
- */
-
-/**
- * @typedef {Object} WorkspaceInfo
- * @property {string} path
- * @property {string} name
- * @property {string} version
- */
-
 const PACKAGE_JSON_PATH =
   process.argv.length === 3 ? process.argv[2] : "package.json";
 

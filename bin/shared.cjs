@@ -20,6 +20,7 @@ const GREENBOT_TAG = `
 
 const DEFAULT_PORT = 5001;
 
+/** @type {import('./types').PackageLockFile[]} */
 const PACKAGE_LOCK_FILES = [
   { file: "yarn.lock", name: "yarn" },
   { file: "package-lock.json", name: "npm" },
@@ -45,8 +46,8 @@ async function inferPackageManager() {
           exists: true,
           name,
         }))
-        .catch(() => false)
-    )
+        .catch(() => false),
+    ),
   );
 
   const manager = responses.find((r) => r.exists);
@@ -56,12 +57,13 @@ async function inferPackageManager() {
 
 /**
  *
- * @param {(string | (ctx: { center: (str: string) => string }) => string)[]} lines
+ * @param {import('./types').RenderBoxLine[]} lines
+ * @param {import('./types').RenderBoxOptions} options
  */
 function renderBox(lines = [], { color = chalk.green, padding = 1 } = {}) {
   const maxLineLength = lines.reduce(
     (max, line) => Math.max(max, stripAnsi(line).length),
-    0
+    0,
   );
 
   const maxLength = maxLineLength + padding * 2;
@@ -109,7 +111,7 @@ ${bl}${border}${br}`);
 /**
  * indexEntries - index entries by name
  *
- * @param xs {{name:string; latest:string;}[]}
+ * @param {import('./types').PackageMeta[]} xs
  * @returns {Record<string,string>}
  */
 const indexEntries = (xs) =>
@@ -118,8 +120,8 @@ const indexEntries = (xs) =>
 /**
  * rawVersion - extract version and qualifier from version string
  *
- * @param version {string}
- * @returns {{version:string; qualifier: string | undefined}}
+ * @param {string} version
+ * @returns {import('./types').RawVersion}
  */
 const rawVersion = (version) => ({
   version: version.replace(/[\^~]/, ""),
@@ -131,7 +133,7 @@ const isNumber = (n) => !isNaN(Number(n));
 /*
  * isValidSemVer - check if version is a valid semver
  *
- * @param version {string} - version string
+ * @param {string} version - version string
  * @returns {boolean} - true if valid semver
  */
 const isValidSemVer = (version = "") => {
@@ -145,9 +147,9 @@ const isValidSemVer = (version = "") => {
 /**
  * fetchNPMPackageMeta - fetch package.json from npm
  *
- * @param name {string}
- * @param version {string}
- * @returns {Promise<{name:string; version: string; latest: string, latestOutOfRange: string, meta: import("package-json").FullMetadata}>}
+ * @param {string} name
+ * @param {string} version
+ * @returns {Promise<import('./types').PackageMeta>}
  */
 const fetchNPMPackageMeta = async (name, version = "latest") => {
   if (!isValidSemVer(version)) {
@@ -174,7 +176,7 @@ const fetchNPMPackageMeta = async (name, version = "latest") => {
     };
   } catch (error) {
     console.log(
-      chalk.red(`[greenbot] Could not fetch latest version for ${name}`)
+      chalk.red(`[greenbot] Could not fetch latest version for ${name}`),
     );
 
     return {

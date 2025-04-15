@@ -2,6 +2,9 @@ const fs = require("fs/promises");
 const replaceInFile = require("replace-in-file");
 const { rawVersion } = require("./shared.cjs");
 
+/** @typedef {import("./types").PackageJsonContent} PackageJsonContent */
+/** @typedef {import("./types").PackageVersionInfo} PackageVersionInfo */
+
 /**
  * readPackageJson - read package.json file
  *

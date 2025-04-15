@@ -19,7 +19,7 @@ function getPackageJsonPath({ path = "" }, defaultPath) {
 /**
  * Register all routes
  * @param {import('fastify').FastifyInstance} fastify
- * @param {AppContext} context - Application context
+ * @param {import("./types").AppContext} context - Application context
  */
 async function registerRoutes(fastify, context) {
   // Info routes
@@ -63,6 +63,7 @@ async function registerRoutes(fastify, context) {
       fetchNPMPackageMeta(packageName, version),
     );
 
+    /** @type {import("./types").PackageMeta[]} */
     const resolved = await new Promise(async (resolve) => {
       const result = [];
       const chunkSize = 10;

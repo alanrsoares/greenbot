@@ -2,19 +2,8 @@ const fs = require("fs/promises");
 const path = require("path");
 const yaml = require("js-yaml");
 
-/**
- * @typedef {Object} PackageJsonContent
- * @property {Record<string, string>} dependencies
- * @property {Record<string, string>} [devDependencies]
- * @property {string[]} [workspaces]
- */
-
-/**
- * @typedef {Object} WorkspaceInfo
- * @property {string} path
- * @property {string} name
- * @property {string} version
- */
+/** @typedef {import("./types").PackageJsonContent} PackageJsonContent */
+/** @typedef {import("./types").WorkspaceInfo} WorkspaceInfo */
 
 /**
  * getWorkspaces - Retrieves the workspaces and their packages based on the package manager
