@@ -2,23 +2,22 @@
 
 const fastify = require("fastify");
 const path = require("path");
-const replaceInFile = require("replace-in-file");
 const chalk = require("chalk");
 const open = require("open");
 const fs = require("fs/promises");
-const { indexBy, prop } = require("rambda");
 const yaml = require("js-yaml");
 
 const {
   GREENBOT_TAG,
   DEFAULT_PORT,
-  indexEntries,
   inferPackageManager,
-  rawVersion,
-  fetchNPMPackageMeta,
   renderBox,
   name,
 } = require("./shared.cjs");
+
+const registerRoutes = require("./routes.cjs");
+const { readPackageJson } = require("./utils.cjs");
+const { getWorkspaces } = require("./workspaces.cjs");
 
 /**
  * @typedef {Object} PackageJsonContent
@@ -28,18 +27,10 @@ const {
  */
 
 /**
- * @typedef {Object} PackageVersionInfo
+ * @typedef {Object} WorkspaceInfo
+ * @property {string} path
  * @property {string} name
  * @property {string} version
- * @property {string} latest
- */
-
-/**
- * @typedef {Object} PackageMetaInfo
- * @property {string} name
- * @property {string} version
- * @property {string} latest
- * @property {any} meta
  */
 
 const PACKAGE_JSON_PATH =
@@ -51,176 +42,12 @@ const CONTEXT = {
   packageManager: null,
   isMonorepo: false,
   workspaces: null,
+  PACKAGE_JSON_PATH,
 };
-
-/**
- * readPackageJson - read package.json file
- *
- * @returns {Promise<PackageJsonContent>}
- */
-async function readPackageJson(path = PACKAGE_JSON_PATH) {
-  try {
-    const raw = await fs.readFile(path, "utf8");
-    return JSON.parse(raw);
-  } catch (error) {
-    return { dependencies: {}, devDependencies: {} };
-  }
-}
-
-/**
- * upgradeVersion - upgrade version in package.json
- *
- * @param package {PackageVersionInfo}
- */
-async function upgradeVersion(
-  { name, version, latest },
-  path = PACKAGE_JSON_PATH,
-) {
-  const { qualifier } = rawVersion(version);
-
-  await replaceInFile({
-    files: path,
-    from: `"${name}": "${version}"`,
-    to: `"${name}": "${qualifier}${latest}"`,
-  });
-
-  return { name, version, latest: `${qualifier}${latest}` };
-}
-
-/**
- * @typedef {Object} PackageInfo
- * @property {string} name
- * @property {string} version
- * @property {string} dir
- */
-
-/**
- * @typedef {Object} WorkspaceInfo
- * @property {string} path
- * @property {string} name
- * @property {string} version
- */
-
-/**
- * getWorkspaces - Retrieves the workspaces and their packages based on the package manager
- *
- * @param {PackageJsonContent} packageJson - The package.json content
- * @param {"npm" | "pnpm" | "yarn" | "bun"} packageManager - The package manager
- *
- * @returns {Promise<WorkspaceInfo[]>} - A promise that resolves to an array of workspace information
- */
-async function getWorkspaces(packageJson, packageManager) {
-  /**
-   * @type {string[]}
-   */
-  let workspaces = [];
-
-  switch (packageManager) {
-    case "yarn":
-    case "npm":
-    case "bun":
-      if (packageJson.workspaces) {
-        workspaces = packageJson.workspaces;
-      }
-      break;
-    case "pnpm":
-      const rawYaml = await fs
-        .readFile("pnpm-workspace.yaml", "utf8")
-        .catch(() => null);
-      if (rawYaml) {
-        const parsed = yaml.load(rawYaml);
-        workspaces = parsed.packages
-          .filter((x) => !x.startsWith("!"))
-          .map((x) => x.replace("/*", ""));
-      }
-      break;
-  }
-
-  const deepWorkspaces = await Promise.all(
-    workspaces.map(async (workspace) => {
-      const cleanWorkspace = workspace.replace(/\/\*$/, "");
-
-      const workspacePath = path.resolve(cleanWorkspace);
-
-      const validSubdirs = await fs
-        .readdir(workspacePath, { withFileTypes: true })
-        .catch(() => [])
-        .then((entries) => entries.filter((entry) => entry.isDirectory()));
-
-      const packageNames = await Promise.all(
-        validSubdirs.map(async (dir) => {
-          const packageJsonPath = path.resolve(
-            workspacePath,
-            dir.name,
-            "package.json",
-          );
-
-          const pkg = await fs
-            .readFile(packageJsonPath, "utf8")
-            .catch(() => null)
-            .then(JSON.parse);
-
-          if (!pkg) {
-            return null;
-          }
-
-          const { name, version } = pkg;
-
-          return { name, version, dir: dir.name };
-        }),
-      );
-
-      const validPackages = packageNames.filter(Boolean);
-
-      return [cleanWorkspace, validPackages];
-    }),
-  );
-
-  const flatWorkspaces = deepWorkspaces
-    .filter(([_, packages]) => packages.length)
-    .flatMap(([workspace, packages]) =>
-      packages.map((p) => ({
-        path: `${workspace}/${p.dir}`,
-        name: p.name,
-        version: p.version,
-      })),
-    );
-
-  return flatWorkspaces;
-}
-
-/**
- * upgradeVersions - upgrade versions in package.json
- *
- * @param packages {PackageVersionInfo[]}
- * @returns
- */
-async function upgradeVersions(packages = [], path = PACKAGE_JSON_PATH) {
-  const values = packages.map(({ name, version, latest }) => ({
-    name,
-    version,
-    latest,
-    qualifier: rawVersion(version).qualifier,
-  }));
-
-  const from = values.map(({ name, version }) => `"${name}": "${version}"`);
-  const to = values.map(
-    ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
-  );
-
-  await replaceInFile({ files: path, from, to });
-
-  return packages;
-}
 
 const app = fastify({
   logger: false,
 });
-
-const gePackageJsonPath = ({ path = "" }) =>
-  !path || path === PACKAGE_JSON_PATH
-    ? PACKAGE_JSON_PATH
-    : `${path}/package.json`;
 
 // Register plugins
 app.register(require("@fastify/cors"), {
@@ -232,94 +59,13 @@ app.register(require("@fastify/static"), {
 });
 
 // Register routes
-app.get("/info/package/:name/:version?", async (request, reply) => {
-  const { name, version } = request.params;
-  const result = await fetchNPMPackageMeta(name, version);
-  return result;
-});
-
-app.get("/info/scoped/:namespace/:name/:version?", async (request, reply) => {
-  const { namespace, name, version } = request.params;
-  const result = await fetchNPMPackageMeta(`${namespace}/${name}`, version);
-  return result;
-});
-
-app.get("/workspaces", async (request, reply) => {
-  return CONTEXT.isMonorepo ? CONTEXT.workspaces : null;
-});
-
-app.get("/package", async (request, reply) => {
-  const packageJsonPath = gePackageJsonPath(request.query);
-  const selectedTab = String(request.query.tab);
-
-  const response = await readPackageJson(packageJsonPath);
-
-  const dependencyEntries = Object.entries(response.dependencies ?? {});
-  const devDependencyEntries = Object.entries(response.devDependencies ?? {});
-
-  const allEntries =
-    selectedTab === "dependencies" ? dependencyEntries : devDependencyEntries;
-
-  const promises = allEntries.map(([packageName, version]) =>
-    fetchNPMPackageMeta(packageName, version),
-  );
-
-  const resolved = await new Promise(async (resolve) => {
-    const result = [];
-    const chunkSize = 10;
-    const chunks = Math.ceil(promises.length / chunkSize);
-
-    if (!promises.length) {
-      return resolve([]);
-    }
-
-    for (let i = 0; i < chunks; i++) {
-      const chunk = promises.slice(i * chunkSize, (i + 1) * chunkSize);
-      const chunkresult = await Promise.all(chunk);
-      result.push(...chunkresult);
-
-      if (result.length === promises.length) {
-        resolve(result);
-      }
-    }
-  });
-
-  return {
-    ...response,
-    resolutions: indexEntries(resolved),
-    meta: indexBy(prop("name"), resolved.map(prop("meta"))),
-    packageManager: CONTEXT.packageManager,
-    isMonorepo: CONTEXT.isMonorepo,
-    workspaces: CONTEXT.isMonorepo ? CONTEXT.workspaces : null,
-  };
-});
-
-app.post("/upgrade", async (request, reply) => {
-  const { name, version, latest } = request.body;
-  const packageJsonPath = gePackageJsonPath(request.query);
-
-  const result = await upgradeVersion(
-    { name, version, latest },
-    packageJsonPath,
-  );
-
-  return result;
-});
-
-app.post("/upgrade-packages", async (request, reply) => {
-  const { packages, path } = request.body;
-  const packageJsonPath = gePackageJsonPath({ path });
-
-  const result = await upgradeVersions(packages, packageJsonPath);
-
-  return result;
-});
+registerRoutes(app, CONTEXT);
 
 const MAX_TRIES = 5;
 
 async function main(port = DEFAULT_PORT, tries = 0) {
   const packageManager = await inferPackageManager();
-  const packageJson = await readPackageJson();
+  const packageJson = await readPackageJson(PACKAGE_JSON_PATH);
   const workspaces = await getWorkspaces(packageJson, packageManager);
 
   CONTEXT.workspaces = workspaces;
