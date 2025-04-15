@@ -1,6 +1,5 @@
-const chalk = require("chalk");
-
-const {
+import chalk from "chalk";
+import {
   GREENBOT_TAG,
   inferPackageManager,
   REPOSITORY_URL,
@@ -8,7 +7,7 @@ const {
   version,
   name,
   fetchNPMPackageMeta,
-} = require("../bin/shared.cjs");
+} from "../bin/shared.mjs";
 
 async function main() {
   // check for latest version on npm
@@ -22,7 +21,7 @@ async function main() {
   const releaseUrl = `${REPOSITORY_URL}/releases/tag/v${latest}`;
 
   const updateLine = chalk.bold(
-    `📦 Update available! ${chalk.red(version)} → ${chalk.green(latest)}`
+    `📦 Update available! ${chalk.red(version)} → ${chalk.green(latest)}`,
   );
 
   const packageManager = await inferPackageManager();
@@ -43,7 +42,7 @@ async function main() {
       "",
       (ctx) =>
         ctx.center(
-          `Run ${chalk.bgGray(installCommands[packageManager])} to update!`
+          `Run ${chalk.bgGray(installCommands[packageManager])} to update!`,
         ),
       "",
       "Find out more about this release:",
@@ -54,7 +53,7 @@ async function main() {
     {
       color: chalk.bold.yellow,
       padding: 2,
-    }
+    },
   );
 }
 
