@@ -1,13 +1,20 @@
-const fs = require("fs/promises");
-const stripAnsi = require("strip-ansi");
-const chalk = require("chalk");
-const packageJson = require("package-json");
+import fs from "fs/promises";
+import stripAnsi from "strip-ansi";
+import chalk from "chalk";
+import packageJson from "package-json";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 
-const { version, name } = require("../package.json");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const { version, name } = JSON.parse(
+  await fs.readFile(resolve(__dirname, "../package.json"), "utf8"),
+);
 
 const vTag = chalk.cyan(`v${version}`);
 
-const GREENBOT_TAG = `
+export const GREENBOT_TAG = `
 ░██████╗░██████╗░███████╗███████╗███╗░░██╗██████╗░░█████╗░████████╗
 ██╔════╝░██╔══██╗██╔════╝██╔════╝████╗░██║██╔══██╗██╔══██╗╚══██╔══╝
 ██║░░██╗░██████╔╝█████╗░░█████╗░░██╔██╗██║██████╦╝██║░░██║░░░██║░░░
@@ -18,26 +25,26 @@ const GREENBOT_TAG = `
   .trim()
   .split("\n");
 
-const DEFAULT_PORT = 5001;
+export const DEFAULT_PORT = 5001;
 
 /** @type {import('./types').PackageLockFile[]} */
-const PACKAGE_LOCK_FILES = [
+export const PACKAGE_LOCK_FILES = [
   { file: "yarn.lock", name: "yarn" },
   { file: "package-lock.json", name: "npm" },
   { file: "pnpm-lock.yaml", name: "pnpm" },
   { file: "bun.lock", name: "bun" },
 ];
 
-const REPOSITORY_URL = "https://github.com/alanrsoares/greenbot";
+export const REPOSITORY_URL = "https://github.com/alanrsoares/greenbot";
 
-const pad = (n = 0, char = " ") => char.repeat(n);
+export const pad = (n = 0, char = " ") => char.repeat(n);
 
 /**
  * inferPackageManager - infer package manager
  *
  * @returns {Promise<"yarn" | "npm" | "pnpm" | "bun">}
  */
-async function inferPackageManager() {
+export async function inferPackageManager() {
   const responses = await Promise.all(
     PACKAGE_LOCK_FILES.map(({ file, name }) =>
       fs
@@ -60,7 +67,10 @@ async function inferPackageManager() {
  * @param {import('./types').RenderBoxLine[]} lines
  * @param {import('./types').RenderBoxOptions} options
  */
-function renderBox(lines = [], { color = chalk.green, padding = 1 } = {}) {
+export function renderBox(
+  lines = [],
+  { color = chalk.green, padding = 1 } = {},
+) {
   const maxLineLength = lines.reduce(
     (max, line) => Math.max(max, stripAnsi(line).length),
     0,
@@ -114,7 +124,7 @@ ${bl}${border}${br}`);
  * @param {import('./types').PackageMeta[]} xs
  * @returns {Record<string,string>}
  */
-const indexEntries = (xs) =>
+export const indexEntries = (xs) =>
   xs.reduce((acc, { name, latest }) => ({ ...acc, [name]: latest }), {});
 
 /**
@@ -123,7 +133,7 @@ const indexEntries = (xs) =>
  * @param {string} version
  * @returns {import('./types').RawVersion}
  */
-const rawVersion = (version) => ({
+export const rawVersion = (version) => ({
   version: version.replace(/[\^~]/, ""),
   qualifier: isNaN(Number(version[0])) ? version[0] : undefined,
 });
@@ -136,7 +146,7 @@ const isNumber = (n) => !isNaN(Number(n));
  * @param {string} version - version string
  * @returns {boolean} - true if valid semver
  */
-const isValidSemVer = (version = "") => {
+export const isValidSemVer = (version = "") => {
   const raw = rawVersion(version);
   return (
     raw.version.split(".").length === 3 &&
@@ -151,7 +161,7 @@ const isValidSemVer = (version = "") => {
  * @param {string} version
  * @returns {Promise<import('./types').PackageMeta>}
  */
-const fetchNPMPackageMeta = async (name, version = "latest") => {
+export const fetchNPMPackageMeta = async (name, version = "latest") => {
   if (!isValidSemVer(version)) {
     return {
       name,
@@ -187,18 +197,4 @@ const fetchNPMPackageMeta = async (name, version = "latest") => {
   }
 };
 
-module.exports = {
-  GREENBOT_TAG,
-  DEFAULT_PORT,
-  REPOSITORY_URL,
-  PACKAGE_LOCK_FILES,
-  version,
-  inferPackageManager,
-  renderBox,
-  pad,
-  version,
-  name,
-  indexEntries,
-  rawVersion,
-  fetchNPMPackageMeta,
-};
+export { version, name };

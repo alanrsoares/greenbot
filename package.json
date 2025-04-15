@@ -14,10 +14,10 @@
     "bin/",
     "scripts/"
   ],
-  "bin": "./bin/greenbot.cjs",
+  "bin": "./bin/greenbot.mjs",
   "type": "module",
   "scripts": {
-    "dev": "concurrently 'vite' 'node bin/greenbot.cjs'",
+    "dev": "concurrently 'vite' 'node bin/greenbot.mjs'",
     "build": "vite build",
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",

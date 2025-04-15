@@ -1,6 +1,6 @@
-const fs = require("fs/promises");
-const path = require("path");
-const yaml = require("js-yaml");
+import fs from "fs/promises";
+import path from "path";
+import yaml from "js-yaml";
 
 /** @typedef {import("./types").PackageJsonContent} PackageJsonContent */
 /** @typedef {import("./types").WorkspaceInfo} WorkspaceInfo */
@@ -13,7 +13,7 @@ const yaml = require("js-yaml");
  *
  * @returns {Promise<WorkspaceInfo[]>} - A promise that resolves to an array of workspace information
  */
-async function getWorkspaces(packageJson, packageManager) {
+export async function getWorkspaces(packageJson, packageManager) {
   /**
    * @type {string[]}
    */
@@ -92,7 +92,3 @@ async function getWorkspaces(packageJson, packageManager) {
 
   return flatWorkspaces;
 }
-
-module.exports = {
-  getWorkspaces,
-};

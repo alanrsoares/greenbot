@@ -1,6 +1,6 @@
-const fs = require("fs/promises");
-const replaceInFile = require("replace-in-file");
-const { rawVersion } = require("./shared.cjs");
+import fs from "fs/promises";
+import replaceInFile from "replace-in-file";
+import { rawVersion } from "./shared.mjs";
 
 /** @typedef {import("./types").PackageJsonContent} PackageJsonContent */
 /** @typedef {import("./types").PackageVersionInfo} PackageVersionInfo */
@@ -11,7 +11,7 @@ const { rawVersion } = require("./shared.cjs");
  * @param {string} path - Path to package.json
  * @returns {Promise<PackageJsonContent>}
  */
-async function readPackageJson(path) {
+export async function readPackageJson(path) {
   try {
     const raw = await fs.readFile(path, "utf8");
     return JSON.parse(raw);
@@ -26,7 +26,7 @@ async function readPackageJson(path) {
  * @param {PackageVersionInfo} package - Package version info
  * @param {string} path - Path to package.json
  */
-async function upgradeVersion({ name, version, latest }, path) {
+export async function upgradeVersion({ name, version, latest }, path) {
   const { qualifier } = rawVersion(version);
 
   await replaceInFile({
@@ -44,7 +44,7 @@ async function upgradeVersion({ name, version, latest }, path) {
  * @param {PackageVersionInfo[]} packages - Array of package version info
  * @param {string} path - Path to package.json
  */
-async function upgradeVersions(packages = [], path) {
+export async function upgradeVersions(packages = [], path) {
   const values = packages.map(({ name, version, latest }) => ({
     name,
     version,
@@ -61,9 +61,3 @@ async function upgradeVersions(packages = [], path) {
 
   return packages;
 }
-
-module.exports = {
-  readPackageJson,
-  upgradeVersion,
-  upgradeVersions,
-};

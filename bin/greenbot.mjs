@@ -1,21 +1,26 @@
 #!/usr/bin/env node
 
-const fastify = require("fastify");
-const path = require("path");
-const chalk = require("chalk");
-const open = require("open");
+import fastify from "fastify";
+import path from "path";
+import chalk from "chalk";
+import open from "open";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-const {
+import {
   GREENBOT_TAG,
   DEFAULT_PORT,
   inferPackageManager,
   renderBox,
   name,
-} = require("./shared.cjs");
+} from "./shared.mjs";
 
-const registerRoutes = require("./routes.cjs");
-const { readPackageJson } = require("./utils.cjs");
-const { getWorkspaces } = require("./workspaces.cjs");
+import { registerRoutes } from "./routes.mjs";
+import { readPackageJson } from "./utils.mjs";
+import { getWorkspaces } from "./workspaces.mjs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const PACKAGE_JSON_PATH =
   process.argv.length === 3 ? process.argv[2] : "package.json";
@@ -34,11 +39,11 @@ const app = fastify({
 });
 
 // Register plugins
-app.register(require("@fastify/cors"), {
+app.register(await import("@fastify/cors"), {
   origin: "*",
 });
 
-app.register(require("@fastify/static"), {
+app.register(await import("@fastify/static"), {
   root: STATIC_PATH,
 });
 

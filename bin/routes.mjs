@@ -1,10 +1,6 @@
-const { fetchNPMPackageMeta, indexEntries } = require("./shared.cjs");
-const { indexBy, prop } = require("rambda");
-const {
-  readPackageJson,
-  upgradeVersion,
-  upgradeVersions,
-} = require("./utils.cjs");
+import { fetchNPMPackageMeta, indexEntries } from "./shared.mjs";
+import { indexBy, prop } from "rambda";
+import { readPackageJson, upgradeVersion, upgradeVersions } from "./utils.mjs";
 
 /**
  * Get package.json path based on query parameters
@@ -21,7 +17,7 @@ function getPackageJsonPath({ path = "" }, defaultPath) {
  * @param {import('fastify').FastifyInstance} fastify
  * @param {import("./types").AppContext} context - Application context
  */
-async function registerRoutes(fastify, context) {
+export async function registerRoutes(fastify, context) {
   // Info routes
   fastify.get("/info/package/:name/:version?", async (request) => {
     const { name, version } = request.params;
@@ -121,5 +117,3 @@ async function registerRoutes(fastify, context) {
     return result;
   });
 }
-
-module.exports = registerRoutes;
