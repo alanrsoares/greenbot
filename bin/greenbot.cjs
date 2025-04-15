@@ -4,8 +4,6 @@ const fastify = require("fastify");
 const path = require("path");
 const chalk = require("chalk");
 const open = require("open");
-const fs = require("fs/promises");
-const yaml = require("js-yaml");
 
 const {
   GREENBOT_TAG,
