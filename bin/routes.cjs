@@ -23,7 +23,7 @@ function getPackageJsonPath({ path = "" }, defaultPath) {
  */
 async function registerRoutes(fastify, context) {
   // Info routes
-  fastify.get("/info/package/:name/:version?", async (request, reply) => {
+  fastify.get("/info/package/:name/:version?", async (request) => {
     const { name, version } = request.params;
     const result = await fetchNPMPackageMeta(name, version);
     return result;
@@ -39,12 +39,12 @@ async function registerRoutes(fastify, context) {
   );
 
   // Workspace routes
-  fastify.get("/workspaces", async (request, reply) => {
+  fastify.get("/workspaces", async () => {
     return context.isMonorepo ? context.workspaces : null;
   });
 
   // Package routes
-  fastify.get("/package", async (request, reply) => {
+  fastify.get("/package", async (request) => {
     const packageJsonPath = getPackageJsonPath(
       request.query,
       context.PACKAGE_JSON_PATH,
@@ -93,7 +93,7 @@ async function registerRoutes(fastify, context) {
     };
   });
 
-  fastify.post("/upgrade", async (request, reply) => {
+  fastify.post("/upgrade", async (request) => {
     const { name, version, latest } = request.body;
     const packageJsonPath = getPackageJsonPath(
       request.query,
@@ -108,7 +108,7 @@ async function registerRoutes(fastify, context) {
     return result;
   });
 
-  fastify.post("/upgrade-packages", async (request, reply) => {
+  fastify.post("/upgrade-packages", async (request) => {
     const { packages, path } = request.body;
     const packageJsonPath = getPackageJsonPath(
       { path },
