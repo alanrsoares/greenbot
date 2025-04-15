@@ -211,7 +211,7 @@
 
 <div class="relative">
   <aside
-    class="absolute right-0 top-8 transition-all duration-300 ease-in"
+    class="help-sidebar"
     class:translate-x-64={isHelpVisible}
     use:clickOutside={hideHelp}
   >
@@ -229,7 +229,7 @@
       {/if}
     </button>
     <ul
-      class="bg-slate-900/60 p-4 rounded-xl grid gap-2 opacity-10"
+      class="help-list"
       class:opacity-100={isHelpVisible}
       aria-hidden={!isHelpVisible}
     >
@@ -237,9 +237,7 @@
         <li class="flex items-center">
           <div class="flex gap-2">
             {#each keys as { symbol, rotation }}
-              <kbd
-                class="text-sm font-semibold flex p-1.5 bg-castleton-green/40 rounded"
-              >
+              <kbd class="keyboard-key">
                 <ArrowUpIcon
                   class="h-3 w-3"
                   style={`transform: rotate(${rotation}deg);`}
@@ -254,9 +252,7 @@
       {/each}
     </ul>
   </aside>
-  <section
-    class="bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2"
-  >
+  <section class="dependencies-section">
     <div class="relative group">
       <input
         bind:this={inputRef}
@@ -272,22 +268,16 @@
         }}
       />
       {#if !isSearchFocused || !searchTerm}
-        <kbd
-          class="kbd absolute right-2 top-2 transition-opacity opacity-50 group-hover:opacity-100"
-        >
+        <kbd class="search-shortcut group-hover:opacity-100">
           <span class="text-xs font-mono"> / </span>
         </kbd>
       {/if}
     </div>
-    <header
-      class="p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2"
-    >
+    <header class="dependencies-header">
       <div class="flex items-center justify-between w-full">
         <div>
           {selectedTab === "dependencies" ? "Dependencies" : "Dev Dependencies"}
-          <span
-            class="text-xs tracking-wider bg-castleton-green px-2 py-1 rounded-full"
-          >
+          <span class="package-count">
             {upToDatePackages.length}/{entries.length}
           </span>
         </div>
@@ -307,9 +297,9 @@
         {/if}
       </div>
     </header>
-    <main class="min-h-[32rem] mx-2">
+    <main class="dependencies-main">
       {#if !pageEntries.length}
-        <div class="flex items-center justify-center h-full group">
+        <div class="empty-state group">
           <div class="flex flex-col items-center justify-center gap-2">
             <AlertCircleIcon
               class="h-10 w-10 text-base-content/80 group-hover:animate-pulse"
@@ -340,8 +330,8 @@
       {/if}
     </main>
     {#if pages > 1}
-      <footer class="grid place-items-center">
-        <div class="bg-slate-900/90 rounded-full">
+      <footer class="pagination-container">
+        <div class="pagination-wrapper">
           <Pagination {pages} bind:pageIndex />
         </div>
       </footer>
@@ -355,7 +345,52 @@
   .help-trigger {
     @apply h-10 w-10 absolute -right-10 p-2 bg-black/40 rounded-r-full opacity-40 hover:opacity-100 transition-opacity outline-none;
   }
+
+  .help-sidebar {
+    @apply absolute right-0 top-8 transition-all duration-300 ease-in;
+  }
+
+  .help-list {
+    @apply bg-slate-900/60 p-4 rounded-xl grid gap-2 opacity-10;
+  }
+
+  .keyboard-key {
+    @apply text-sm font-semibold flex p-1.5 bg-castleton-green/40 rounded;
+  }
+
+  .dependencies-section {
+    @apply bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2;
+  }
+
   .search-input {
     @apply w-full p-4 text-sm text-white bg-white/5 rounded-xl outline-none focus:ring-4 ring-castleton-green/60;
+  }
+
+  .search-shortcut {
+    @apply absolute right-2 top-2 transition-opacity opacity-50;
+  }
+
+  .dependencies-header {
+    @apply p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2;
+  }
+
+  .package-count {
+    @apply text-xs tracking-wider bg-castleton-green px-2 py-1 rounded-full;
+  }
+
+  .dependencies-main {
+    @apply min-h-[32rem] mx-2;
+  }
+
+  .empty-state {
+    @apply flex items-center justify-center h-full;
+  }
+
+  .pagination-container {
+    @apply grid place-items-center;
+  }
+
+  .pagination-wrapper {
+    @apply bg-slate-900/90 rounded-full;
   }
 </style>
