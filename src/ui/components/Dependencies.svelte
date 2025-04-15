@@ -349,7 +349,7 @@
   </section>
 </div>
 
-<style>
+<style lang="postcss">
   @reference "../../app.css";
 
   .help-trigger {

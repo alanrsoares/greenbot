@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Package } from "~/domain/types";
+  import type { Package } from "~/domain/types";
   import PackageManagerIcon from "./PackageManagerIcon.svelte";
   export let name = "";
   export let version = "";
@@ -19,7 +19,7 @@
   </div>
 </a>
 
-<style>
+<style lang="postcss">
   @reference "../../app.css";
 
   a {

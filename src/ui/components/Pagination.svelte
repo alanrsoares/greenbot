@@ -53,7 +53,7 @@
   </li>
 </ul>
 
-<style>
+<style lang="postcss">
   @reference "../../app.css";
 
   .btn-arrow {

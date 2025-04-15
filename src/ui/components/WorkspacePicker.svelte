@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Package } from "~/domain/types";
+  import type { Package } from "~/domain/types";
 
   import { ChevronLeftIcon, ChevronRightIcon } from "~/lib/icons";
 
@@ -55,7 +55,7 @@
   </div>
 {/if}
 
-<style>
+<style lang="postcss">
   @reference "../../app.css";
 
   .chrevron-btn {

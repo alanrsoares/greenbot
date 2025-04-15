@@ -164,7 +164,11 @@
             <div class="text-granny-smith-apple flex items-center gap-2">
               <span>Authored by</span>
               <span class="font-semibold">
-                {meta.author.name}
+                {#if typeof meta.author === "string"}
+                  {meta.author}
+                {:else}
+                  {meta.author.name}
+                {/if}
               </span>
             </div>
           {/if}
@@ -206,7 +210,7 @@
           {/if}
           {#if meta.bugs}
             <a
-              href={meta.bugs.url}
+              href={typeof meta.bugs === "string" ? meta.bugs : meta.bugs.url}
               target="_blank"
               class="hover:underline"
               rel="noopener noreferrer"
@@ -221,7 +225,7 @@
   </div>
 </li>
 
-<style>
+<style lang="postcss">
   @reference "../../app.css";
 
   li {

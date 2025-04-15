@@ -36,7 +36,7 @@
   </footer>
 </div>
 
-<style>
+<style lang="postcss">
   @reference "../../app.css";
 
   .layout {

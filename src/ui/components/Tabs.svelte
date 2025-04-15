@@ -24,7 +24,7 @@
   {/each}
 </div>
 
-<style>
+<style lang="postcss">
   @reference "../../app.css";
   .container {
     @apply border-2 border-gray-900 bg-gray-900/60  rounded-3xl flex justify-between overflow-hidden p-2  gap-2;
