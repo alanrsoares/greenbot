@@ -1,20 +1,8 @@
-export interface PackageJsonContent {
-  dependencies: Record<string, string>;
-  devDependencies?: Record<string, string>;
-  workspaces?: string[];
-}
+import type { Package, PackageInfo } from "../src/domain/types";
 
-export interface WorkspaceInfo {
-  path: string;
-  name: string;
-  version: string;
-}
-
-export interface PackageVersionInfo {
-  name: string;
-  version: string;
-  latest: string;
-}
+// Re-export domain types
+export type { Package, PackageInfo };
+export type WorkspaceInfo = NonNullable<Package["workspaces"]>[number];
 
 export interface AppContext {
   packageManager: string;
@@ -26,14 +14,6 @@ export interface AppContext {
 export interface PackageLockFile {
   file: string;
   name: string;
-}
-
-export interface PackageMeta {
-  name: string;
-  version: string;
-  latest: string;
-  meta?: import("package-json").FullMetadata;
-  latestOutOfRange?: string;
 }
 
 export interface RawVersion {
