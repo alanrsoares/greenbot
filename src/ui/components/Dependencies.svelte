@@ -349,7 +349,9 @@
   </section>
 </div>
 
-<style lang="postcss">
+<style>
+  @reference "../../app.css";
+
   .help-trigger {
     @apply h-10 w-10 absolute -right-10 p-2 bg-black/40 rounded-r-full opacity-40 hover:opacity-100 transition-opacity outline-none;
   }

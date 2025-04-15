@@ -221,10 +221,12 @@
   </div>
 </li>
 
-<style lang="postcss">
+<style>
+  @reference "../../app.css";
+
   li {
     @apply border-granny-smith-apple/50 text-xs transition-all;
-    @apply hover:text-opacity-80;
+    @apply hover:opacity-80;
   }
   .expanded {
     @apply bg-castleton-green rounded-3xl scale-105 shadow-lg;

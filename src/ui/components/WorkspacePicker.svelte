@@ -22,7 +22,7 @@
     const index =
       selectedWorkspace === ""
         ? 0
-        : workspaces.findIndex((x) => x.path === selectedWorkspace) ?? -1;
+        : (workspaces.findIndex((x) => x.path === selectedWorkspace) ?? -1);
 
     if (index >= 0) {
       const nextWorkspace =
@@ -55,7 +55,9 @@
   </div>
 {/if}
 
-<style lang="postcss">
+<style>
+  @reference "../../app.css";
+
   .chrevron-btn {
     @apply flex-1 grid place-items-center;
   }

@@ -19,7 +19,9 @@
   </div>
 </a>
 
-<style lang="postcss">
+<style>
+  @reference "../../app.css";
+
   a {
     @apply bg-npm px-4 py-2 rounded-full text-white flex items-center justify-center gap-2 outline-none;
     @apply focus:ring-4 ring-npm/50;

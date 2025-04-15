@@ -134,9 +134,3 @@
     {/if}
   </div>
 </Layout>
-
-<style global lang="postcss">
-  button {
-    @apply hover:opacity-70 font-medium;
-  }
-</style>

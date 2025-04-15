@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  /* Colors */
+  --color-aero-blue: #d7fff1;
+  --color-granny-smith-apple: #aafcb8;
+  --color-granny-smith-apple-2: #8cd790;
+  --color-green-sheen: #77af9c;
+  --color-castleton-green: #285943;
+  --color-npm: #cb3837;
+
+  /* Font families */
+  --font-mono: "Fira Mono", mono;
+  --font-sans: "Fira Mono", mono;
+
+  /* Spacing */
+  --spacing-text: 1em;
+
+  /* Animation */
+  --animate-fadeIn: fadeIn 0.66s ease-in-out forwards;
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateX(-25%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+@layer utilities {
+  .text-spacing {
+    margin: 1em;
+  }
+}

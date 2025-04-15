@@ -36,7 +36,9 @@
   </footer>
 </div>
 
-<style lang="postcss">
+<style>
+  @reference "../../app.css";
+
   .layout {
     @apply min-h-screen text-granny-smith-apple flex flex-col;
   }

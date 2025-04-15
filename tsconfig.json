@@ -12,6 +12,7 @@
     "baseUrl": ".",
     "allowJs": true,
     "checkJs": true,
+    "verbatimModuleSyntax": true,
     "paths": {
       "~/*": ["./src/*"]
     },

@@ -1,4 +1,4 @@
-import "./app.postcss";
+import "./app.css";
 import Main from "./Main.svelte";
 
 const target = document.getElementById("app");

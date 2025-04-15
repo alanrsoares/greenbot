@@ -53,7 +53,9 @@
   </li>
 </ul>
 
-<style lang="postcss">
+<style>
+  @reference "../../app.css";
+
   .btn-arrow {
     @apply p-4 px-6 rounded-xl  outline-none ring-castleton-green/50;
     @apply disabled:opacity-50;
