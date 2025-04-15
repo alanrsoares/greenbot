@@ -2,8 +2,8 @@ import {
   createMutation,
   createQuery,
   type CreateMutationOptions,
-  Updater,
-  QueryObserverResult,
+  type QueryObserverResult,
+  type Updater,
 } from "@tanstack/svelte-query";
 import { onDestroy, onMount } from "svelte";
 
@@ -12,7 +12,7 @@ import type { Package, PackageInfo, TabKind } from "~/domain/types";
 
 import * as api from "./api";
 import { getFilteredEntries, isLatestVersion, rawVersion } from "./helpers";
-import { Mood } from "~/ui/components/Bot.svelte";
+import type { Mood } from "~/ui/components/Bot.svelte";
 
 export const useUpgradePackagesMutation = (
   options?: CreateMutationOptions<
@@ -20,7 +20,7 @@ export const useUpgradePackagesMutation = (
     unknown,
     api.UpgradePackagesInput,
     void
-  >
+  >,
 ) =>
   createMutation({
     ...options,
@@ -80,7 +80,7 @@ export function useKeyDown(onKeyDown: (e: KeyboardEvent) => void) {
 
 export function useCurrentMood(
   result?: QueryObserverResult<Package, unknown>,
-  selectedTab?: TabKind
+  selectedTab?: TabKind,
 ): Mood {
   if (!result || result.isLoading) {
     return "asleep";
@@ -92,14 +92,14 @@ export function useCurrentMood(
     const { dependencies, devDependencies, resolutions } = result.data;
 
     const allEntries = Object.entries(
-      (selectedTab === "dependencies" ? dependencies : devDependencies) ?? {}
+      (selectedTab === "dependencies" ? dependencies : devDependencies) ?? {},
     );
 
     const outdatedPackagesCount = getFilteredEntries(
       allEntries,
-      result.data.resolutions
+      result.data.resolutions,
     ).filter(
-      ([name, version]) => !isLatestVersion(version, resolutions[name])
+      ([name, version]) => !isLatestVersion(version, resolutions[name]),
     ).length;
 
     return outdatedPackagesCount > 0 ? "angry" : "happy";

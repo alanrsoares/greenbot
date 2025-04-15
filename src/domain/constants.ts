@@ -1,4 +1,4 @@
-import { GetPackageInput } from "~/lib/api";
+import type { GetPackageInput } from "~/lib/api";
 
 export const PAGE_SIZE = 10;
 
