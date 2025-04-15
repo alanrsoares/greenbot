@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-const express = require("express");
-const cors = require("cors");
-const { json } = require("body-parser");
+const fastify = require("fastify");
 const path = require("path");
 const replaceInFile = require("replace-in-file");
 const chalk = require("chalk");
@@ -76,7 +74,7 @@ async function readPackageJson(path = PACKAGE_JSON_PATH) {
  */
 async function upgradeVersion(
   { name, version, latest },
-  path = PACKAGE_JSON_PATH
+  path = PACKAGE_JSON_PATH,
 ) {
   const { qualifier } = rawVersion(version);
 
@@ -154,7 +152,7 @@ async function getWorkspaces(packageJson, packageManager) {
           const packageJsonPath = path.resolve(
             workspacePath,
             dir.name,
-            "package.json"
+            "package.json",
           );
 
           const pkg = await fs
@@ -169,13 +167,13 @@ async function getWorkspaces(packageJson, packageManager) {
           const { name, version } = pkg;
 
           return { name, version, dir: dir.name };
-        })
+        }),
       );
 
       const validPackages = packageNames.filter(Boolean);
 
       return [cleanWorkspace, validPackages];
-    })
+    }),
   );
 
   const flatWorkspaces = deepWorkspaces
@@ -185,7 +183,7 @@ async function getWorkspaces(packageJson, packageManager) {
         path: `${workspace}/${p.dir}`,
         name: p.name,
         version: p.version,
-      }))
+      })),
     );
 
   return flatWorkspaces;
@@ -207,7 +205,7 @@ async function upgradeVersions(packages = [], path = PACKAGE_JSON_PATH) {
 
   const from = values.map(({ name, version }) => `"${name}": "${version}"`);
   const to = values.map(
-    ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`
+    ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
   );
 
   await replaceInFile({ files: path, from, to });
@@ -215,102 +213,107 @@ async function upgradeVersions(packages = [], path = PACKAGE_JSON_PATH) {
   return packages;
 }
 
-const app = express();
+const app = fastify({
+  logger: false,
+});
 
 const gePackageJsonPath = ({ path = "" }) =>
   !path || path === PACKAGE_JSON_PATH
     ? PACKAGE_JSON_PATH
     : `${path}/package.json`;
 
-app
-  .use(cors({ origin: "*" }))
-  .use(json())
-  .use(express.static(STATIC_PATH))
-  .get("/info/:name/:version?", async (req, res) => {
-    const { name, version } = req.params;
-    const result = await fetchNPMPackageMeta(name, version);
+// Register plugins
+app.register(require("@fastify/cors"), {
+  origin: "*",
+});
 
-    res.json(result);
-  })
-  .get("/info/:namespace/:name/:version?", async (req, res) => {
-    const { namespace, name, version } = req.params;
-    const result = await fetchNPMPackageMeta(`${namespace}/${name}`, version);
+app.register(require("@fastify/static"), {
+  root: STATIC_PATH,
+});
 
-    res.json(result);
-  })
-  .get("/workspaces", async (_, res) => {
-    res.json(CONTEXT.isMonorepo ? CONTEXT.workspaces : null);
-  })
-  .get("/package", async (req, res) => {
-    const packageJsonPath = gePackageJsonPath(req.query);
-    const selectedTab = String(req.query.tab);
+// Register routes
+app.get("/info/package/:name/:version?", async (request, reply) => {
+  const { name, version } = request.params;
+  const result = await fetchNPMPackageMeta(name, version);
+  return result;
+});
 
-    const response = await readPackageJson(packageJsonPath);
+app.get("/info/scoped/:namespace/:name/:version?", async (request, reply) => {
+  const { namespace, name, version } = request.params;
+  const result = await fetchNPMPackageMeta(`${namespace}/${name}`, version);
+  return result;
+});
 
-    const dependencyEntries = Object.entries(response.dependencies ?? {});
-    const devDependencyEntries = Object.entries(response.devDependencies ?? {});
+app.get("/workspaces", async (request, reply) => {
+  return CONTEXT.isMonorepo ? CONTEXT.workspaces : null;
+});
 
-    const allEntries =
-      selectedTab === "dependencies" ? dependencyEntries : devDependencyEntries;
+app.get("/package", async (request, reply) => {
+  const packageJsonPath = gePackageJsonPath(request.query);
+  const selectedTab = String(request.query.tab);
 
-    const promises = allEntries.map(([packageName, version]) =>
-      fetchNPMPackageMeta(packageName, version)
-    );
+  const response = await readPackageJson(packageJsonPath);
 
-    /**
-     * @type {PackageMetaInfo[]}
-     */
-    const resolved = await new Promise(async (resolve) => {
-      // resolve promises in chunks of 10
-      const result = [];
-      const chunkSize = 10;
-      const chunks = Math.ceil(promises.length / chunkSize);
+  const dependencyEntries = Object.entries(response.dependencies ?? {});
+  const devDependencyEntries = Object.entries(response.devDependencies ?? {});
 
-      if (!promises.length) {
-        return resolve([]);
+  const allEntries =
+    selectedTab === "dependencies" ? dependencyEntries : devDependencyEntries;
+
+  const promises = allEntries.map(([packageName, version]) =>
+    fetchNPMPackageMeta(packageName, version),
+  );
+
+  const resolved = await new Promise(async (resolve) => {
+    const result = [];
+    const chunkSize = 10;
+    const chunks = Math.ceil(promises.length / chunkSize);
+
+    if (!promises.length) {
+      return resolve([]);
+    }
+
+    for (let i = 0; i < chunks; i++) {
+      const chunk = promises.slice(i * chunkSize, (i + 1) * chunkSize);
+      const chunkresult = await Promise.all(chunk);
+      result.push(...chunkresult);
+
+      if (result.length === promises.length) {
+        resolve(result);
       }
-
-      for (let i = 0; i < chunks; i++) {
-        const chunk = promises.slice(i * chunkSize, (i + 1) * chunkSize);
-
-        const chunkresult = await Promise.all(chunk);
-
-        result.push(...chunkresult);
-
-        if (result.length === promises.length) {
-          resolve(result);
-        }
-      }
-    });
-
-    res.json({
-      ...response,
-      resolutions: indexEntries(resolved),
-      meta: indexBy(prop("name"), resolved.map(prop("meta"))),
-      packageManager: CONTEXT.packageManager,
-      isMonorepo: CONTEXT.isMonorepo,
-      workspaces: CONTEXT.isMonorepo ? CONTEXT.workspaces : null,
-    });
-  })
-  .post("/upgrade", async (req, res) => {
-    const { name, version, latest } = req.body;
-    const packageJsonPath = gePackageJsonPath(req.query);
-
-    const result = await upgradeVersion(
-      { name, version, latest },
-      packageJsonPath
-    );
-
-    res.json(result);
-  })
-  .post("/upgrade-packages", async (req, res) => {
-    const { packages, path } = req.body;
-    const packageJsonPath = gePackageJsonPath({ path });
-
-    const result = await upgradeVersions(packages, packageJsonPath);
-
-    res.json(result);
+    }
   });
+
+  return {
+    ...response,
+    resolutions: indexEntries(resolved),
+    meta: indexBy(prop("name"), resolved.map(prop("meta"))),
+    packageManager: CONTEXT.packageManager,
+    isMonorepo: CONTEXT.isMonorepo,
+    workspaces: CONTEXT.isMonorepo ? CONTEXT.workspaces : null,
+  };
+});
+
+app.post("/upgrade", async (request, reply) => {
+  const { name, version, latest } = request.body;
+  const packageJsonPath = gePackageJsonPath(request.query);
+
+  const result = await upgradeVersion(
+    { name, version, latest },
+    packageJsonPath,
+  );
+
+  return result;
+});
+
+app.post("/upgrade-packages", async (request, reply) => {
+  const { packages, path } = request.body;
+  const packageJsonPath = gePackageJsonPath({ path });
+
+  const result = await upgradeVersions(packages, packageJsonPath);
+
+  return result;
+});
 
 const MAX_TRIES = 5;
 
@@ -323,15 +326,8 @@ async function main(port = DEFAULT_PORT, tries = 0) {
   CONTEXT.isMonorepo = Boolean(workspaces?.length);
   CONTEXT.packageManager = packageManager;
 
-  app.listen(port, (err) => {
-    if (err) {
-      console.log(chalk.red("An error occurred:"), err);
-      if (tries < MAX_TRIES) {
-        return main(port + 1, tries + 1);
-      }
-      return;
-    }
-
+  try {
+    await app.listen({ port });
     const url = `http://localhost:${port}`;
 
     renderBox(
@@ -347,13 +343,18 @@ async function main(port = DEFAULT_PORT, tries = 0) {
       {
         color: chalk.yellow,
         padding: 2,
-      }
+      },
     );
 
     open(url).catch(() => {
       console.log(chalk.yellow(`[greenbot] Could not open browser at ${url}`));
     });
-  });
+  } catch (err) {
+    console.log(chalk.red("An error occurred:"), err);
+    if (tries < MAX_TRIES) {
+      return main(port + 1, tries + 1);
+    }
+  }
 }
 
 main();
