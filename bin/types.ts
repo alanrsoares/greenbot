@@ -30,4 +30,10 @@ export interface CenterContext {
   center: (str: string) => string;
 }
 
+export interface PackageJsonContent {
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
+  workspaces?: string[];
+}
+
 export type RenderBoxLine = string | ((ctx: CenterContext) => string);

@@ -46,13 +46,13 @@ export async function getWorkspaces(packageJson, packageManager) {
 
       const workspacePath = path.resolve(cleanWorkspace);
 
-      const validSubdirs = await fs
+      const subFolders = await fs
         .readdir(workspacePath, { withFileTypes: true })
         .catch(() => [])
         .then((entries) => entries.filter((entry) => entry.isDirectory()));
 
       const packageNames = await Promise.all(
-        validSubdirs.map(async (dir) => {
+        subFolders.map(async (dir) => {
           const packageJsonPath = path.resolve(
             workspacePath,
             dir.name,
