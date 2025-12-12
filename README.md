@@ -10,7 +10,7 @@
 
 - 🎨 Beautiful web UI for dependency updates
 - ⌨️ Fully keyboard accessible
-- 🏗️ Supports multiple package managers: npm, yarn, pnpm
+- 🏗️ Supports multiple package managers: npm, yarn, pnpm, bun
 - 📦 Monorepo savvy: Automatically identifies your package structure
 
 ## Quick Start

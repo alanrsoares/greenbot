@@ -30,6 +30,7 @@ async function main() {
     npm: `npm i ${name}@latest`,
     yarn: `yarn add ${name}@latest`,
     pnpm: `pnpm add ${name}@latest`,
+    bun: `bun add ${name}@latest`,
   };
 
   renderBox(

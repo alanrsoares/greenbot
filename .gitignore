@@ -2,3 +2,5 @@
 /.vscode/
 .DS_Store
 dist
+bun.lockb
+pnpm-lock.yaml
