@@ -28,6 +28,7 @@
   export let name = "";
   export let version = "";
   export let latest: string | undefined = "";
+  export let latestOutOfRange: string | undefined = undefined;
   export let index = 0;
   export let isLatest = false;
   export let meta: FullMetadata | undefined;
@@ -121,24 +122,68 @@
       </div>
       <div class="grid place-items-end gap-2 items-center">
         {#if isLatest}
-          <div class="flex items-center gap-2 justify-end py-2">
-            <span>
-              {version}
-            </span>
-            <CheckCircleIcon class="h-4 w-4" />
+          <div class="flex flex-col gap-2 items-end py-1">
+            <div class="flex items-center gap-2 justify-end py-2">
+              <span>
+                {version}
+              </span>
+              <CheckCircleIcon class="h-4 w-4" />
+            </div>
+            {#if latestOutOfRange && latestOutOfRange !== latest}
+              <UpgradeButton
+                outOfRange={true}
+                disabled={$upgradePackagesMutation.isPending}
+                isLoading={$upgradePackagesMutation.isPending}
+                on:click={(e) => {
+                  e.stopPropagation();
+                  handleUpgradePackages([
+                    {
+                      name,
+                      version,
+                      latest: latestOutOfRange,
+                      latestOutOfRange,
+                      meta,
+                    },
+                  ]);
+                }}
+              >
+                {version} &rArr; {latestOutOfRange} (out of range)
+              </UpgradeButton>
+            {/if}
           </div>
         {:else}
-          <div class="py-1">
+          <div class="flex flex-col gap-2 items-end py-1">
             <UpgradeButton
               disabled={$upgradePackagesMutation.isPending}
               isLoading={$upgradePackagesMutation.isPending}
               on:click={(e) => {
                 e.stopPropagation();
-                handleUpgradePackages([{ name, version, latest, meta }]);
+                handleUpgradePackages([{ name, version, latest, latestOutOfRange, meta }]);
               }}
             >
               {version} &rArr; {latest}
             </UpgradeButton>
+            {#if latestOutOfRange && latestOutOfRange !== latest}
+              <UpgradeButton
+                outOfRange={true}
+                disabled={$upgradePackagesMutation.isPending}
+                isLoading={$upgradePackagesMutation.isPending}
+                on:click={(e) => {
+                  e.stopPropagation();
+                  handleUpgradePackages([
+                    {
+                      name,
+                      version,
+                      latest: latestOutOfRange,
+                      latestOutOfRange,
+                      meta,
+                    },
+                  ]);
+                }}
+              >
+                {version} &rArr; {latestOutOfRange} (out of range)
+              </UpgradeButton>
+            {/if}
           </div>
         {/if}
       </div>
@@ -182,6 +227,12 @@
               <span class="font-semibold">
                 {($bundlephobiaQuery.data.size / 1024).toFixed(1)}kb
               </span> (uncompressed)
+            </div>
+          {/if}
+          {#if latestOutOfRange && latestOutOfRange !== latest}
+            <div class="text-granny-smith-apple/80 text-xs">
+              Latest version available (out of range):
+              <span class="font-semibold">{latestOutOfRange}</span>
             </div>
           {/if}
         </div>

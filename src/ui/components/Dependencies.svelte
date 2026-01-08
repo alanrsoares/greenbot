@@ -309,12 +309,13 @@
         </div>
       {:else}
         <ul class="grid">
-          {#each pageEntries as { name, version, latest, isLatest, meta }, index}
+          {#each pageEntries as { name, version, latest, latestOutOfRange, isLatest, meta }, index}
             <Dependency
               {index}
               {name}
               {version}
               {latest}
+              {latestOutOfRange}
               {isLatest}
               {meta}
               bind:selectedWorkspace
@@ -379,7 +380,7 @@
   }
 
   .dependencies-main {
-    @apply min-h-[32rem] mx-2;
+    @apply min-h-128 mx-2;
   }
 
   .empty-state {

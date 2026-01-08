@@ -55,12 +55,19 @@
   });
 
   const toPackageInfo =
-    (resolutions: Record<string, string>, meta: Record<string, FullMetadata>) =>
+    (
+      resolutions: Record<string, string>,
+      meta: Record<string, FullMetadata>,
+      latestOutOfRange?: Record<string, string>
+    ) =>
     ([name, version]: [string, string]): PackageInfo => {
       return {
         name,
         version,
         latest: name in resolutions ? resolutions[name] : version,
+        latestOutOfRange: latestOutOfRange && name in latestOutOfRange
+          ? latestOutOfRange[name]
+          : undefined,
         meta: name in meta ? meta[name] : undefined,
       };
     };
@@ -85,7 +92,8 @@
   $: entries = tabEntries.map(
     toPackageInfo(
       $packageQuery.data?.resolutions ?? {},
-      $packageQuery.data?.meta ?? {}
+      $packageQuery.data?.meta ?? {},
+      $packageQuery.data?.latestOutOfRange
     )
   );
 </script>

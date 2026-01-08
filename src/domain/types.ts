@@ -8,6 +8,7 @@ export interface Package {
   dependencies: Record<string, string>;
   devDependencies?: Record<string, string>;
   resolutions: Record<string, string>;
+  latestOutOfRange?: Record<string, string>;
   meta: Record<string, FullMetadata>;
   packageManager: "npm" | "yarn" | "pnpm" | "bun";
   workspaces:
@@ -23,6 +24,7 @@ export interface PackageInfo {
   name: string;
   version: string;
   latest: string | undefined;
+  latestOutOfRange?: string | undefined;
   meta: FullMetadata | undefined;
 }
 

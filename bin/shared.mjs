@@ -128,6 +128,19 @@ export const indexEntries = (xs) =>
   xs.reduce((acc, { name, latest }) => ({ ...acc, [name]: latest }), {});
 
 /**
+ * indexLatestOutOfRangeEntries - index latestOutOfRange entries by name
+ *
+ * @param {import('./types').PackageMeta[]} xs
+ * @returns {Record<string,string>}
+ */
+export const indexLatestOutOfRangeEntries = (xs) =>
+  xs.reduce(
+    (acc, { name, latestOutOfRange }) =>
+      latestOutOfRange ? { ...acc, [name]: latestOutOfRange } : acc,
+    {},
+  );
+
+/**
  * rawVersion - extract version and qualifier from version string
  *
  * @param {string} version
@@ -172,28 +185,52 @@ export const fetchNPMPackageMeta = async (name, version = "latest") => {
   try {
     const options = { version, fullMetadata: true };
 
-    const [{ version: latest, ...meta }, outOfRange] = await Promise.all([
-      packageJson(name, options),
-      packageJson(name, { ...options, version: "latest" }),
+    // Fetch both the latest version within range and the absolute latest version
+    const [latestInRange, absoluteLatest] = await Promise.all([
+      packageJson(name, options).catch(() => null),
+      packageJson(name, { version: "latest", fullMetadata: true }).catch(
+        () => null,
+      ),
     ]);
+
+    // If we couldn't fetch the latest in range, fall back to the version string
+    const latest = latestInRange?.version ?? version;
+    const latestOutOfRange = absoluteLatest?.version;
+
+    // Extract version from metadata (original pattern)
+    const { version: _, ...meta } = latestInRange ?? {};
 
     return {
       name,
       version,
       latest,
-      meta,
-      latestOutOfRange: outOfRange.version,
+      meta: latestInRange ? meta : undefined,
+      latestOutOfRange,
     };
   } catch (error) {
     console.log(
       chalk.red(`[greenbot] Could not fetch latest version for ${name}`),
     );
 
-    return {
-      name,
-      version,
-      latest: version,
-    };
+    // Try to at least get the absolute latest version even if range fetch fails
+    try {
+      const absoluteLatest = await packageJson(name, {
+        version: "latest",
+        fullMetadata: true,
+      });
+      return {
+        name,
+        version,
+        latest: version,
+        latestOutOfRange: absoluteLatest.version,
+      };
+    } catch (fallbackError) {
+      return {
+        name,
+        version,
+        latest: version,
+      };
+    }
   }
 };
 

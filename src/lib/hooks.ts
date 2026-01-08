@@ -36,6 +36,7 @@ export const updatePackageQueryCache =
       const { qualifier } = rawVersion(item.version);
       const latestVersion = `${qualifier}${item.latest}`;
 
+      // Update dependencies/devDependencies
       if (next.dependencies && item.name in next.dependencies) {
         console.log("updating dependency", item.name, "to", latestVersion);
         next.dependencies[item.name] = latestVersion;
@@ -43,6 +44,12 @@ export const updatePackageQueryCache =
       if (next.devDependencies && item.name in next.devDependencies) {
         console.log("updating devDependency", item.name, "to", latestVersion);
         next.devDependencies[item.name] = latestVersion;
+      }
+
+      // Update resolutions cache to reflect the new latest version
+      // This ensures that after upgrading to out-of-range, the cache shows the correct latest
+      if (next.resolutions && item.latest) {
+        next.resolutions[item.name] = item.latest;
       }
     }
 

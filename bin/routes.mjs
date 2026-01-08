@@ -1,4 +1,8 @@
-import { fetchNPMPackageMeta, indexEntries } from "./shared.mjs";
+import {
+  fetchNPMPackageMeta,
+  indexEntries,
+  indexLatestOutOfRangeEntries,
+} from "./shared.mjs";
 import { indexBy, prop } from "rambda";
 import { readPackageJson, upgradeVersion, upgradeVersions } from "./utils.mjs";
 
@@ -83,6 +87,7 @@ export async function registerRoutes(fastify, context) {
     return {
       ...response,
       resolutions: indexEntries(resolved),
+      latestOutOfRange: indexLatestOutOfRangeEntries(resolved),
       meta: indexBy(prop("name"), resolved.map(prop("meta"))),
       packageManager: context.packageManager,
       isMonorepo: context.isMonorepo,
