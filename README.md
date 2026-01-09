@@ -21,7 +21,7 @@
 | --------------- | ---------------------------- |
 | npm             | `npx @greenbot@latest`       |
 | pnpm            | `pnpx @greenbot/cli@latest`  |
-| bun             | `bun x @greenbot/cli@latest` |
+| bun             | `bunx @greenbot/cli@latest`  |
 
 📌 For `yarn`, you'll need to install it globally:
 
