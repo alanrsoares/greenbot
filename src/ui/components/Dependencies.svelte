@@ -9,15 +9,12 @@
     AlertCircleIcon,
   } from "~/lib/icons";
 
-  import { PAGE_SIZE, QUERY_KEYS } from "~/domain/constants";
-  import type { Package, PackageInfo, TabKind } from "~/domain/types";
+  import { PAGE_SIZE } from "~/domain/constants";
+  import type { PackageInfo, TabKind } from "~/domain/types";
   import { clickOutside } from "~/lib/directives";
   import { isLatestVersion } from "~/lib/helpers";
-  import {
-    updatePackageQueryCache,
-    useKeyDown,
-    useUpgradePackagesMutation,
-  } from "~/lib/hooks";
+  import { useKeyDown, useUpgradePackagesMutation } from "~/lib/hooks";
+  import { applyPackageUpgrades } from "~/lib/apply-package-upgrades";
 
   import Dependency from "./Dependency.svelte";
   import PackageSearchInput from "./PackageSearchInput.svelte";
@@ -49,31 +46,20 @@
 
   const queryClient = useQueryClient();
 
+  function resetPaging() {
+    pageIndex = 0;
+    expandedRowIndex = -1;
+  }
+
   async function handleUpgradePackages(packages: PackageInfo[]) {
-    try {
-      const updated = await $upgradePackagesMutation.mutateAsync({
-        packages,
-        path: selectedWorkspace,
-      });
-
-      // apply optimistic update
-      queryClient.setQueryData<Package>(
-        QUERY_KEYS.package({
-          path: selectedWorkspace,
-          tab: selectedTab,
-        }),
-        updatePackageQueryCache(updated),
-      );
-
-      await queryClient.refetchQueries({
-        queryKey: QUERY_KEYS.package({
-          path: selectedWorkspace,
-          tab: selectedTab,
-        }),
-      });
-    } catch (error) {
-      console.log("Failed to upgrade packages:", { originalError: error });
-    }
+    await applyPackageUpgrades({
+      queryClient,
+      mutateAsync: (input) => $upgradePackagesMutation.mutateAsync(input),
+      packages,
+      path: selectedWorkspace,
+      tab: selectedTab,
+      refetchAfter: true,
+    });
   }
 
   useKeyDown((event) => {
@@ -125,6 +111,8 @@
         event.preventDefault();
         if (isHelpVisible) {
           isHelpVisible = false;
+        } else if (expandedRowIndex !== -1) {
+          expandedRowIndex = -1;
         }
         break;
       case "h":
@@ -168,17 +156,13 @@
 
   $: {
     if (selectedTab) {
-      // reset pageIndex on selectedTab change
-      pageIndex = 0;
-      expandedRowIndex = -1;
+      resetPaging();
     }
   }
 
   $: {
     if (searchTerm) {
-      // reset pageIndex on searchTerm change
-      pageIndex = 0;
-      expandedRowIndex = -1;
+      resetPaging();
     }
   }
 
@@ -279,13 +263,20 @@
             tip="Packages matching semver-safe latest / total in this tab"
             placement="bottom"
           >
-            <Badge variant="primary" size="sm" class="ml-1 align-middle tracking-wider">
+            <Badge
+              variant="primary"
+              size="sm"
+              class="ml-1 align-middle tracking-wider"
+            >
               {upToDatePackages.length}/{entries.length}
             </Badge>
           </Tooltip>
         </div>
         {#if isAllUpToDate}
-          <Tooltip tip="Every package is at latest within its semver range" placement="left">
+          <Tooltip
+            tip="Every package is at latest within its semver range"
+            placement="left"
+          >
             <span class="inline-flex ml-1">
               <CheckCircleIcon class="size-4" />
             </span>

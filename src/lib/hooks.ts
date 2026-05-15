@@ -38,11 +38,9 @@ export const updatePackageQueryCache =
 
       // Update dependencies/devDependencies
       if (next.dependencies && item.name in next.dependencies) {
-        console.log("updating dependency", item.name, "to", latestVersion);
         next.dependencies[item.name] = latestVersion;
       }
       if (next.devDependencies && item.name in next.devDependencies) {
-        console.log("updating devDependency", item.name, "to", latestVersion);
         next.devDependencies[item.name] = latestVersion;
       }
 

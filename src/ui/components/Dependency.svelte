@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { FullMetadata } from "package-json";
-  import { onDestroy, onMount } from "svelte";
   import SvelteMarkdown from "svelte-markdown";
 
   import {
@@ -14,11 +13,10 @@
 
   import { useQueryClient } from "@tanstack/svelte-query";
 
-  import type { Package, PackageInfo, TabKind } from "~/domain/types";
-  import { QUERY_KEYS } from "~/domain/constants";
+  import type { PackageInfo, TabKind } from "~/domain/types";
+  import { applyPackageUpgrades } from "~/lib/apply-package-upgrades";
   import { ellipsis } from "~/lib/helpers";
   import {
-    updatePackageQueryCache,
     useBundlephobiaReportQuery,
     useUpgradePackagesMutation,
   } from "~/lib/hooks";
@@ -41,24 +39,29 @@
 
   const upgradePackagesMutation = useUpgradePackagesMutation();
 
-  async function handleUpgradePackages(packages: PackageInfo[]) {
-    try {
-      const updated = await $upgradePackagesMutation.mutateAsync({
-        packages,
-        path: selectedWorkspace,
-      });
+  $: upgradePending = $upgradePackagesMutation.isPending;
 
-      // apply optimistic update
-      queryClient.setQueryData<Package>(
-        QUERY_KEYS.package({
-          path: selectedWorkspace,
-          tab: selectedTab,
-        }),
-        updatePackageQueryCache(updated),
-      );
-    } catch (error) {
-      console.log("Failed to upgrade packages:", { originalError: error });
-    }
+  async function handleUpgradePackages(packages: PackageInfo[]) {
+    await applyPackageUpgrades({
+      queryClient,
+      mutateAsync: (input) => $upgradePackagesMutation.mutateAsync(input),
+      packages,
+      path: selectedWorkspace,
+      tab: selectedTab,
+      refetchAfter: false,
+    });
+  }
+
+  function outOfRangeSinglePackage(): PackageInfo[] {
+    return [
+      {
+        name,
+        version,
+        latest: latestOutOfRange!,
+        latestOutOfRange,
+        meta,
+      },
+    ];
   }
 
   function handleToggleExpandedRow() {
@@ -69,21 +72,7 @@
     }
   }
 
-  function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === "Escape") {
-      expandedRowIndex = -1;
-    }
-  }
-
   const bundlephobiaQuery = useBundlephobiaReportQuery(name);
-
-  onMount(() => {
-    window.addEventListener("keydown", handleKeyDown);
-  });
-
-  onDestroy(() => {
-    window.removeEventListener("keydown", handleKeyDown);
-  });
 
   $: isExpanded = expandedRowIndex === index;
   $: isBlurred = !isExpanded && expandedRowIndex !== -1;
@@ -147,19 +136,11 @@
               >
                 <UpgradeButton
                   outOfRange={true}
-                  disabled={$upgradePackagesMutation.isPending}
-                  isLoading={$upgradePackagesMutation.isPending}
+                  disabled={upgradePending}
+                  isLoading={upgradePending}
                   on:click={(e) => {
                     e.stopPropagation();
-                    handleUpgradePackages([
-                      {
-                        name,
-                        version,
-                        latest: latestOutOfRange,
-                        latestOutOfRange,
-                        meta,
-                      },
-                    ]);
+                    handleUpgradePackages(outOfRangeSinglePackage());
                   }}
                 >
                   {version} &rArr; {latestOutOfRange}
@@ -174,8 +155,8 @@
               placement="bottom"
             >
               <UpgradeButton
-                disabled={$upgradePackagesMutation.isPending}
-                isLoading={$upgradePackagesMutation.isPending}
+                disabled={upgradePending}
+                isLoading={upgradePending}
                 on:click={(e) => {
                   e.stopPropagation();
                   handleUpgradePackages([
@@ -194,19 +175,11 @@
               >
                 <UpgradeButton
                   outOfRange={true}
-                  disabled={$upgradePackagesMutation.isPending}
-                  isLoading={$upgradePackagesMutation.isPending}
+                  disabled={upgradePending}
+                  isLoading={upgradePending}
                   on:click={(e) => {
                     e.stopPropagation();
-                    handleUpgradePackages([
-                      {
-                        name,
-                        version,
-                        latest: latestOutOfRange,
-                        latestOutOfRange,
-                        meta,
-                      },
-                    ]);
+                    handleUpgradePackages(outOfRangeSinglePackage());
                   }}
                 >
                   {version} &rArr; {latestOutOfRange}
