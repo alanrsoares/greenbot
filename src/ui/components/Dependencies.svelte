@@ -283,22 +283,20 @@
           </Tooltip>
         {/if}
       </div>
-      <div>
-        {#if !isAllUpToDate}
-          <Tooltip
-            tip="Upgrade all outdated packages on this page to their semver-safe latest"
-            placement="bottom"
+      {#if !isAllUpToDate}
+        <Tooltip
+          tip="Upgrade all outdated packages on this page to their semver-safe latest"
+          placement="bottom"
+        >
+          <UpgradeButton
+            on:click={() => handleUpgradePackages(outdatedPackages)}
+            disabled={$upgradePackagesMutation.isPending}
+            isLoading={$upgradePackagesMutation.isPending}
           >
-            <UpgradeButton
-              on:click={() => handleUpgradePackages(outdatedPackages)}
-              disabled={$upgradePackagesMutation.isPending}
-              isLoading={$upgradePackagesMutation.isPending}
-            >
-              Upgrade all
-            </UpgradeButton>
-          </Tooltip>
-        {/if}
-      </div>
+            Upgrade all
+          </UpgradeButton>
+        </Tooltip>
+      {/if}
     </header>
     <main class="dependencies-main">
       {#if !pageEntries.length}

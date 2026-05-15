@@ -19,7 +19,7 @@
     search
     variant="ghost"
     size="md"
-    class="w-full rounded-xl p-4 text-sm text-white bg-white/5 focus-within:ring-4 focus-within:ring-castleton-green/60"
+    class="w-full rounded-xl px-4 pr-12 py-0 text-sm leading-normal text-white bg-white/5 focus-within:ring-4 focus-within:ring-castleton-green/60 [&_input]:min-h-0"
     {placeholder}
     bind:value
     on:focus={() => {
@@ -35,7 +35,7 @@
     <Tooltip
       tip="Focus search (press /)"
       placement="left"
-      class="absolute right-2 top-2"
+      class="absolute right-2 top-1/2 -translate-y-1/2"
     >
       <Kbd
         size="sm"

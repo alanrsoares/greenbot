@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const upgradeButtonVariants = cva(
-  "flex items-center rounded-full p-1 focus:ring -mr-1 whitespace-nowrap transition-all",
+  "flex items-center rounded-full p-1 focus:ring whitespace-nowrap transition-all",
   {
     variants: {
       outOfRange: {

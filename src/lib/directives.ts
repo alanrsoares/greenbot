@@ -20,3 +20,16 @@ export function clickOutside(node: HTMLElement, callback: () => void) {
     },
   };
 }
+
+/** Move node to `document.body` so `z-index` / `position: fixed` stack above app chrome. */
+export function portalBody(node: HTMLElement) {
+  if (typeof document === "undefined") {
+    return { destroy() {} };
+  }
+  document.body.appendChild(node);
+  return {
+    destroy() {
+      node.remove();
+    },
+  };
+}

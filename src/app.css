@@ -17,6 +17,14 @@
   /* Spacing */
   --spacing-text: 1em;
 
+  /* Stacking elevations (low → high). Use `z-*` utilities, e.g. `z-tooltip`. */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-overlay: 2000;
+  --z-toast: 3000;
+  --z-tooltip: 2147483646;
+
   /* Animation */
   --animate-fadeIn: fadeIn 0.66s ease-in-out forwards;
 
