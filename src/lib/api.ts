@@ -43,7 +43,7 @@ export type UpgradePackagesInput = {
 };
 
 export function upgradePackages(
-  input: UpgradePackagesInput
+  input: UpgradePackagesInput,
 ): Promise<PackageInfo[]> {
   return greenbotClient
     .post("upgrade-packages", { json: input })

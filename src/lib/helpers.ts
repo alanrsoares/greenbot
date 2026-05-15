@@ -24,15 +24,15 @@ export const uuidv4 = () => {
 
 export const mapObject = <T, U>(
   obj: Record<string, T>,
-  fn: (value: T, key: string) => U
+  fn: (value: T, key: string) => U,
 ) =>
   Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => [key, fn(value, key)])
+    Object.entries(obj).map(([key, value]) => [key, fn(value, key)]),
   );
 
 export function getFilteredEntries(
   entries: [string, string][],
-  resolutions: Record<string, string>
+  resolutions: Record<string, string>,
 ) {
   return entries.filter(([name, version]) => resolutions[name] !== version);
 }

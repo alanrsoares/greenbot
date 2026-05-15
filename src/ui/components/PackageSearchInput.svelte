@@ -32,7 +32,11 @@
     }}
   />
   {#if !isSearchFocused || !value}
-    <Tooltip tip="Focus search (press /)" placement="left" class="absolute right-2 top-2">
+    <Tooltip
+      tip="Focus search (press /)"
+      placement="left"
+      class="absolute right-2 top-2"
+    >
       <Kbd
         size="sm"
         class="transition-opacity opacity-50 group-hover:opacity-100 border-0 shadow-none bg-transparent font-mono"

@@ -12,7 +12,7 @@ console.log(
 88   8 88   8 88   88   88  8 88     8 8   8   88  
 88eee8 88   8 88ee 88ee 88  8 88eeeee8 8eee8   88
 =========================================== v${version}
-`)
+`),
 );
 
 type Answer = "web" | "cli" | "exit";

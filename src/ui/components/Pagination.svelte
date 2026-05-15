@@ -46,7 +46,9 @@
           variant="ghost"
           size="lg"
           square
-          class="pagination-btn text-xl {index === pageIndex ? 'bg-castleton-green' : ''}"
+          class="pagination-btn text-xl {index === pageIndex
+            ? 'bg-castleton-green'
+            : ''}"
           on:click={handlePageClick}
         >
           {index + 1}

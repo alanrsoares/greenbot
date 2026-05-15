@@ -51,8 +51,16 @@
         </Button>
       </Tooltip>
       <div class="grid place-items-center flex-1 min-w-0">
-        <Tooltip tip="Workspace folder (syncs ?path= in URL)" placement="bottom" class="w-full">
-          <Select bind:value={selectedWorkspace} size="sm" class="w-full max-w-xs">
+        <Tooltip
+          tip="Workspace folder (syncs ?path= in URL)"
+          placement="bottom"
+          class="w-full"
+        >
+          <Select
+            bind:value={selectedWorkspace}
+            size="sm"
+            class="w-full max-w-xs"
+          >
             <option value="">root</option>
             {#each workspaces as workspace}
               <option value={workspace.path}>{workspace.name}</option>

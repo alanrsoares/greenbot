@@ -72,7 +72,7 @@ declare module "typewriter-effect/dist/core" {
          * onRemoveNode	Function	null	Callback function when a node is about to be removed. First param will be an object { node?: HTMLNode, charater?: string }
          */
         onRemoveNode?: (node: HTMLElement, char: string) => void;
-      }
+      },
     );
 
     /**

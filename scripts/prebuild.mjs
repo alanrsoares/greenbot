@@ -13,7 +13,7 @@ const updateVersionInReadme = (readmeContent, newVersion) =>
   readmeContent
     .replace(
       /(https:\/\/img\.shields\.io\/badge\/version-)([\d\.]+)(-blue)/g,
-      `$1${newVersion}$3`
+      `$1${newVersion}$3`,
     )
     .replace(/(Current Version: `)([\d\.]+)(`)/g, `$1${newVersion}$3`);
 
@@ -32,11 +32,11 @@ const updateVersionInReadme = (readmeContent, newVersion) =>
     await fs.writeFile(
       readmePath,
       updateVersionInReadme(readmeContent, latestVersion),
-      "utf8"
+      "utf8",
     );
 
     console.log(
-      `Successfully updated version to ${latestVersion} in README.md`
+      `Successfully updated version to ${latestVersion} in README.md`,
     );
   } catch (err) {
     console.error(`Error: ${err}`);
