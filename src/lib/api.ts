@@ -7,11 +7,11 @@ import type {
 } from "~/domain/types";
 
 const greenbotClient = ky.create({
-  prefixUrl: "http://localhost:5001/",
+  baseUrl: "http://localhost:5001/",
 });
 
 const bundlephobiaClient = ky.create({
-  prefixUrl: "https://bundlephobia.com/",
+  baseUrl: "https://bundlephobia.com/",
 });
 
 export type GetPackageInput = {
