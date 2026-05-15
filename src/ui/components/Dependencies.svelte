@@ -20,8 +20,12 @@
   } from "~/lib/hooks";
 
   import Dependency from "./Dependency.svelte";
+  import PackageSearchInput from "./PackageSearchInput.svelte";
   import Pagination from "./Pagination.svelte";
+  import Tooltip from "./Tooltip.svelte";
   import UpgradeButton from "./UpgradeButton.svelte";
+  import { PACKAGE_SEARCH_INPUT_ID } from "~/ui/constants";
+  import { Badge, Kbd } from "~/ui/primitives";
 
   /**
    * bound selectedTab
@@ -40,8 +44,6 @@
   let searchTerm = "";
   let isHelpVisible = false;
   let isSearchFocused = false;
-
-  let inputRef: HTMLInputElement | null = null;
 
   const upgradePackagesMutation = useUpgradePackagesMutation();
 
@@ -132,9 +134,9 @@
         }
         break;
       case "/":
-        if (!isSearchFocused && inputRef) {
+        if (!isSearchFocused) {
           event.preventDefault();
-          inputRef.focus();
+          document.getElementById(PACKAGE_SEARCH_INPUT_ID)?.focus();
         }
         break;
     }
@@ -215,19 +217,25 @@
     class:translate-x-[96%]={isHelpVisible}
     use:clickOutside={hideHelp}
   >
-    <button
-      class="help-trigger"
-      class:hidden={isHelpVisible}
-      on:click={() => {
-        isHelpVisible = !isHelpVisible;
-      }}
+    <Tooltip
+      tip={isHelpVisible ? "Close shortcuts panel" : "Keyboard shortcuts (H)"}
+      placement="left"
     >
-      {#if isHelpVisible}
-        <XIcon />
-      {:else}
-        <InfoIcon />
-      {/if}
-    </button>
+      <button
+        class="help-trigger"
+        class:hidden={isHelpVisible}
+        type="button"
+        on:click={() => {
+          isHelpVisible = !isHelpVisible;
+        }}
+      >
+        {#if isHelpVisible}
+          <XIcon />
+        {:else}
+          <InfoIcon />
+        {/if}
+      </button>
+    </Tooltip>
     <ul
       class="help-list"
       aria-hidden={!isHelpVisible}
@@ -238,13 +246,16 @@
         <li class="flex items-center">
           <div class="flex gap-2">
             {#each keys as { symbol, rotation }}
-              <kbd class="keyboard-key">
+              <Kbd
+                size="sm"
+                class="flex p-1.5 bg-castleton-green/40 border-0 shadow-none min-w-0"
+              >
                 <ArrowUpIcon
                   class="size-3"
                   style={`transform: rotate(${rotation}deg);`}
                 />
                 <span class="sr-only">{symbol}</span>
-              </kbd>
+              </Kbd>
             {/each}
           </div>
 
@@ -254,47 +265,47 @@
     </ul>
   </aside>
   <section class="dependencies-section">
-    <div class="relative group">
-      <input
-        bind:this={inputRef}
-        type="search"
-        class="search-input"
-        placeholder="search package by name or version"
-        bind:value={searchTerm}
-        on:focus={() => {
-          isSearchFocused = true;
-        }}
-        on:blur={() => {
-          isSearchFocused = false;
-        }}
-      />
-      {#if !isSearchFocused || !searchTerm}
-        <kbd class="search-shortcut group-hover:opacity-100">
-          <span class="text-xs font-mono"> / </span>
-        </kbd>
-      {/if}
-    </div>
+    <PackageSearchInput
+      bind:value={searchTerm}
+      on:focused={(e) => {
+        isSearchFocused = e.detail;
+      }}
+    />
     <header class="dependencies-header">
       <div class="flex items-center justify-between w-full">
         <div>
           {selectedTab === "dependencies" ? "Dependencies" : "Dev Dependencies"}
-          <span class="package-count">
-            {upToDatePackages.length}/{entries.length}
-          </span>
+          <Tooltip
+            tip="Packages matching semver-safe latest / total in this tab"
+            placement="bottom"
+          >
+            <Badge variant="primary" size="sm" class="ml-1 align-middle tracking-wider">
+              {upToDatePackages.length}/{entries.length}
+            </Badge>
+          </Tooltip>
         </div>
         {#if isAllUpToDate}
-          <CheckCircleIcon class="size-4 ml-1" />
+          <Tooltip tip="Every package is at latest within its semver range" placement="left">
+            <span class="inline-flex ml-1">
+              <CheckCircleIcon class="size-4" />
+            </span>
+          </Tooltip>
         {/if}
       </div>
       <div>
         {#if !isAllUpToDate}
-          <UpgradeButton
-            on:click={() => handleUpgradePackages(outdatedPackages)}
-            disabled={$upgradePackagesMutation.isPending}
-            isLoading={$upgradePackagesMutation.isPending}
+          <Tooltip
+            tip="Upgrade all outdated packages on this page to their semver-safe latest"
+            placement="bottom"
           >
-            Upgrade all
-          </UpgradeButton>
+            <UpgradeButton
+              on:click={() => handleUpgradePackages(outdatedPackages)}
+              disabled={$upgradePackagesMutation.isPending}
+              isLoading={$upgradePackagesMutation.isPending}
+            >
+              Upgrade all
+            </UpgradeButton>
+          </Tooltip>
         {/if}
       </div>
     </header>
@@ -356,28 +367,12 @@
     @apply bg-slate-900/60 p-4 rounded-xl grid gap-2;
   }
 
-  .keyboard-key {
-    @apply text-sm font-semibold flex p-1.5 bg-castleton-green/40 rounded;
-  }
-
   .dependencies-section {
     @apply bg-slate-900/60 rounded-3xl overflow-hidden relative shadow-md p-4 grid gap-2;
   }
 
-  .search-input {
-    @apply w-full p-4 text-sm text-white bg-white/5 rounded-xl outline-none focus:ring-4 ring-castleton-green/60;
-  }
-
-  .search-shortcut {
-    @apply absolute right-2 top-2 transition-opacity opacity-50;
-  }
-
   .dependencies-header {
     @apply p-4 border-b border-granny-smith-apple/50 flex items-center justify-between mx-2;
-  }
-
-  .package-count {
-    @apply text-xs tracking-wider bg-castleton-green px-2 py-1 rounded-full;
   }
 
   .dependencies-main {

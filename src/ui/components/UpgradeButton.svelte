@@ -1,5 +1,10 @@
 <script lang="ts">
+  import { cn } from "~/lib/cn";
   import { ArrowUpIcon } from "~/lib/icons";
+  import {
+    upgradeButtonIconVariants,
+    upgradeButtonVariants,
+  } from "~/ui/variants/upgrade-button";
 
   export let isLoading = false;
   export let disabled = false;
@@ -7,12 +12,12 @@
 </script>
 
 <button
-  class="flex items-center rounded-full p-1 focus:ring -mr-1 whitespace-nowrap transition-all {outOfRange
-    ? 'bg-amber-500/90 text-amber-950 border-2 border-amber-400 ring-amber-400/60'
-    : 'bg-granny-smith-apple/95 text-castleton-green'}"
+  type="button"
+  class={cn(
+    upgradeButtonVariants({ outOfRange, isLoading, disabled }),
+    typeof $$props["class"] === "string" ? $$props["class"] : "",
+  )}
   on:click
-  class:opacity-90={isLoading}
-  class:opacity-70={disabled}
   {disabled}
 >
   <div class="px-2 font-medium relative">
@@ -25,11 +30,7 @@
       <slot />
     {/if}
   </div>
-  <div
-    class="size-6 rounded-full p-1 {outOfRange
-      ? 'bg-amber-600 text-amber-100'
-      : 'bg-gray-800 text-granny-smith-apple'}"
-  >
+  <div class={upgradeButtonIconVariants({ outOfRange })}>
     <ArrowUpIcon class="size-4" />
   </div>
 </button>

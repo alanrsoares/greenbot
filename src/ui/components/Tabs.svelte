@@ -6,21 +6,36 @@
 </script>
 
 <script lang="ts">
+  import Tooltip from "./Tooltip.svelte";
+
   export let selectedTab = "";
   export let tabs: TabItem[] = [];
+
+  function tabTip(value: string) {
+    if (value === "dependencies") {
+      return "Runtime & bundled packages — Shift + ← / → to switch tab";
+    }
+    if (value === "devDependencies") {
+      return "Dev & build-only packages — Shift + ← / → to switch tab";
+    }
+    return "Switch tab";
+  }
 </script>
 
 <div class="container">
   {#each tabs as tab}
-    <button
-      data-value={tab.value}
-      class:bg-castleton-green={selectedTab === tab.value}
-      on:click={() => {
-        selectedTab = tab.value;
-      }}
-    >
-      {tab.label}
-    </button>
+    <Tooltip tip={tabTip(tab.value)} placement="bottom" class="flex-1 min-w-0">
+      <button
+        type="button"
+        data-value={tab.value}
+        class:bg-castleton-green={selectedTab === tab.value}
+        on:click={() => {
+          selectedTab = tab.value;
+        }}
+      >
+        {tab.label}
+      </button>
+    </Tooltip>
   {/each}
 </div>
 

@@ -24,6 +24,7 @@
   } from "~/lib/hooks";
 
   import UpgradeButton from "./UpgradeButton.svelte";
+  import Tooltip from "./Tooltip.svelte";
 
   export let name = "";
   export let version = "";
@@ -107,18 +108,20 @@
   >
     <div class="flex justify-between p-4 py-2">
       <div>
-        <a
-          href={`https://npmjs.com/package/${name}`}
-          target="_blank"
-          class="hover:underline font-medium whitespace-nowrap flex items-center gap-2 text-lg"
-          class:pt-1={isExpanded}
-          rel="noopener noreferrer"
-        >
-          <div class:hidden={!isExpanded}>
-            <PackageIcon class="size-6" />
-          </div>
-          {ellipsis(MAX_LENGTH, name)}
-        </a>
+        <Tooltip tip={`View ${name} on npm`} placement="bottom" class="min-w-0">
+          <a
+            href={`https://npmjs.com/package/${name}`}
+            target="_blank"
+            class="hover:underline font-medium whitespace-nowrap flex items-center gap-2 text-lg"
+            class:pt-1={isExpanded}
+            rel="noopener noreferrer"
+          >
+            <div class:hidden={!isExpanded}>
+              <PackageIcon class="size-6" />
+            </div>
+            {ellipsis(MAX_LENGTH, name)}
+          </a>
+        </Tooltip>
       </div>
       <div class="grid place-items-end gap-2 items-center">
         {#if isLatest}
@@ -127,64 +130,88 @@
               <span>
                 {version}
               </span>
-              <CheckCircleIcon class="size-4" />
+              <Tooltip
+                tip="At latest within your semver range"
+                placement="bottom"
+              >
+                <span class="inline-flex">
+                  <CheckCircleIcon class="size-4" />
+                </span>
+              </Tooltip>
             </div>
             {#if latestOutOfRange && latestOutOfRange !== latest}
-              <UpgradeButton
-                outOfRange={true}
-                disabled={$upgradePackagesMutation.isPending}
-                isLoading={$upgradePackagesMutation.isPending}
-                on:click={(e) => {
-                  e.stopPropagation();
-                  handleUpgradePackages([
-                    {
-                      name,
-                      version,
-                      latest: latestOutOfRange,
-                      latestOutOfRange,
-                      meta,
-                    },
-                  ]);
-                }}
+              <Tooltip
+                tip="Install latest on npm (may be outside the range in package.json)"
+                placement="bottom"
+                color="warning"
               >
-                {version} &rArr; {latestOutOfRange} (out of range)
-              </UpgradeButton>
+                <UpgradeButton
+                  outOfRange={true}
+                  disabled={$upgradePackagesMutation.isPending}
+                  isLoading={$upgradePackagesMutation.isPending}
+                  on:click={(e) => {
+                    e.stopPropagation();
+                    handleUpgradePackages([
+                      {
+                        name,
+                        version,
+                        latest: latestOutOfRange,
+                        latestOutOfRange,
+                        meta,
+                      },
+                    ]);
+                  }}
+                >
+                  {version} &rArr; {latestOutOfRange}
+                </UpgradeButton>
+              </Tooltip>
             {/if}
           </div>
         {:else}
           <div class="flex flex-col gap-2 items-end py-1">
-            <UpgradeButton
-              disabled={$upgradePackagesMutation.isPending}
-              isLoading={$upgradePackagesMutation.isPending}
-              on:click={(e) => {
-                e.stopPropagation();
-                handleUpgradePackages([
-                  { name, version, latest, latestOutOfRange, meta },
-                ]);
-              }}
+            <Tooltip
+              tip="Upgrade to latest allowed by the semver range in package.json"
+              placement="bottom"
             >
-              {version} &rArr; {latest}
-            </UpgradeButton>
-            {#if latestOutOfRange && latestOutOfRange !== latest}
               <UpgradeButton
-                outOfRange={true}
                 disabled={$upgradePackagesMutation.isPending}
                 isLoading={$upgradePackagesMutation.isPending}
                 on:click={(e) => {
                   e.stopPropagation();
                   handleUpgradePackages([
-                    {
-                      name,
-                      version,
-                      latest: latestOutOfRange,
-                      latestOutOfRange,
-                      meta,
-                    },
+                    { name, version, latest, latestOutOfRange, meta },
                   ]);
                 }}
               >
-                {version} &rArr; {latestOutOfRange} (out of range)
+                {version} &rArr; {latest}
               </UpgradeButton>
+            </Tooltip>
+            {#if latestOutOfRange && latestOutOfRange !== latest}
+              <Tooltip
+                tip="Install latest on npm (may be outside the range in package.json)"
+                placement="bottom"
+                color="warning"
+              >
+                <UpgradeButton
+                  outOfRange={true}
+                  disabled={$upgradePackagesMutation.isPending}
+                  isLoading={$upgradePackagesMutation.isPending}
+                  on:click={(e) => {
+                    e.stopPropagation();
+                    handleUpgradePackages([
+                      {
+                        name,
+                        version,
+                        latest: latestOutOfRange,
+                        latestOutOfRange,
+                        meta,
+                      },
+                    ]);
+                  }}
+                >
+                  {version} &rArr; {latestOutOfRange}
+                </UpgradeButton>
+              </Tooltip>
             {/if}
           </div>
         {/if}
@@ -201,7 +228,11 @@
         <div class="grid gap-2">
           {#if meta.license}
             <div class="flex gap-1 items-center">
-              <ScaleIcon class="size-4 -translate-y-px" />
+              <Tooltip tip="SPDX license" placement="top">
+                <span class="inline-flex -translate-y-px">
+                  <ScaleIcon class="size-4" />
+                </span>
+              </Tooltip>
               <span>
                 {meta.license ?? ""}
               </span>
@@ -240,37 +271,43 @@
         </div>
         <div class="flex gap-2 items-center text-lg">
           {#if meta.repository?.url}
-            <a
-              href={meta.repository.url.replace(/^git\+/, "")}
-              target="_blank"
-              class="hover:underline"
-              rel="noopener noreferrer"
-              title="Github"
-            >
-              <GithubIcon class="size-4" />
-            </a>
+            <Tooltip tip="Repository" placement="top">
+              <a
+                href={meta.repository.url.replace(/^git\+/, "")}
+                target="_blank"
+                class="hover:underline inline-flex"
+                rel="noopener noreferrer"
+                aria-label="Open repository"
+              >
+                <GithubIcon class="size-4" />
+              </a>
+            </Tooltip>
           {/if}
           {#if meta.homepage}
-            <a
-              href={meta.homepage}
-              target="_blank"
-              class="hover:underline"
-              rel="noopener noreferrer"
-              title="Homepage"
-            >
-              <GlobeIcon class="size-4" />
-            </a>
+            <Tooltip tip="Homepage" placement="top">
+              <a
+                href={meta.homepage}
+                target="_blank"
+                class="hover:underline inline-flex"
+                rel="noopener noreferrer"
+                aria-label="Open homepage"
+              >
+                <GlobeIcon class="size-4" />
+              </a>
+            </Tooltip>
           {/if}
           {#if meta.bugs}
-            <a
-              href={typeof meta.bugs === "string" ? meta.bugs : meta.bugs.url}
-              target="_blank"
-              class="hover:underline"
-              rel="noopener noreferrer"
-              title="Bugs"
-            >
-              <BugIcon class="size-5" />
-            </a>
+            <Tooltip tip="Issue tracker" placement="top">
+              <a
+                href={typeof meta.bugs === "string" ? meta.bugs : meta.bugs.url}
+                target="_blank"
+                class="hover:underline inline-flex"
+                rel="noopener noreferrer"
+                aria-label="Open issue tracker"
+              >
+                <BugIcon class="size-5" />
+              </a>
+            </Tooltip>
           {/if}
         </div>
       </div>
