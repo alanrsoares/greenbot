@@ -12,7 +12,7 @@
   rel="noopener noreferrer"
 >
   <div class="rounded-full -translate-x-2 bg-black/25 p-2.5">
-    <PackageManagerIcon kind={manager} class="h-4 w-4" />
+    <PackageManagerIcon kind={manager} class="size-4" />
   </div>
   <div class="font-mono font-medium -translate-x-2">
     {name} @ {version}

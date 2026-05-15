@@ -53,7 +53,7 @@
           path: selectedWorkspace,
           tab: selectedTab,
         }),
-        updatePackageQueryCache(updated)
+        updatePackageQueryCache(updated),
       );
     } catch (error) {
       console.log("Failed to upgrade packages:", { originalError: error });
@@ -115,7 +115,7 @@
           rel="noopener noreferrer"
         >
           <div class:hidden={!isExpanded}>
-            <PackageIcon class="h-6 w-6" />
+            <PackageIcon class="size-6" />
           </div>
           {ellipsis(MAX_LENGTH, name)}
         </a>
@@ -127,7 +127,7 @@
               <span>
                 {version}
               </span>
-              <CheckCircleIcon class="h-4 w-4" />
+              <CheckCircleIcon class="size-4" />
             </div>
             {#if latestOutOfRange && latestOutOfRange !== latest}
               <UpgradeButton
@@ -158,7 +158,9 @@
               isLoading={$upgradePackagesMutation.isPending}
               on:click={(e) => {
                 e.stopPropagation();
-                handleUpgradePackages([{ name, version, latest, latestOutOfRange, meta }]);
+                handleUpgradePackages([
+                  { name, version, latest, latestOutOfRange, meta },
+                ]);
               }}
             >
               {version} &rArr; {latest}
@@ -199,7 +201,7 @@
         <div class="grid gap-2">
           {#if meta.license}
             <div class="flex gap-1 items-center">
-              <ScaleIcon class="h-4 w-4 -translate-y-px" />
+              <ScaleIcon class="size-4 -translate-y-px" />
               <span>
                 {meta.license ?? ""}
               </span>
@@ -245,7 +247,7 @@
               rel="noopener noreferrer"
               title="Github"
             >
-              <GithubIcon class="h-4 w-4" />
+              <GithubIcon class="size-4" />
             </a>
           {/if}
           {#if meta.homepage}
@@ -256,7 +258,7 @@
               rel="noopener noreferrer"
               title="Homepage"
             >
-              <GlobeIcon class="h-4 w-4" />
+              <GlobeIcon class="size-4" />
             </a>
           {/if}
           {#if meta.bugs}
@@ -267,7 +269,7 @@
               rel="noopener noreferrer"
               title="Bugs"
             >
-              <BugIcon class="h-5 w-5" />
+              <BugIcon class="size-5" />
             </a>
           {/if}
         </div>

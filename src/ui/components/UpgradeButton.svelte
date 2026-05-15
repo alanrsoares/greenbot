@@ -26,10 +26,10 @@
     {/if}
   </div>
   <div
-    class="h-6 w-6 rounded-full p-1 {outOfRange
+    class="size-6 rounded-full p-1 {outOfRange
       ? 'bg-amber-600 text-amber-100'
       : 'bg-gray-800 text-granny-smith-apple'}"
   >
-    <ArrowUpIcon class="h-4 w-4" />
+    <ArrowUpIcon class="size-4" />
   </div>
 </button>

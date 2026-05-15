@@ -41,7 +41,7 @@
     window.history.replaceState(
       {},
       "",
-      `${window.location.pathname}?${params.toString()}`
+      `${window.location.pathname}?${params.toString()}`,
     );
   }
 
@@ -58,16 +58,17 @@
     (
       resolutions: Record<string, string>,
       meta: Record<string, FullMetadata>,
-      latestOutOfRange?: Record<string, string>
+      latestOutOfRange?: Record<string, string>,
     ) =>
     ([name, version]: [string, string]): PackageInfo => {
       return {
         name,
         version,
         latest: name in resolutions ? resolutions[name] : version,
-        latestOutOfRange: latestOutOfRange && name in latestOutOfRange
-          ? latestOutOfRange[name]
-          : undefined,
+        latestOutOfRange:
+          latestOutOfRange && name in latestOutOfRange
+            ? latestOutOfRange[name]
+            : undefined,
         meta: name in meta ? meta[name] : undefined,
       };
     };
@@ -86,15 +87,15 @@
       ? []
       : getFilteredEntries(
           Object.entries($packageQuery.data[selectedTab] ?? {}),
-          $packageQuery.data.resolutions
+          $packageQuery.data.resolutions,
         );
 
   $: entries = tabEntries.map(
     toPackageInfo(
       $packageQuery.data?.resolutions ?? {},
       $packageQuery.data?.meta ?? {},
-      $packageQuery.data?.latestOutOfRange
-    )
+      $packageQuery.data?.latestOutOfRange,
+    ),
   );
 </script>
 
@@ -127,7 +128,7 @@
       <div
         class="border-2 border-slate-900 bg-slate-900/60 rounded-3xl flex justify-center items-center overflow-hidden p-8 gap-2"
       >
-        <div class="h-4 w-4">
+        <div class="size-4">
           <Spinner animated />
         </div>
         <span

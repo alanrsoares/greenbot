@@ -240,7 +240,7 @@
             {#each keys as { symbol, rotation }}
               <kbd class="keyboard-key">
                 <ArrowUpIcon
-                  class="h-3 w-3"
+                  class="size-3"
                   style={`transform: rotate(${rotation}deg);`}
                 />
                 <span class="sr-only">{symbol}</span>
@@ -283,7 +283,7 @@
           </span>
         </div>
         {#if isAllUpToDate}
-          <CheckCircleIcon class="h-4 w-4 ml-1" />
+          <CheckCircleIcon class="size-4 ml-1" />
         {/if}
       </div>
       <div>
@@ -303,7 +303,7 @@
         <div class="empty-state group">
           <div class="flex flex-col items-center justify-center gap-2">
             <AlertCircleIcon
-              class="h-10 w-10 text-base-content/80 group-hover:animate-pulse"
+              class="size-10 text-base-content/80 group-hover:animate-pulse"
             />
             <span class="text-sm text-base-content/80">No packages found</span>
           </div>
@@ -345,7 +345,7 @@
   @reference "../../app.css";
 
   .help-trigger {
-    @apply h-10 w-10 absolute -right-10 p-2 bg-black/40 rounded-r-full opacity-40 hover:opacity-100 transition-opacity outline-none;
+    @apply size-10 absolute -right-10 p-2 bg-black/40 rounded-r-full opacity-40 hover:opacity-100 transition-opacity outline-none;
   }
 
   .help-sidebar {
