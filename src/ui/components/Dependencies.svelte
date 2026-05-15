@@ -60,7 +60,7 @@
           path: selectedWorkspace,
           tab: selectedTab,
         }),
-        updatePackageQueryCache(updated)
+        updatePackageQueryCache(updated),
       );
 
       await queryClient.refetchQueries({
@@ -143,7 +143,7 @@
   $: filteredEntries = entries.filter(
     ({ name, version }) =>
       name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      version.toLowerCase().includes(searchTerm.toLowerCase())
+      version.toLowerCase().includes(searchTerm.toLowerCase()),
   );
   $: pages = Math.ceil(filteredEntries.length / PAGE_SIZE);
   $: displayEntries = filteredEntries
@@ -212,7 +212,7 @@
 <div class="relative">
   <aside
     class="help-sidebar"
-    class:translate-x-64={isHelpVisible}
+    class:translate-x-[96%]={isHelpVisible}
     use:clickOutside={hideHelp}
   >
     <button
@@ -230,8 +230,9 @@
     </button>
     <ul
       class="help-list"
-      class:opacity-100={isHelpVisible}
       aria-hidden={!isHelpVisible}
+      class:opacity-90={isHelpVisible}
+      class:opacity-10={!isHelpVisible}
     >
       {#each helpItems as { keys, label }}
         <li class="flex items-center">
@@ -352,7 +353,7 @@
   }
 
   .help-list {
-    @apply bg-slate-900/60 p-4 rounded-xl grid gap-2 opacity-10;
+    @apply bg-slate-900/60 p-4 rounded-xl grid gap-2;
   }
 
   .keyboard-key {
