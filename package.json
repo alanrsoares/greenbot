@@ -33,7 +33,7 @@
     "format": "prettier --write .",
     "postversion": "bun run build && git add . && git commit --amend --no-edit",
     "release": "bun publish && git push && git push --tags",
-    "prepare": "husky install",
+    "prepare": "husky || true",
     "prebuild": "node scripts/prebuild.mjs",
     "postinstall": "node scripts/postinstall.mjs"
   },
