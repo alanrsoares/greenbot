@@ -24,7 +24,9 @@ export async function getWorkspaces(packageJson, packageManager) {
     case "npm":
     case "bun":
       if (packageJson.workspaces) {
-        workspaces = packageJson.workspaces;
+        workspaces = Array.isArray(packageJson.workspaces)
+          ? packageJson.workspaces
+          : (packageJson.workspaces.packages ?? []);
       }
       break;
     case "pnpm":

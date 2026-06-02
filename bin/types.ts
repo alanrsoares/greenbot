@@ -33,7 +33,7 @@ export interface CenterContext {
 export interface PackageJsonContent {
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
-  workspaces?: string[];
+  workspaces?: string[] | { packages?: string[] };
 }
 
 export type RenderBoxLine = string | ((ctx: CenterContext) => string);
