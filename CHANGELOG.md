@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.36.1](https://github.com/alanrsoares/greenbot/compare/v0.36.0...v0.36.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* **ci:** prevent husky prepare from breaking publish ([82005ab](https://github.com/alanrsoares/greenbot/commit/82005ab13744ccc3776f2e22713b31fdc0867389))
+
 ## [0.36.0](https://github.com/alanrsoares/greenbot/compare/v0.35.1...v0.36.0) (2026-05-15)
 
 
