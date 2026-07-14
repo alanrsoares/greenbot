@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.37.0](https://github.com/alanrsoares/greenbot/compare/v0.36.0...v0.37.0) (2026-07-14)
+
+
+### Features
+
+* **cli:** transition CLI to interactive TUI by default ([c16a0a1](https://github.com/alanrsoares/greenbot/commit/c16a0a12ea48d1c1d4f0dc2b1ade4590f150d8bd))
+
+
+### Bug Fixes
+
+* **ci:** prevent husky prepare from breaking publish ([82005ab](https://github.com/alanrsoares/greenbot/commit/82005ab13744ccc3776f2e22713b31fdc0867389))
+
 ## [0.36.0](https://github.com/alanrsoares/greenbot/compare/v0.35.1...v0.36.0) (2026-05-15)
 
 
