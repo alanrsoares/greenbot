@@ -1,87 +1,55 @@
-# Greenbot
+# 🤖 greenbot
 
-[![npm downloads](https://img.shields.io/npm/dt/@greenbot/cli.svg)](https://npmjs.org/@greenbot/cli)
-![Version](https://img.shields.io/badge/version-0.36.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![NPM Version](https://img.shields.io/npm/v/@greenbot/cli?color=green)](https://www.npmjs.com/package/@greenbot/cli)
+[![NPM Downloads](https://img.shields.io/npm/dm/@greenbot/cli)](https://www.npmjs.com/package/@greenbot/cli)
+[![License](https://img.shields.io/npm/l/@greenbot/cli)](https://github.com/alanrsoares/greenbot/blob/master/LICENSE)
 
-> An interactive package updater for npm-based applications.
+> A modern, interactive package updater for npm-based projects.
 
-## Features
+`greenbot` scans your dependencies, checks for updates, and upgrades your `package.json` directly from a beautiful terminal interface (TUI) or an optional local web dashboard.
 
-- 🎨 Beautiful web UI for dependency updates
-- ⌨️ Fully keyboard accessible
-- 🏗️ Supports multiple package managers: npm, yarn, pnpm, bun
-- 📦 Monorepo savvy: Automatically identifies your package structure
+---
 
-## Quick Start
+## 🚀 Quick Start
 
-### Run Greenbot with your favorite package manager
-
-| Package Manager | Command                     |
-| --------------- | --------------------------- |
-| npm             | `npx @greenbot@latest`      |
-| pnpm            | `pnpx @greenbot/cli@latest` |
-| bun             | `bunx @greenbot/cli@latest` |
-
-📌 For `yarn`, you'll need to install it globally:
+Run it directly using your favorite package manager:
 
 ```bash
-yarn global add @greenbot/cli
-@greenbot/cli
+# Using npm
+npx @greenbot/cli@latest
+
+# Using pnpm
+pnpm dlx @greenbot/cli@latest
+
+# Using bun
+bunx @greenbot/cli@latest
 ```
 
-## Technical Details
+_For yarn, install it globally:_ `yarn global add @greenbot/cli && greenbot`
 
-### Version
+---
 
-Current Version: `0.36.0`
+## 🌿 Features
 
-### Binaries
+- **⚡ Interactive TUI**: Instantly inspect and select package upgrades directly in your terminal.
+- **🌐 Optional Web Dashboard**: Run `greenbot --web` to open a keyboard-accessible web UI.
+- **🏗️ Multi-Manager**: Built-in support for `npm`, `yarn`, `pnpm`, and `bun`.
+- **📦 Monorepos**: Automatically detects workspaces and lets you choose which package to scan.
 
-The CLI executable is located at `./bin/greenbot.cjs`
+---
 
-### Available Scripts
+## 🎨 Preview
 
-| Script        | Description                                      |
-| ------------- | ------------------------------------------------ |
-| `dev`         | Concurrently run Vite and the Node.js binary     |
-| `build`       | Build the project using Vite                     |
-| `serve`       | Preview the build                                |
-| `check`       | Run type checks with Svelte                      |
-| `postversion` | Amend the last commit and build after versioning |
-| `release`     | Publish the package and push to Git              |
-| `prepare`     | Install Husky hooks                              |
-| `postinstall` | Run post-install script                          |
+### Terminal User Interface (TUI)
 
-### Homepage & Source Code
+![TUI Preview](https://github.com/alanrsoares/greenbot/assets/273334/487c276b-2266-439e-96e5-fbd7e658c4bd)
 
-- 🏠 [Homepage](https://github.com/alanrsoares/greenbot)
-- 👾 [GitHub Repository](https://github.com/alanrsoares/greenbot)
+### Web Dashboard
 
-## Screenshots
+![Web UI Preview 1](https://github.com/alanrsoares/greenbot/assets/273334/66ddde3c-0844-4440-8295-9ba6ad8334f9)
 
-### CLI
+---
 
-![CLI Screenshot](https://github.com/alanrsoares/greenbot/assets/273334/487c276b-2266-439e-96e5-fbd7e658c4bd)
+## 📄 License
 
-### Web UI
-
-![Web UI Screenshot 1](https://github.com/alanrsoares/greenbot/assets/273334/66ddde3c-0844-4440-8295-9ba6ad8334f9)
-
-![Web UI Screenshot 2](https://github.com/alanrsoares/greenbot/assets/273334/5d78ce0b-7f68-40e5-ae2d-d66994571059)
-
-## License
-
-This project is licensed under the terms of the MIT license.
-
-## Acknowledgements
-
-Special thanks to the following open-source projects that make Greenbot tick:
-
-- [Svelte](https://svelte.dev/)
-- [Express](https://expressjs.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/)
-- [Husky](https://github.com/typicode/husky)
-- [DaisyUI](https://daisyui.com/)
-- [Rambda](https://ramdajs.com/)
+MIT © [Alan R. Soares](https://github.com/alanrsoares)
