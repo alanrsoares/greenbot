@@ -20,7 +20,8 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Configure NPM Token
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
       - name: Publish @greenbot/cli
         run: bun publish --access public
-        env:
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
