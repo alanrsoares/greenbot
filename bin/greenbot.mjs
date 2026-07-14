@@ -18,12 +18,16 @@ import {
 import { registerRoutes } from "./routes.mjs";
 import { readPackageJson } from "./utils.mjs";
 import { getWorkspaces } from "./workspaces.mjs";
+import { runTui } from "./tui.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const PACKAGE_JSON_PATH =
-  process.argv.length === 3 ? process.argv[2] : "package.json";
+// Parse arguments
+const args = process.argv.slice(2);
+const runWebMode = args.includes("--web") || args.includes("-w");
+const filteredArgs = args.filter((arg) => arg !== "--web" && arg !== "-w");
+const PACKAGE_JSON_PATH = filteredArgs[0] || "package.json";
 
 const STATIC_PATH = path.resolve(__dirname, "..", "dist");
 
@@ -52,15 +56,7 @@ registerRoutes(app, CONTEXT);
 
 const MAX_TRIES = 5;
 
-async function main(port = DEFAULT_PORT, tries = 0) {
-  const packageManager = await inferPackageManager();
-  const packageJson = await readPackageJson(PACKAGE_JSON_PATH);
-  const workspaces = await getWorkspaces(packageJson, packageManager);
-
-  CONTEXT.workspaces = workspaces;
-  CONTEXT.isMonorepo = Boolean(workspaces?.length);
-  CONTEXT.packageManager = packageManager;
-
+async function startWebServer(port = DEFAULT_PORT, tries = 0) {
   try {
     await app.listen({ port });
     const url = `http://localhost:${port}`;
@@ -87,8 +83,24 @@ async function main(port = DEFAULT_PORT, tries = 0) {
   } catch (err) {
     console.log(chalk.red("An error occurred:"), err);
     if (tries < MAX_TRIES) {
-      return main(port + 1, tries + 1);
+      return startWebServer(port + 1, tries + 1);
     }
+  }
+}
+
+async function main() {
+  const packageManager = await inferPackageManager();
+  const packageJson = await readPackageJson(PACKAGE_JSON_PATH);
+  const workspaces = await getWorkspaces(packageJson, packageManager);
+
+  CONTEXT.workspaces = workspaces;
+  CONTEXT.isMonorepo = Boolean(workspaces?.length);
+  CONTEXT.packageManager = packageManager;
+
+  if (runWebMode) {
+    await startWebServer();
+  } else {
+    await runTui(CONTEXT);
   }
 }
 
