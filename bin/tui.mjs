@@ -16,6 +16,7 @@ import {
 } from "./shared.mjs";
 import { readPackageJson, upgradeVersions } from "./utils.mjs";
 import { getWorkspaces } from "./workspaces.mjs";
+import { runSecurityAudit } from "./audit.mjs";
 
 /**
  * Runs the interactive TUI interface.
@@ -58,7 +59,12 @@ export async function runTui(context) {
 
     if (allEntries.length === 0) {
       s.stop("Package analysis complete.");
-      return { packages: [], outdatedSafe: [], outdatedMajor: [] };
+      return {
+        packages: [],
+        outdatedSafe: [],
+        outdatedMajor: [],
+        vulnerablePackages: [],
+      };
     }
 
     s.message(
@@ -86,12 +92,26 @@ export async function runTui(context) {
       );
     }
 
-    s.stop("Registry scan complete.");
+    s.message("Checking packages for security vulnerabilities...");
+    const auditPackageMap = {};
+    resolved.forEach((pkg) => {
+      auditPackageMap[pkg.name] = pkg.ver;
+    });
+
+    const auditResult = await runSecurityAudit(auditPackageMap);
+
+    // Attach vulnerabilities to package objects
+    resolved.forEach((pkg) => {
+      pkg.vulnerability = auditResult[pkg.name] || null;
+    });
+
+    s.stop("Registry scan & security audit complete.");
 
     // Classify packages
     const packages = resolved;
     const outdatedSafe = [];
     const outdatedMajor = [];
+    const vulnerablePackages = [];
 
     for (const pkg of packages) {
       const raw = rawVersion(pkg.ver).version;
@@ -105,9 +125,12 @@ export async function runTui(context) {
       if (!isMajorLatest) {
         outdatedMajor.push(pkg);
       }
+      if (pkg.vulnerability) {
+        vulnerablePackages.push(pkg);
+      }
     }
 
-    return { packages, outdatedSafe, outdatedMajor };
+    return { packages, outdatedSafe, outdatedMajor, vulnerablePackages };
   }
 
   let currentStep =
@@ -178,7 +201,6 @@ export async function runTui(context) {
           options: [{ value: "continue", label: "Return to Menu Selection" }],
         });
         if (isCancel(goBack)) {
-          // Go back to depType step
           continue;
         }
         continue;
@@ -193,14 +215,28 @@ export async function runTui(context) {
       while (true) {
         const totalOutdated =
           analysis.outdatedSafe.length + analysis.outdatedMajor.length;
+        const totalVulnerable = analysis.vulnerablePackages.length;
 
         let statusHeader = "";
-        if (totalOutdated === 0) {
-          statusHeader = chalk.green("✔ All packages are up to date!");
-        } else {
-          statusHeader = chalk.yellow(
-            `⚠ Found ${analysis.outdatedSafe.length} safe and ${analysis.outdatedMajor.length} major updates.`,
+        if (totalOutdated === 0 && totalVulnerable === 0) {
+          statusHeader = chalk.green(
+            "✔ All packages are up to date and secure!",
           );
+        } else {
+          const parts = [];
+          if (analysis.outdatedSafe.length > 0)
+            parts.push(`${analysis.outdatedSafe.length} safe`);
+          if (analysis.outdatedMajor.length > 0)
+            parts.push(`${analysis.outdatedMajor.length} major`);
+          const updateStr =
+            parts.length > 0
+              ? `Found ${parts.join(" and ")} updates`
+              : "All packages up to date";
+          const vulnStr =
+            totalVulnerable > 0
+              ? `⚠️  ${totalVulnerable} vulnerable`
+              : "secure";
+          statusHeader = chalk.yellow(`${updateStr} | ${vulnStr}.`);
         }
 
         const action = await select({
@@ -214,6 +250,10 @@ export async function runTui(context) {
             {
               value: "major",
               label: `⚠️ Run Major/Out-of-Range Upgrades [${analysis.outdatedMajor.length} available]`,
+            },
+            {
+              value: "audit",
+              label: `🛡️ Run Security Audit & Patch [${totalVulnerable} vulnerable]`,
             },
             { value: "recheck", label: "🔄 Re-scan npm registry" },
             { value: "exit", label: "🚪 Exit" },
@@ -259,6 +299,13 @@ export async function runTui(context) {
               statusStr = `${chalk.red("🔴 major update")} ${current} ➔ ${chalk.bold.yellow(safe)} (safe) | ${chalk.bold.red(major)} (major)`;
             }
 
+            if (pkg.vulnerability) {
+              const sev = pkg.vulnerability.severity.toUpperCase();
+              const color =
+                sev === "CRITICAL" || sev === "HIGH" ? chalk.red : chalk.yellow;
+              statusStr += ` | ${color(`🛡️  ${sev}: ${pkg.vulnerability.title}`)}`;
+            }
+
             console.log(
               `  ${chalk.cyan(nameCol)} ${chalk.dim(typeCol)} ${statusStr}`,
             );
@@ -270,7 +317,6 @@ export async function runTui(context) {
             options: [{ value: "back", label: "Return to Menu" }],
           });
           if (isCancel(goBack)) {
-            // Cancel returns to menu loop, no exit
             continue;
           }
           continue;
@@ -305,7 +351,7 @@ export async function runTui(context) {
               { value: "all", label: chalk.bold("All packages") },
               ...analysis.outdatedSafe.map((pkg) => ({
                 value: pkg.name,
-                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})`,
+                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
               })),
             ],
           });
@@ -374,7 +420,7 @@ export async function runTui(context) {
               { value: "all", label: chalk.bold("All packages") },
               ...analysis.outdatedMajor.map((pkg) => ({
                 value: pkg.name,
-                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})`,
+                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
               })),
             ],
           });
@@ -408,6 +454,96 @@ export async function runTui(context) {
           s.stop("Upgraded successfully to absolute latest version!");
 
           console.log(chalk.bold("\nPackages upgraded:"));
+          packagesToUpgrade.forEach((pkg) => {
+            console.log(
+              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.version} ➔ ${pkg.latest}`,
+            );
+          });
+          console.log("");
+
+          analysis = await performAnalysis(selectedWorkspacePath, depTypeVal);
+          continue;
+        }
+
+        if (action === "audit") {
+          const upgradable = analysis.vulnerablePackages.filter((pkg) => {
+            const raw = rawVersion(pkg.ver).version;
+            const hasSafeUpgrade = raw !== pkg.latest;
+            const hasMajorUpgrade =
+              pkg.latestOutOfRange && pkg.latestOutOfRange !== raw;
+            return hasSafeUpgrade || hasMajorUpgrade;
+          });
+
+          if (upgradable.length === 0) {
+            console.log(
+              chalk.green(
+                "\nNo vulnerable packages have upgrades available.\n",
+              ),
+            );
+            const goBack = await select({
+              message: "No action needed.",
+              options: [{ value: "back", label: "Return to Menu" }],
+            });
+            if (isCancel(goBack)) {
+              continue;
+            }
+            continue;
+          }
+
+          const maxNameLen = Math.max(
+            ...upgradable.map((p) => p.name.length),
+            10,
+          );
+          const choices = await multiselect({
+            message:
+              "Select vulnerable packages to patch (Space to toggle, Enter to confirm):",
+            options: [
+              { value: "all", label: chalk.bold("All vulnerable packages") },
+              ...upgradable.map((pkg) => {
+                const targetVersion = pkg.latestOutOfRange || pkg.latest;
+                const sev = pkg.vulnerability.severity.toUpperCase();
+                const color =
+                  sev === "CRITICAL" || sev === "HIGH"
+                    ? chalk.red
+                    : chalk.yellow;
+                return {
+                  value: pkg.name,
+                  label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${targetVersion} (${color(sev + ": " + pkg.vulnerability.title)})`,
+                };
+              }),
+            ],
+            initialValues: ["all", ...upgradable.map((pkg) => pkg.name)],
+          });
+
+          if (isCancel(choices)) {
+            continue;
+          }
+
+          if (choices.length === 0) {
+            console.log(chalk.yellow("\nNo packages selected.\n"));
+            continue;
+          }
+
+          const s = spinner();
+          s.start("Patching package.json...");
+
+          const selectedNames = choices.includes("all")
+            ? upgradable.map((pkg) => pkg.name)
+            : choices;
+
+          const packagesToUpgrade = upgradable
+            .filter((pkg) => selectedNames.includes(pkg.name))
+            .map((pkg) => ({
+              name: pkg.name,
+              version: pkg.ver,
+              latest: pkg.latestOutOfRange || pkg.latest,
+            }));
+
+          await upgradeVersions(packagesToUpgrade, selectedWorkspacePath);
+
+          s.stop("Vulnerabilities patched successfully!");
+
+          console.log(chalk.bold("\nPackages patched:"));
           packagesToUpgrade.forEach((pkg) => {
             console.log(
               `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.version} ➔ ${pkg.latest}`,
