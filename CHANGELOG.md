@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.39.0](https://github.com/alanrsoares/greenbot/compare/v0.38.0...v0.39.0) (2026-07-15)
+
+
+### Features
+
+* **cli:** add support for monorepo catalog packages ([46ba540](https://github.com/alanrsoares/greenbot/commit/46ba5400b9a44ef9064eccc5f2730e70d0289916))
+* **cli:** migrate CLI to TypeScript using tsup compiler ([cb8eeb6](https://github.com/alanrsoares/greenbot/commit/cb8eeb6e1c1a24971a36c580b178e956fb6c412c))
+
 ## [0.38.0](https://github.com/alanrsoares/greenbot/compare/v0.37.0...v0.38.0) (2026-07-15)
 
 
