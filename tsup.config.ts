@@ -4,6 +4,7 @@ import pkg from "./package.json";
 export default defineConfig({
   entry: {
     greenbot: "bin/greenbot.ts",
+    shared: "bin/shared.ts",
   },
   outDir: "dist/bin",
   format: ["esm"],

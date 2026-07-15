@@ -1,5 +1,13 @@
 import chalk from "chalk";
-import {
+
+let shared;
+try {
+  shared = await import("../dist/bin/shared.js");
+} catch (err) {
+  // If we are developing locally and dist/ hasn't been built yet, skip quietly
+  process.exit(0);
+}
+const {
   GREENBOT_TAG,
   inferPackageManager,
   REPOSITORY_URL,
@@ -7,7 +15,7 @@ import {
   version,
   name,
   fetchNPMPackageMeta,
-} from "../bin/shared.mjs";
+} = shared;
 
 async function main() {
   // check for latest version on npm
