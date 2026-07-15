@@ -1,30 +1,55 @@
-import { fetchNPMPackageMeta, rawVersion } from "./shared.mjs";
-import { readPackageJson } from "./utils.mjs";
-import { runSecurityAudit } from "./audit.mjs";
+import { fetchNPMPackageMeta, rawVersion } from "./shared";
+import { readPackageJson } from "./utils";
+import { runSecurityAudit } from "./audit";
+
+export interface PackageMetaResolved {
+  name: string;
+  ver: string;
+  resolvedVer: string;
+  type: string;
+  isCatalog: boolean;
+  latest: string;
+  meta?: any;
+  latestOutOfRange?: string;
+  vulnerability?: any;
+}
+
+export interface AnalysisResult {
+  packages: PackageMetaResolved[];
+  outdatedSafe: PackageMetaResolved[];
+  outdatedMajor: PackageMetaResolved[];
+  vulnerablePackages: PackageMetaResolved[];
+}
 
 /**
  * Performs package analysis and security audits.
- * @param {string} selectedWorkspacePath - Path to package.json, or "catalog"
- * @param {"both" | "dependencies" | "devDependencies"} depType
- * @param {(msg: string) => void} [onProgress] - Optional progress reporting callback
- * @param {string} [rootPackageJsonPath] - Path to root package.json
+ * @param selectedWorkspacePath - Path to package.json, or "catalog"
+ * @param depType
+ * @param onProgress - Optional progress reporting callback
+ * @param rootPackageJsonPath - Path to root package.json
  */
 export async function performAnalysis(
-  selectedWorkspacePath,
-  depType,
-  onProgress,
-  rootPackageJsonPath,
-) {
+  selectedWorkspacePath: string,
+  depType: "both" | "dependencies" | "devDependencies",
+  onProgress?: (msg: string) => void,
+  rootPackageJsonPath?: string,
+): Promise<AnalysisResult> {
   if (onProgress) onProgress("Reading package.json...");
 
   // Load root catalog if available
-  let catalog = {};
+  let catalog: Record<string, string> = {};
   if (rootPackageJsonPath) {
     const rootPkg = await readPackageJson(rootPackageJsonPath);
-    catalog = rootPkg.workspaces?.catalog || rootPkg.catalog || {};
+    catalog = (rootPkg.workspaces as any)?.catalog || rootPkg.catalog || {};
   }
 
-  let allEntries = [];
+  let allEntries: Array<{
+    name: string;
+    ver: string;
+    resolvedVer: string;
+    type: string;
+    isCatalog: boolean;
+  }> = [];
 
   if (selectedWorkspacePath === "catalog") {
     // Audit the catalog itself
@@ -87,7 +112,7 @@ export async function performAnalysis(
       `Found ${allEntries.length} packages. Scanning npm registry... (0/${allEntries.length})`,
     );
 
-  const resolved = [];
+  const resolved: PackageMetaResolved[] = [];
   const chunkSize = 10;
   const chunks = Math.ceil(allEntries.length / chunkSize);
 
@@ -111,7 +136,7 @@ export async function performAnalysis(
 
   if (onProgress)
     onProgress("Checking packages for security vulnerabilities...");
-  const auditPackageMap = {};
+  const auditPackageMap: Record<string, string> = {};
   resolved.forEach((pkg) => {
     auditPackageMap[pkg.name] = pkg.resolvedVer;
   });
@@ -125,9 +150,9 @@ export async function performAnalysis(
 
   // Classify packages
   const packages = resolved;
-  const outdatedSafe = [];
-  const outdatedMajor = [];
-  const vulnerablePackages = [];
+  const outdatedSafe: PackageMetaResolved[] = [];
+  const outdatedMajor: PackageMetaResolved[] = [];
+  const vulnerablePackages: PackageMetaResolved[] = [];
 
   for (const pkg of packages) {
     const raw = rawVersion(pkg.resolvedVer).version;

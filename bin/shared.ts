@@ -2,15 +2,15 @@ import fs from "fs/promises";
 import stripAnsi from "strip-ansi";
 import chalk from "chalk";
 import packageJson from "package-json";
-import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
+import type {
+  PackageLockFile,
+  RawVersion,
+  RenderBoxLine,
+  RenderBoxOptions,
+} from "./types";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const { version, name } = JSON.parse(
-  await fs.readFile(resolve(__dirname, "../package.json"), "utf8"),
-);
+export const version = process.env.GREENBOT_VERSION || "0.0.0";
+export const name = process.env.GREENBOT_NAME || "greenbot";
 
 const vTag = chalk.cyan(`v${version}`);
 
@@ -27,8 +27,7 @@ export const GREENBOT_TAG = `
 
 export const DEFAULT_PORT = 5001;
 
-/** @type {import('./types').PackageLockFile[]} */
-export const PACKAGE_LOCK_FILES = [
+export const PACKAGE_LOCK_FILES: PackageLockFile[] = [
   { file: "yarn.lock", name: "yarn" },
   { file: "package-lock.json", name: "npm" },
   { file: "pnpm-lock.yaml", name: "pnpm" },
@@ -41,19 +40,22 @@ export const pad = (n = 0, char = " ") => char.repeat(n);
 
 /**
  * inferPackageManager - infer package manager
- *
- * @returns {Promise<"yarn" | "npm" | "pnpm" | "bun">}
  */
-export async function inferPackageManager() {
+export async function inferPackageManager(): Promise<
+  "yarn" | "npm" | "pnpm" | "bun"
+> {
   const responses = await Promise.all(
     PACKAGE_LOCK_FILES.map(({ file, name }) =>
       fs
         .readFile(file, "utf8")
         .then(() => ({
           exists: true,
-          name,
+          name: name as "yarn" | "npm" | "pnpm" | "bun",
         }))
-        .catch(() => false),
+        .catch(() => ({
+          exists: false,
+          name: name as "yarn" | "npm" | "pnpm" | "bun",
+        })),
     ),
   );
 
@@ -62,19 +64,14 @@ export async function inferPackageManager() {
   return manager?.name ?? "npm";
 }
 
-/**
- *
- * @param {import('./types').RenderBoxLine[]} lines
- * @param {import('./types').RenderBoxOptions} options
- */
 export function renderBox(
-  lines = [],
-  { color = chalk.green, padding = 1 } = {},
+  lines: RenderBoxLine[] = [],
+  { color = chalk.green, padding = 1 }: RenderBoxOptions = {},
 ) {
-  const maxLineLength = lines.reduce(
-    (max, line) => Math.max(max, stripAnsi(line).length),
-    0,
-  );
+  const maxLineLength = lines.reduce((max: number, line) => {
+    const lineStr = typeof line === "function" ? "" : line;
+    return Math.max(max, stripAnsi(lineStr).length);
+  }, 0);
 
   const maxLength = maxLineLength + padding * 2;
 
@@ -95,70 +92,43 @@ export function renderBox(
 ${tl}${border}${tr}${py}
 ${lines
   .map((line) => {
-    const [short, long] = [maxLength, stripAnsi(line).length].sort();
-
-    const padX = pad(padding);
-    const rPad = long === short ? 0 : long - short - padding * 2;
-
-    const withBounds = (str = "") => `${v}${padX}${str}${padX}${v}`;
-
     if (typeof line === "function") {
-      function center(str = "") {
+      const center = (str = "") => {
         const len = stripAnsi(str).length;
         const raw = (maxLength - padding * 2 - len) / 2;
         const [padL, padR] = [Math.floor, Math.ceil].map((f) => pad(f(raw)));
 
         return `${padL}${str}${padR}`;
-      }
-      return withBounds(`${line({ center })}`);
+      };
+      return `${v}${pad(padding)}${line({ center })}${pad(padding)}${v}`;
     }
-    return withBounds(`${line}${pad(Math.max(rPad, 0))}`);
+
+    const lineStr = line;
+    const [short, long] = [maxLength, stripAnsi(lineStr).length].sort();
+    const rPad = long === short ? 0 : long - short - padding * 2;
+    return `${v}${pad(padding)}${lineStr}${pad(padding)}${pad(Math.max(rPad, 0))}${v}`;
   })
   .join("\n")}${py}
 ${bl}${border}${br}`);
 }
 
-/**
- * indexEntries - index entries by name
- *
- * @param {import('./types').PackageMeta[]} xs
- * @returns {Record<string,string>}
- */
-export const indexEntries = (xs) =>
+export const indexEntries = (xs: any[]) =>
   xs.reduce((acc, { name, latest }) => ({ ...acc, [name]: latest }), {});
 
-/**
- * indexLatestOutOfRangeEntries - index latestOutOfRange entries by name
- *
- * @param {import('./types').PackageMeta[]} xs
- * @returns {Record<string,string>}
- */
-export const indexLatestOutOfRangeEntries = (xs) =>
+export const indexLatestOutOfRangeEntries = (xs: any[]) =>
   xs.reduce(
     (acc, { name, latestOutOfRange }) =>
       latestOutOfRange ? { ...acc, [name]: latestOutOfRange } : acc,
     {},
   );
 
-/**
- * rawVersion - extract version and qualifier from version string
- *
- * @param {string} version
- * @returns {import('./types').RawVersion}
- */
-export const rawVersion = (version) => ({
+export const rawVersion = (version: string): RawVersion => ({
   version: version.replace(/[\^~]/, ""),
   qualifier: isNaN(Number(version[0])) ? version[0] : undefined,
 });
 
-const isNumber = (n) => !isNaN(Number(n));
+const isNumber = (n: any) => !isNaN(Number(n));
 
-/*
- * isValidSemVer - check if version is a valid semver
- *
- * @param {string} version - version string
- * @returns {boolean} - true if valid semver
- */
 export const isValidSemVer = (version = "") => {
   const raw = rawVersion(version);
   return (
@@ -167,14 +137,10 @@ export const isValidSemVer = (version = "") => {
   );
 };
 
-/**
- * fetchNPMPackageMeta - fetch package.json from npm
- *
- * @param {string} name
- * @param {string} version
- * @returns {Promise<import('./types').PackageMeta>}
- */
-export const fetchNPMPackageMeta = async (name, version = "latest") => {
+export const fetchNPMPackageMeta = async (
+  name: string,
+  version = "latest",
+): Promise<any> => {
   if (!isValidSemVer(version)) {
     return {
       name,
@@ -185,7 +151,6 @@ export const fetchNPMPackageMeta = async (name, version = "latest") => {
   try {
     const options = { version, fullMetadata: true };
 
-    // Fetch both the latest version within range and the absolute latest version
     const [latestInRange, absoluteLatest] = await Promise.all([
       packageJson(name, options).catch(() => null),
       packageJson(name, { version: "latest", fullMetadata: true }).catch(
@@ -193,12 +158,10 @@ export const fetchNPMPackageMeta = async (name, version = "latest") => {
       ),
     ]);
 
-    // If we couldn't fetch the latest in range, fall back to the version string
     const latest = latestInRange?.version ?? version;
     const latestOutOfRange = absoluteLatest?.version;
 
-    // Extract version from metadata (original pattern)
-    const { version: _, ...meta } = latestInRange ?? {};
+    const { version: _, ...meta } = (latestInRange ?? {}) as any;
 
     return {
       name,
@@ -212,7 +175,6 @@ export const fetchNPMPackageMeta = async (name, version = "latest") => {
       chalk.red(`[greenbot] Could not fetch latest version for ${name}`),
     );
 
-    // Try to at least get the absolute latest version even if range fetch fails
     try {
       const absoluteLatest = await packageJson(name, {
         version: "latest",
@@ -233,5 +195,3 @@ export const fetchNPMPackageMeta = async (name, version = "latest") => {
     }
   }
 };
-
-export { version, name };

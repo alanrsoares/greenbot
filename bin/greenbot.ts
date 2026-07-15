@@ -4,6 +4,8 @@ import fastify from "fastify";
 import path from "path";
 import chalk from "chalk";
 import open from "open";
+import cors from "@fastify/cors";
+import fastifyStatic from "@fastify/static";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -14,13 +16,14 @@ import {
   renderBox,
   name,
   rawVersion,
-} from "./shared.mjs";
+} from "./shared";
 
-import { registerRoutes } from "./routes.mjs";
-import { readPackageJson, upgradeVersions } from "./utils.mjs";
-import { getWorkspaces } from "./workspaces.mjs";
-import { runTui } from "./tui.mjs";
-import { performAnalysis as performAnalysisShared } from "./analysis.mjs";
+import { registerRoutes } from "./routes";
+import { readPackageJson, upgradeVersions } from "./utils";
+import { getWorkspaces } from "./workspaces";
+import { runTui } from "./tui";
+import { performAnalysis as performAnalysisShared } from "./analysis";
+import type { AppContext } from "./types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,10 +60,10 @@ const runNonInteractiveMode = isJson || isPatch || isAudit || isMajor;
 
 const STATIC_PATH = path.resolve(__dirname, "..", "dist");
 
-const CONTEXT = {
-  packageManager: null,
+const CONTEXT: AppContext = {
+  packageManager: "npm",
   isMonorepo: false,
-  workspaces: null,
+  workspaces: [],
   PACKAGE_JSON_PATH,
 };
 
@@ -69,11 +72,11 @@ const app = fastify({
 });
 
 // Register plugins
-app.register(await import("@fastify/cors"), {
+app.register(cors, {
   origin: "*",
 });
 
-app.register(await import("@fastify/static"), {
+app.register(fastifyStatic, {
   root: STATIC_PATH,
 });
 
@@ -82,7 +85,7 @@ registerRoutes(app, CONTEXT);
 
 const MAX_TRIES = 5;
 
-async function startWebServer(port = DEFAULT_PORT, tries = 0) {
+async function startWebServer(port = DEFAULT_PORT, tries = 0): Promise<void> {
   try {
     await app.listen({ port });
     const url = `http://localhost:${port}`;
@@ -114,17 +117,20 @@ async function startWebServer(port = DEFAULT_PORT, tries = 0) {
   }
 }
 
-async function runNonInteractive(packageJsonPath, args) {
+async function runNonInteractive(
+  packageJsonPath: string,
+  args: string[],
+): Promise<void> {
   try {
     const analysis = await performAnalysisShared(
       packageJsonPath,
       "both",
-      null,
+      undefined,
       PACKAGE_JSON_PATH,
     );
 
     if (isPatch) {
-      const packagesToUpgrade = [];
+      const packagesToUpgrade: any[] = [];
 
       // Safe upgrades (included by default)
       if (analysis.outdatedSafe.length > 0) {
@@ -281,7 +287,7 @@ async function runNonInteractive(packageJsonPath, args) {
   }
 }
 
-async function main() {
+async function main(): Promise<void> {
   const packageManager = await inferPackageManager();
   const packageJson = await readPackageJson(PACKAGE_JSON_PATH);
   const workspaces = await getWorkspaces(packageJson, packageManager);

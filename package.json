@@ -23,11 +23,11 @@
     "bin/",
     "scripts/"
   ],
-  "bin": "./bin/greenbot.mjs",
+  "bin": "./dist/bin/greenbot.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently 'vite' 'node bin/greenbot.mjs --web'",
-    "build": "vite build",
+    "dev": "concurrently 'vite' 'bun run bin/greenbot.ts --web'",
+    "build": "vite build && tsup",
     "serve": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write .",
@@ -58,6 +58,7 @@
     "svelte-preprocess": "^6.0.5",
     "tailwindcss": "^4.3.2",
     "tslib": "^2.8.1",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vite": "^6.4.3",
     "vite-tsconfig-paths": "^5.1.4",

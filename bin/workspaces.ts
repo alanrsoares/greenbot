@@ -1,23 +1,21 @@
 import fs from "fs/promises";
 import path from "path";
 import yaml from "js-yaml";
-
-/** @typedef {import("./types").PackageJsonContent} PackageJsonContent */
-/** @typedef {import("./types").WorkspaceInfo} WorkspaceInfo */
+import type { PackageJsonContent, WorkspaceInfo } from "./types";
 
 /**
  * getWorkspaces - Retrieves the workspaces and their packages based on the package manager
  *
- * @param {PackageJsonContent} packageJson - The package.json content
- * @param {"npm" | "pnpm" | "yarn" | "bun"} packageManager - The package manager
+ * @param packageJson - The package.json content
+ * @param packageManager - The package manager
  *
- * @returns {Promise<WorkspaceInfo[]>} - A promise that resolves to an array of workspace information
+ * @returns A promise that resolves to an array of workspace information
  */
-export async function getWorkspaces(packageJson, packageManager) {
-  /**
-   * @type {string[]}
-   */
-  let workspaces = [];
+export async function getWorkspaces(
+  packageJson: PackageJsonContent,
+  packageManager: "npm" | "pnpm" | "yarn" | "bun",
+): Promise<WorkspaceInfo[]> {
+  let workspaces: string[] = [];
 
   switch (packageManager) {
     case "yarn":
@@ -34,8 +32,8 @@ export async function getWorkspaces(packageJson, packageManager) {
         .readFile("pnpm-workspace.yaml", "utf8")
         .catch(() => null);
       if (rawYaml) {
-        const parsed = yaml.load(rawYaml);
-        workspaces = parsed.packages
+        const parsed = yaml.load(rawYaml) as { packages?: string[] };
+        workspaces = (parsed.packages ?? [])
           .filter((x) => !x.startsWith("!"))
           .map((x) => x.replace("/*", ""));
       }
@@ -61,24 +59,28 @@ export async function getWorkspaces(packageJson, packageManager) {
             "package.json",
           );
 
-          const pkg = await fs
+          const pkg = (await fs
             .readFile(packageJsonPath, "utf8")
             .catch(() => null)
-            .then(JSON.parse);
+            .then((raw) =>
+              raw ? JSON.parse(raw) : null,
+            )) as PackageJsonContent | null;
 
           if (!pkg) {
             return null;
           }
 
-          const { name, version } = pkg;
+          const { name, version } = pkg as any;
 
           return { name, version, dir: dir.name };
         }),
       );
 
-      const validPackages = packageNames.filter(Boolean);
+      const validPackages = packageNames.filter(
+        (p): p is { name: string; version: string; dir: string } => p !== null,
+      );
 
-      return [cleanWorkspace, validPackages];
+      return [cleanWorkspace, validPackages] as const;
     }),
   );
 

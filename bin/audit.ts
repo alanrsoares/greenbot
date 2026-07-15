@@ -1,16 +1,32 @@
+interface Advisory {
+  id: number;
+  title: string;
+  severity: "low" | "moderate" | "high" | "critical";
+  url: string;
+  vulnerable_versions: string;
+}
+
+interface AuditResult {
+  severity: string;
+  title: string;
+  url: string;
+  id: number;
+}
+
 /**
  * runSecurityAudit - Audit packages against the NPM Registry Security Advisories API
- * @param {Record<string, string>} packageMap - Object mapping package name to version string
- * @returns {Promise<Record<string, any>>} - Object mapping package name to vulnerability info
+ * @param packageMap - Object mapping package name to version string
+ * @returns Object mapping package name to vulnerability info
  */
-export async function runSecurityAudit(packageMap) {
+export async function runSecurityAudit(
+  packageMap: Record<string, string>,
+): Promise<Record<string, AuditResult>> {
   if (Object.keys(packageMap).length === 0) {
     return {};
   }
 
-  const payload = {};
+  const payload: Record<string, string[]> = {};
   for (const [name, version] of Object.entries(packageMap)) {
-    // Strip qualifiers to get raw version
     const cleanVersion = version.replace(/[\^~]/, "");
     payload[name] = [cleanVersion];
   }
@@ -31,12 +47,11 @@ export async function runSecurityAudit(packageMap) {
       throw new Error(`Registry responded with status ${response.status}`);
     }
 
-    const data = await response.json();
-    const result = {};
+    const data = (await response.json()) as Record<string, Advisory[]>;
+    const result: Record<string, AuditResult> = {};
 
     for (const [name, advisories] of Object.entries(data)) {
       if (advisories && advisories.length > 0) {
-        // Sort advisories to find the highest severity
         const severityScores = { low: 1, moderate: 2, high: 3, critical: 4 };
         const sorted = advisories.sort(
           (a, b) =>
@@ -55,7 +70,6 @@ export async function runSecurityAudit(packageMap) {
 
     return result;
   } catch (error) {
-    // Fallback gracefully on network error or offline mode
     return {};
   }
 }

@@ -9,28 +9,27 @@ import {
 } from "@clack/prompts";
 import chalk from "chalk";
 import path from "path";
-import {
-  inferPackageManager,
-  fetchNPMPackageMeta,
-  rawVersion,
-} from "./shared.mjs";
-import { readPackageJson, upgradeVersions } from "./utils.mjs";
-import { getWorkspaces } from "./workspaces.mjs";
-import { runSecurityAudit } from "./audit.mjs";
-import { performAnalysis as performAnalysisShared } from "./analysis.mjs";
+import { inferPackageManager, rawVersion } from "./shared";
+import { readPackageJson, upgradeVersions } from "./utils";
+import { getWorkspaces } from "./workspaces";
+import { performAnalysis as performAnalysisShared } from "./analysis";
+import type { AppContext } from "./types";
 
 /**
  * Runs the interactive TUI interface.
- * @param {import("./types").AppContext} context
+ * @param context AppContext
  */
-export async function runTui(context) {
+export async function runTui(context: AppContext): Promise<void> {
   intro(chalk.bold.green("greenbot 🤖 - Interactive Package Updater"));
 
   const packageManager = await inferPackageManager();
   const mainPackageJson = await readPackageJson(context.PACKAGE_JSON_PATH);
   const workspaces = await getWorkspaces(mainPackageJson, packageManager);
 
-  async function performAnalysis(selectedWorkspacePath, depType) {
+  async function performAnalysis(
+    selectedWorkspacePath: string,
+    depType: "both" | "dependencies" | "devDependencies",
+  ) {
     const s = spinner();
     s.start("Reading package.json...");
     try {
@@ -51,20 +50,20 @@ export async function runTui(context) {
   }
 
   const hasCatalog = Boolean(
-    mainPackageJson.workspaces?.catalog || mainPackageJson.catalog,
+    (mainPackageJson.workspaces as any)?.catalog || mainPackageJson.catalog,
   );
 
-  let currentStep =
+  let currentStep: "workspace" | "depType" | "menu" =
     (workspaces && workspaces.length > 0) || hasCatalog
       ? "workspace"
       : "depType";
   let selectedWorkspacePath = context.PACKAGE_JSON_PATH;
-  let depTypeVal = "both";
-  let analysis = null;
+  let depTypeVal: "both" | "dependencies" | "devDependencies" = "both";
+  let analysis: any = null;
 
   while (true) {
     if (currentStep === "workspace") {
-      const workspaceOptions = [
+      const workspaceOptions: Array<{ value: string; label: string }> = [
         { value: "root", label: `Root (${context.PACKAGE_JSON_PATH})` },
       ];
 
@@ -101,7 +100,10 @@ export async function runTui(context) {
       }
 
       if (selectedWorkspace !== "root") {
-        selectedWorkspacePath = path.join(selectedWorkspace, "package.json");
+        selectedWorkspacePath = path.join(
+          selectedWorkspace as string,
+          "package.json",
+        );
       } else {
         selectedWorkspacePath = context.PACKAGE_JSON_PATH;
       }
@@ -130,7 +132,7 @@ export async function runTui(context) {
         }
       }
 
-      depTypeVal = depType;
+      depTypeVal = depType as "both" | "dependencies" | "devDependencies";
       analysis = await performAnalysis(selectedWorkspacePath, depTypeVal);
 
       if (analysis.packages.length === 0) {
@@ -214,10 +216,10 @@ export async function runTui(context) {
         if (action === "status") {
           console.log("\n" + chalk.bold.underline("Package Status Summary:"));
           const maxNameLen = Math.max(
-            ...analysis.packages.map((p) => p.name.length),
+            ...analysis.packages.map((p: any) => p.name.length),
             10,
           );
-          analysis.packages.forEach((pkg) => {
+          analysis.packages.forEach((pkg: any) => {
             const nameCol = pkg.name.padEnd(maxNameLen + 2);
             const typeCol =
               `(${pkg.type === "dependencies" ? "dep" : "dev"})`.padEnd(8);
@@ -284,7 +286,7 @@ export async function runTui(context) {
           }
 
           const maxNameLen = Math.max(
-            ...analysis.outdatedSafe.map((p) => p.name.length),
+            ...analysis.outdatedSafe.map((p: any) => p.name.length),
             10,
           );
           const choices = await multiselect({
@@ -292,7 +294,7 @@ export async function runTui(context) {
               "Select safe packages to upgrade (Space to select, Enter to confirm):",
             options: [
               { value: "all", label: chalk.bold("All packages") },
-              ...analysis.outdatedSafe.map((pkg) => ({
+              ...analysis.outdatedSafe.map((pkg: any) => ({
                 value: pkg.name,
                 label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
               })),
@@ -303,7 +305,8 @@ export async function runTui(context) {
             continue;
           }
 
-          if (choices.length === 0) {
+          const selectedChoices = choices as string[];
+          if (selectedChoices.length === 0) {
             console.log(chalk.yellow("\nNo packages selected.\n"));
             continue;
           }
@@ -311,13 +314,13 @@ export async function runTui(context) {
           const s = spinner();
           s.start("Upgrading package.json...");
 
-          const selectedNames = choices.includes("all")
-            ? analysis.outdatedSafe.map((pkg) => pkg.name)
-            : choices;
+          const selectedNames = selectedChoices.includes("all")
+            ? analysis.outdatedSafe.map((pkg: any) => pkg.name)
+            : selectedChoices;
 
           const packagesToUpgrade = analysis.outdatedSafe
-            .filter((pkg) => selectedNames.includes(pkg.name))
-            .map((pkg) => ({
+            .filter((pkg: any) => selectedNames.includes(pkg.name))
+            .map((pkg: any) => ({
               name: pkg.name,
               version: pkg.ver,
               resolvedVer: pkg.resolvedVer,
@@ -359,7 +362,7 @@ export async function runTui(context) {
           }
 
           const maxNameLen = Math.max(
-            ...analysis.outdatedMajor.map((p) => p.name.length),
+            ...analysis.outdatedMajor.map((p: any) => p.name.length),
             10,
           );
           const choices = await multiselect({
@@ -367,7 +370,7 @@ export async function runTui(context) {
               "Select major packages to upgrade (caution: breaking changes possible):",
             options: [
               { value: "all", label: chalk.bold("All packages") },
-              ...analysis.outdatedMajor.map((pkg) => ({
+              ...analysis.outdatedMajor.map((pkg: any) => ({
                 value: pkg.name,
                 label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
               })),
@@ -378,7 +381,8 @@ export async function runTui(context) {
             continue;
           }
 
-          if (choices.length === 0) {
+          const selectedChoices = choices as string[];
+          if (selectedChoices.length === 0) {
             console.log(chalk.yellow("\nNo packages selected.\n"));
             continue;
           }
@@ -386,13 +390,13 @@ export async function runTui(context) {
           const s = spinner();
           s.start("Upgrading package.json...");
 
-          const selectedNames = choices.includes("all")
-            ? analysis.outdatedMajor.map((pkg) => pkg.name)
-            : choices;
+          const selectedNames = selectedChoices.includes("all")
+            ? analysis.outdatedMajor.map((pkg: any) => pkg.name)
+            : selectedChoices;
 
           const packagesToUpgrade = analysis.outdatedMajor
-            .filter((pkg) => selectedNames.includes(pkg.name))
-            .map((pkg) => ({
+            .filter((pkg: any) => selectedNames.includes(pkg.name))
+            .map((pkg: any) => ({
               name: pkg.name,
               version: pkg.ver,
               resolvedVer: pkg.resolvedVer,
@@ -421,7 +425,7 @@ export async function runTui(context) {
         }
 
         if (action === "audit") {
-          const upgradable = analysis.vulnerablePackages.filter((pkg) => {
+          const upgradable = analysis.vulnerablePackages.filter((pkg: any) => {
             const raw = rawVersion(pkg.resolvedVer).version;
             const hasSafeUpgrade = raw !== pkg.latest;
             const hasMajorUpgrade =
@@ -474,7 +478,8 @@ export async function runTui(context) {
             continue;
           }
 
-          if (choices.length === 0) {
+          const selectedChoices = choices as string[];
+          if (selectedChoices.length === 0) {
             console.log(chalk.yellow("\nNo packages selected.\n"));
             continue;
           }
@@ -482,9 +487,9 @@ export async function runTui(context) {
           const s = spinner();
           s.start("Patching package.json...");
 
-          const selectedNames = choices.includes("all")
+          const selectedNames = selectedChoices.includes("all")
             ? upgradable.map((pkg) => pkg.name)
-            : choices;
+            : selectedChoices;
 
           const packagesToUpgrade = upgradable
             .filter((pkg) => selectedNames.includes(pkg.name))
