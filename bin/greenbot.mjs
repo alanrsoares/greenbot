@@ -13,12 +13,14 @@ import {
   inferPackageManager,
   renderBox,
   name,
+  rawVersion,
 } from "./shared.mjs";
 
 import { registerRoutes } from "./routes.mjs";
-import { readPackageJson } from "./utils.mjs";
+import { readPackageJson, upgradeVersions } from "./utils.mjs";
 import { getWorkspaces } from "./workspaces.mjs";
 import { runTui } from "./tui.mjs";
+import { performAnalysis as performAnalysisShared } from "./analysis.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,8 +28,29 @@ const __dirname = dirname(__filename);
 // Parse arguments
 const args = process.argv.slice(2);
 const runWebMode = args.includes("--web") || args.includes("-w");
-const filteredArgs = args.filter((arg) => arg !== "--web" && arg !== "-w");
+const flags = [
+  "--web",
+  "-w",
+  "--json",
+  "-j",
+  "--patch",
+  "-p",
+  "--audit",
+  "-a",
+  "--security",
+  "--major",
+];
+const filteredArgs = args.filter((arg) => !flags.includes(arg));
 const PACKAGE_JSON_PATH = filteredArgs[0] || "package.json";
+
+const isJson = args.includes("--json") || args.includes("-j");
+const isPatch = args.includes("--patch") || args.includes("-p");
+const isAudit =
+  args.includes("--audit") ||
+  args.includes("-a") ||
+  args.includes("--security");
+const isMajor = args.includes("--major");
+const runNonInteractiveMode = isJson || isPatch || isAudit || isMajor;
 
 const STATIC_PATH = path.resolve(__dirname, "..", "dist");
 
@@ -88,6 +111,153 @@ async function startWebServer(port = DEFAULT_PORT, tries = 0) {
   }
 }
 
+async function runNonInteractive(packageJsonPath, args) {
+  try {
+    const analysis = await performAnalysisShared(packageJsonPath, "both");
+
+    if (isPatch) {
+      const packagesToUpgrade = [];
+
+      // Safe upgrades (included by default)
+      if (analysis.outdatedSafe.length > 0) {
+        packagesToUpgrade.push(
+          ...analysis.outdatedSafe.map((pkg) => ({
+            name: pkg.name,
+            version: pkg.ver,
+            latest: pkg.latest,
+          })),
+        );
+      }
+
+      // Security patches (if requested)
+      if (isAudit && analysis.vulnerablePackages.length > 0) {
+        const upgradableVulnerable = analysis.vulnerablePackages.filter(
+          (pkg) => {
+            const raw = rawVersion(pkg.ver).version;
+            const hasSafeUpgrade = raw !== pkg.latest;
+            const hasMajorUpgrade =
+              pkg.latestOutOfRange && pkg.latestOutOfRange !== raw;
+            return hasSafeUpgrade || hasMajorUpgrade;
+          },
+        );
+
+        upgradableVulnerable.forEach((pkg) => {
+          if (!packagesToUpgrade.some((p) => p.name === pkg.name)) {
+            packagesToUpgrade.push({
+              name: pkg.name,
+              version: pkg.ver,
+              latest: pkg.latestOutOfRange || pkg.latest,
+            });
+          }
+        });
+      }
+
+      // Major upgrades (if requested)
+      if (isMajor && analysis.outdatedMajor.length > 0) {
+        analysis.outdatedMajor.forEach((pkg) => {
+          const existingIdx = packagesToUpgrade.findIndex(
+            (p) => p.name === pkg.name,
+          );
+          if (existingIdx !== -1) {
+            packagesToUpgrade[existingIdx].latest = pkg.latestOutOfRange;
+          } else {
+            packagesToUpgrade.push({
+              name: pkg.name,
+              version: pkg.ver,
+              latest: pkg.latestOutOfRange,
+            });
+          }
+        });
+      }
+
+      if (packagesToUpgrade.length > 0) {
+        await upgradeVersions(packagesToUpgrade, packageJsonPath);
+        if (!isJson) {
+          console.log(
+            chalk.green(
+              `✔ Successfully upgraded ${packagesToUpgrade.length} packages.`,
+            ),
+          );
+          packagesToUpgrade.forEach((pkg) => {
+            console.log(`  ${pkg.name}: ${pkg.version} ➔ ${pkg.latest}`);
+          });
+        }
+      } else {
+        if (!isJson) {
+          console.log(
+            chalk.green("✔ No upgrades to apply. Everything is up to date!"),
+          );
+        }
+      }
+    }
+
+    if (isJson) {
+      const jsonOutput = {
+        packages: analysis.packages.map((pkg) => ({
+          name: pkg.name,
+          version: pkg.ver,
+          type: pkg.type,
+          latest: pkg.latest,
+          latestOutOfRange: pkg.latestOutOfRange,
+          vulnerability: pkg.vulnerability,
+        })),
+        summary: {
+          totalPackages: analysis.packages.length,
+          safeUpdates: analysis.outdatedSafe.length,
+          majorUpdates: analysis.outdatedMajor.length,
+          vulnerabilities: analysis.vulnerablePackages.length,
+        },
+      };
+      console.log(JSON.stringify(jsonOutput, null, 2));
+    } else if (!isPatch) {
+      console.log(chalk.bold.underline("\ngreenbot Analysis Results:\n"));
+
+      const maxNameLen = Math.max(
+        ...analysis.packages.map((p) => p.name.length),
+        10,
+      );
+      analysis.packages.forEach((pkg) => {
+        const raw = rawVersion(pkg.ver).version;
+        const isSafeLatest = raw === pkg.latest;
+        const isMajorLatest =
+          !pkg.latestOutOfRange || pkg.latestOutOfRange === pkg.latest;
+
+        let statusStr = "";
+        if (isSafeLatest && isMajorLatest) {
+          statusStr = chalk.green("🟢 up to date");
+        } else if (!isSafeLatest && isMajorLatest) {
+          statusStr = chalk.yellow(
+            `🟡 safe update available (${pkg.ver} ➔ ${pkg.latest})`,
+          );
+        } else if (isSafeLatest && !isMajorLatest) {
+          statusStr = chalk.red(
+            `🔴 major update available (${pkg.ver} ➔ ${pkg.latestOutOfRange})`,
+          );
+        } else {
+          statusStr = chalk.red(
+            `🔴 major update available (${pkg.ver} ➔ ${pkg.latestOutOfRange})`,
+          );
+        }
+
+        if (pkg.vulnerability) {
+          const sev = pkg.vulnerability.severity.toUpperCase();
+          const color =
+            sev === "CRITICAL" || sev === "HIGH" ? chalk.red : chalk.yellow;
+          statusStr += ` | ${color(`🛡️  ${sev}: ${pkg.vulnerability.title}`)}`;
+        }
+
+        console.log(
+          `  ${chalk.cyan(pkg.name.padEnd(maxNameLen + 2))} ${statusStr}`,
+        );
+      });
+      console.log("");
+    }
+  } catch (error) {
+    console.error(chalk.red("Error during non-interactive execution:"), error);
+    process.exit(1);
+  }
+}
+
 async function main() {
   const packageManager = await inferPackageManager();
   const packageJson = await readPackageJson(PACKAGE_JSON_PATH);
@@ -97,7 +267,9 @@ async function main() {
   CONTEXT.isMonorepo = Boolean(workspaces?.length);
   CONTEXT.packageManager = packageManager;
 
-  if (runWebMode) {
+  if (runNonInteractiveMode) {
+    await runNonInteractive(PACKAGE_JSON_PATH, args);
+  } else if (runWebMode) {
     await startWebServer();
   } else {
     await runTui(CONTEXT);

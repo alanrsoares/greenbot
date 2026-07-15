@@ -17,6 +17,7 @@ import {
 import { readPackageJson, upgradeVersions } from "./utils.mjs";
 import { getWorkspaces } from "./workspaces.mjs";
 import { runSecurityAudit } from "./audit.mjs";
+import { performAnalysis as performAnalysisShared } from "./analysis.mjs";
 
 /**
  * Runs the interactive TUI interface.
@@ -32,105 +33,20 @@ export async function runTui(context) {
   async function performAnalysis(selectedWorkspacePath, depType) {
     const s = spinner();
     s.start("Reading package.json...");
-
-    const pkgJson = await readPackageJson(selectedWorkspacePath);
-    const dependencyEntries = Object.entries(pkgJson.dependencies ?? {});
-    const devDependencyEntries = Object.entries(pkgJson.devDependencies ?? {});
-
-    let allEntries = [];
-    if (depType === "dependencies" || depType === "both") {
-      allEntries.push(
-        ...dependencyEntries.map(([name, ver]) => ({
-          name,
-          ver,
-          type: "dependencies",
-        })),
+    try {
+      const res = await performAnalysisShared(
+        selectedWorkspacePath,
+        depType,
+        (msg) => {
+          s.message(msg);
+        },
       );
+      s.stop("Registry scan & security audit complete.");
+      return res;
+    } catch (err) {
+      s.stop("Scan failed.");
+      throw err;
     }
-    if (depType === "devDependencies" || depType === "both") {
-      allEntries.push(
-        ...devDependencyEntries.map(([name, ver]) => ({
-          name,
-          ver,
-          type: "devDependencies",
-        })),
-      );
-    }
-
-    if (allEntries.length === 0) {
-      s.stop("Package analysis complete.");
-      return {
-        packages: [],
-        outdatedSafe: [],
-        outdatedMajor: [],
-        vulnerablePackages: [],
-      };
-    }
-
-    s.message(
-      `Found ${allEntries.length} packages. Scanning npm registry... (0/${allEntries.length})`,
-    );
-
-    const resolved = [];
-    const chunkSize = 10;
-    const chunks = Math.ceil(allEntries.length / chunkSize);
-
-    for (let i = 0; i < chunks; i++) {
-      const chunk = allEntries.slice(i * chunkSize, (i + 1) * chunkSize);
-      const chunkResult = await Promise.all(
-        chunk.map(async (pkg) => {
-          const meta = await fetchNPMPackageMeta(pkg.name, pkg.ver);
-          return {
-            ...pkg,
-            ...meta,
-          };
-        }),
-      );
-      resolved.push(...chunkResult);
-      s.message(
-        `Scanning npm registry... (${resolved.length}/${allEntries.length})`,
-      );
-    }
-
-    s.message("Checking packages for security vulnerabilities...");
-    const auditPackageMap = {};
-    resolved.forEach((pkg) => {
-      auditPackageMap[pkg.name] = pkg.ver;
-    });
-
-    const auditResult = await runSecurityAudit(auditPackageMap);
-
-    // Attach vulnerabilities to package objects
-    resolved.forEach((pkg) => {
-      pkg.vulnerability = auditResult[pkg.name] || null;
-    });
-
-    s.stop("Registry scan & security audit complete.");
-
-    // Classify packages
-    const packages = resolved;
-    const outdatedSafe = [];
-    const outdatedMajor = [];
-    const vulnerablePackages = [];
-
-    for (const pkg of packages) {
-      const raw = rawVersion(pkg.ver).version;
-      const isSafeLatest = raw === pkg.latest;
-      const isMajorLatest =
-        !pkg.latestOutOfRange || pkg.latestOutOfRange === pkg.latest;
-
-      if (!isSafeLatest) {
-        outdatedSafe.push(pkg);
-      }
-      if (!isMajorLatest) {
-        outdatedMajor.push(pkg);
-      }
-      if (pkg.vulnerability) {
-        vulnerablePackages.push(pkg);
-      }
-    }
-
-    return { packages, outdatedSafe, outdatedMajor, vulnerablePackages };
   }
 
   let currentStep =
