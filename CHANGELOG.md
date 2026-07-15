@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.38.0](https://github.com/alanrsoares/greenbot/compare/v0.37.0...v0.38.0) (2026-07-15)
+
+
+### Features
+
+* **cli:** add agent-friendly non-interactive mode ([abddef9](https://github.com/alanrsoares/greenbot/commit/abddef98e18506e7331a076b2749e9dac3113714))
+* **cli:** add npm audit vulnerability visualizer and patching ([2cec1bf](https://github.com/alanrsoares/greenbot/commit/2cec1bfb7fa68141c8bace8c7254458caff00e83))
+
 ## [0.37.0](https://github.com/alanrsoares/greenbot/compare/v0.36.0...v0.37.0) (2026-07-14)
 
 
