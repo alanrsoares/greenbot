@@ -21,9 +21,67 @@ export async function readPackageJson(path) {
 }
 
 /**
+ * upgradeVersions - upgrade versions in package.json (handling catalog redirects)
+ *
+ * @param {PackageVersionInfo[]} packages - Array of package version info
+ * @param {string} workspacePath - Path to package.json
+ * @param {string} [rootPackageJsonPath] - Path to root package.json
+ */
+export async function upgradeVersions(
+  packages = [],
+  workspacePath,
+  rootPackageJsonPath,
+) {
+  const catalogPackages = packages.filter((pkg) => pkg.isCatalog);
+  const localPackages = packages.filter((pkg) => !pkg.isCatalog);
+
+  if (catalogPackages.length > 0 && rootPackageJsonPath) {
+    const values = catalogPackages.map((pkg) => {
+      // Use resolvedVer (the actual catalog range version, e.g. 0.2.3)
+      const ver = pkg.resolvedVer || pkg.version || "";
+      return {
+        name: pkg.name,
+        version: ver,
+        latest: pkg.latest,
+        qualifier: rawVersion(ver).qualifier || "",
+      };
+    });
+
+    const from = values.map(({ name, version }) => `"${name}": "${version}"`);
+    const to = values.map(
+      ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
+    );
+
+    await replaceInFile({ files: rootPackageJsonPath, from, to });
+  }
+
+  if (
+    localPackages.length > 0 &&
+    workspacePath &&
+    workspacePath !== "catalog"
+  ) {
+    const values = localPackages.map(({ name, version, latest }) => ({
+      name,
+      version,
+      latest,
+      qualifier: rawVersion(version).qualifier || "",
+    }));
+
+    const from = values.map(({ name, version }) => `"${name}": "${version}"`);
+    const to = values.map(
+      ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
+    );
+
+    await replaceInFile({ files: workspacePath, from, to });
+  }
+
+  return packages;
+}
+
+/**
  * upgradeVersion - upgrade version in package.json
  *
- * @param {PackageVersionInfo} package - Package version info
+ * @param {PackageVersionInfo} pkg - Package version info
  * @param {string} path - Path to package.json
  */
 export async function upgradeVersion({ name, version, latest }, path) {
@@ -36,28 +94,4 @@ export async function upgradeVersion({ name, version, latest }, path) {
   });
 
   return { name, version, latest: `${qualifier}${latest}` };
-}
-
-/**
- * upgradeVersions - upgrade versions in package.json
- *
- * @param {PackageVersionInfo[]} packages - Array of package version info
- * @param {string} path - Path to package.json
- */
-export async function upgradeVersions(packages = [], path) {
-  const values = packages.map(({ name, version, latest }) => ({
-    name,
-    version,
-    latest,
-    qualifier: rawVersion(version).qualifier,
-  }));
-
-  const from = values.map(({ name, version }) => `"${name}": "${version}"`);
-  const to = values.map(
-    ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
-  );
-
-  await replaceInFile({ files: path, from, to });
-
-  return packages;
 }

@@ -41,7 +41,10 @@ const flags = [
   "--major",
 ];
 const filteredArgs = args.filter((arg) => !flags.includes(arg));
-const PACKAGE_JSON_PATH = filteredArgs[0] || "package.json";
+const hasCatalogArg = filteredArgs.includes("catalog");
+const rootArg = filteredArgs.find((arg) => arg !== "catalog") || "package.json";
+const PACKAGE_JSON_PATH = rootArg;
+const WORKSPACE_TO_ANALYZE = hasCatalogArg ? "catalog" : rootArg;
 
 const isJson = args.includes("--json") || args.includes("-j");
 const isPatch = args.includes("--patch") || args.includes("-p");
@@ -113,7 +116,12 @@ async function startWebServer(port = DEFAULT_PORT, tries = 0) {
 
 async function runNonInteractive(packageJsonPath, args) {
   try {
-    const analysis = await performAnalysisShared(packageJsonPath, "both");
+    const analysis = await performAnalysisShared(
+      packageJsonPath,
+      "both",
+      null,
+      PACKAGE_JSON_PATH,
+    );
 
     if (isPatch) {
       const packagesToUpgrade = [];
@@ -124,6 +132,8 @@ async function runNonInteractive(packageJsonPath, args) {
           ...analysis.outdatedSafe.map((pkg) => ({
             name: pkg.name,
             version: pkg.ver,
+            resolvedVer: pkg.resolvedVer,
+            isCatalog: pkg.isCatalog,
             latest: pkg.latest,
           })),
         );
@@ -133,7 +143,7 @@ async function runNonInteractive(packageJsonPath, args) {
       if (isAudit && analysis.vulnerablePackages.length > 0) {
         const upgradableVulnerable = analysis.vulnerablePackages.filter(
           (pkg) => {
-            const raw = rawVersion(pkg.ver).version;
+            const raw = rawVersion(pkg.resolvedVer).version;
             const hasSafeUpgrade = raw !== pkg.latest;
             const hasMajorUpgrade =
               pkg.latestOutOfRange && pkg.latestOutOfRange !== raw;
@@ -146,6 +156,8 @@ async function runNonInteractive(packageJsonPath, args) {
             packagesToUpgrade.push({
               name: pkg.name,
               version: pkg.ver,
+              resolvedVer: pkg.resolvedVer,
+              isCatalog: pkg.isCatalog,
               latest: pkg.latestOutOfRange || pkg.latest,
             });
           }
@@ -164,6 +176,8 @@ async function runNonInteractive(packageJsonPath, args) {
             packagesToUpgrade.push({
               name: pkg.name,
               version: pkg.ver,
+              resolvedVer: pkg.resolvedVer,
+              isCatalog: pkg.isCatalog,
               latest: pkg.latestOutOfRange,
             });
           }
@@ -171,7 +185,11 @@ async function runNonInteractive(packageJsonPath, args) {
       }
 
       if (packagesToUpgrade.length > 0) {
-        await upgradeVersions(packagesToUpgrade, packageJsonPath);
+        await upgradeVersions(
+          packagesToUpgrade,
+          packageJsonPath,
+          PACKAGE_JSON_PATH,
+        );
         if (!isJson) {
           console.log(
             chalk.green(
@@ -179,7 +197,9 @@ async function runNonInteractive(packageJsonPath, args) {
             ),
           );
           packagesToUpgrade.forEach((pkg) => {
-            console.log(`  ${pkg.name}: ${pkg.version} ➔ ${pkg.latest}`);
+            console.log(
+              `  ${pkg.name}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
+            );
           });
         }
       } else {
@@ -196,6 +216,8 @@ async function runNonInteractive(packageJsonPath, args) {
         packages: analysis.packages.map((pkg) => ({
           name: pkg.name,
           version: pkg.ver,
+          resolvedVersion: pkg.resolvedVer,
+          isCatalog: pkg.isCatalog,
           type: pkg.type,
           latest: pkg.latest,
           latestOutOfRange: pkg.latestOutOfRange,
@@ -217,25 +239,26 @@ async function runNonInteractive(packageJsonPath, args) {
         10,
       );
       analysis.packages.forEach((pkg) => {
-        const raw = rawVersion(pkg.ver).version;
+        const raw = rawVersion(pkg.resolvedVer).version;
         const isSafeLatest = raw === pkg.latest;
         const isMajorLatest =
           !pkg.latestOutOfRange || pkg.latestOutOfRange === pkg.latest;
+        const current = pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver;
 
         let statusStr = "";
         if (isSafeLatest && isMajorLatest) {
-          statusStr = chalk.green("🟢 up to date");
+          statusStr = chalk.green(`🟢 up to date (${current})`);
         } else if (!isSafeLatest && isMajorLatest) {
           statusStr = chalk.yellow(
-            `🟡 safe update available (${pkg.ver} ➔ ${pkg.latest})`,
+            `🟡 safe update available (${current} ➔ ${pkg.latest})`,
           );
         } else if (isSafeLatest && !isMajorLatest) {
           statusStr = chalk.red(
-            `🔴 major update available (${pkg.ver} ➔ ${pkg.latestOutOfRange})`,
+            `🔴 major update available (${current} ➔ ${pkg.latestOutOfRange})`,
           );
         } else {
           statusStr = chalk.red(
-            `🔴 major update available (${pkg.ver} ➔ ${pkg.latestOutOfRange})`,
+            `🔴 major update available (${current} ➔ ${pkg.latestOutOfRange})`,
           );
         }
 
@@ -268,7 +291,7 @@ async function main() {
   CONTEXT.packageManager = packageManager;
 
   if (runNonInteractiveMode) {
-    await runNonInteractive(PACKAGE_JSON_PATH, args);
+    await runNonInteractive(WORKSPACE_TO_ANALYZE, args);
   } else if (runWebMode) {
     await startWebServer();
   } else {

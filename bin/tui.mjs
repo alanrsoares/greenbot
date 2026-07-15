@@ -40,6 +40,7 @@ export async function runTui(context) {
         (msg) => {
           s.message(msg);
         },
+        context.PACKAGE_JSON_PATH,
       );
       s.stop("Registry scan & security audit complete.");
       return res;
@@ -49,8 +50,14 @@ export async function runTui(context) {
     }
   }
 
+  const hasCatalog = Boolean(
+    mainPackageJson.workspaces?.catalog || mainPackageJson.catalog,
+  );
+
   let currentStep =
-    workspaces && workspaces.length > 0 ? "workspace" : "depType";
+    (workspaces && workspaces.length > 0) || hasCatalog
+      ? "workspace"
+      : "depType";
   let selectedWorkspacePath = context.PACKAGE_JSON_PATH;
   let depTypeVal = "both";
   let analysis = null;
@@ -59,11 +66,21 @@ export async function runTui(context) {
     if (currentStep === "workspace") {
       const workspaceOptions = [
         { value: "root", label: `Root (${context.PACKAGE_JSON_PATH})` },
+      ];
+
+      if (hasCatalog) {
+        workspaceOptions.push({
+          value: "catalog",
+          label: "📖 Catalog (workspaces.catalog)",
+        });
+      }
+
+      workspaceOptions.push(
         ...workspaces.map((w) => ({
           value: w.path,
           label: `${w.name} (${w.path})`,
         })),
-      ];
+      );
 
       const selectedWorkspace = await select({
         message: "Monorepo detected. Select which package/workspace to check:",
@@ -73,6 +90,14 @@ export async function runTui(context) {
       if (isCancel(selectedWorkspace)) {
         cancel("Operation cancelled.");
         process.exit(0);
+      }
+
+      if (selectedWorkspace === "catalog") {
+        selectedWorkspacePath = "catalog";
+        depTypeVal = "both";
+        analysis = await performAnalysis(selectedWorkspacePath, depTypeVal);
+        currentStep = "menu";
+        continue;
       }
 
       if (selectedWorkspace !== "root") {
@@ -96,7 +121,7 @@ export async function runTui(context) {
       });
 
       if (isCancel(depType)) {
-        if (workspaces && workspaces.length > 0) {
+        if ((workspaces && workspaces.length > 0) || hasCatalog) {
           currentStep = "workspace";
           continue;
         } else {
@@ -196,8 +221,10 @@ export async function runTui(context) {
             const nameCol = pkg.name.padEnd(maxNameLen + 2);
             const typeCol =
               `(${pkg.type === "dependencies" ? "dep" : "dev"})`.padEnd(8);
-            const current = pkg.ver;
-            const raw = rawVersion(pkg.ver).version;
+            const current = pkg.isCatalog
+              ? `catalog:${pkg.resolvedVer}`
+              : pkg.ver;
+            const raw = rawVersion(pkg.resolvedVer).version;
             const safe = pkg.latest;
             const major = pkg.latestOutOfRange;
 
@@ -267,7 +294,7 @@ export async function runTui(context) {
               { value: "all", label: chalk.bold("All packages") },
               ...analysis.outdatedSafe.map((pkg) => ({
                 value: pkg.name,
-                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
+                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
               })),
             ],
           });
@@ -293,17 +320,23 @@ export async function runTui(context) {
             .map((pkg) => ({
               name: pkg.name,
               version: pkg.ver,
+              resolvedVer: pkg.resolvedVer,
+              isCatalog: pkg.isCatalog,
               latest: pkg.latest,
             }));
 
-          await upgradeVersions(packagesToUpgrade, selectedWorkspacePath);
+          await upgradeVersions(
+            packagesToUpgrade,
+            selectedWorkspacePath,
+            context.PACKAGE_JSON_PATH,
+          );
 
           s.stop("Upgraded successfully!");
 
           console.log(chalk.bold("\nPackages upgraded:"));
           packagesToUpgrade.forEach((pkg) => {
             console.log(
-              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.version} ➔ ${pkg.latest}`,
+              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
             );
           });
           console.log("");
@@ -336,7 +369,7 @@ export async function runTui(context) {
               { value: "all", label: chalk.bold("All packages") },
               ...analysis.outdatedMajor.map((pkg) => ({
                 value: pkg.name,
-                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
+                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
               })),
             ],
           });
@@ -362,17 +395,23 @@ export async function runTui(context) {
             .map((pkg) => ({
               name: pkg.name,
               version: pkg.ver,
+              resolvedVer: pkg.resolvedVer,
+              isCatalog: pkg.isCatalog,
               latest: pkg.latestOutOfRange,
             }));
 
-          await upgradeVersions(packagesToUpgrade, selectedWorkspacePath);
+          await upgradeVersions(
+            packagesToUpgrade,
+            selectedWorkspacePath,
+            context.PACKAGE_JSON_PATH,
+          );
 
           s.stop("Upgraded successfully to absolute latest version!");
 
           console.log(chalk.bold("\nPackages upgraded:"));
           packagesToUpgrade.forEach((pkg) => {
             console.log(
-              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.version} ➔ ${pkg.latest}`,
+              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
             );
           });
           console.log("");
@@ -383,7 +422,7 @@ export async function runTui(context) {
 
         if (action === "audit") {
           const upgradable = analysis.vulnerablePackages.filter((pkg) => {
-            const raw = rawVersion(pkg.ver).version;
+            const raw = rawVersion(pkg.resolvedVer).version;
             const hasSafeUpgrade = raw !== pkg.latest;
             const hasMajorUpgrade =
               pkg.latestOutOfRange && pkg.latestOutOfRange !== raw;
@@ -424,7 +463,7 @@ export async function runTui(context) {
                     : chalk.yellow;
                 return {
                   value: pkg.name,
-                  label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.ver} ➔ ${targetVersion} (${color(sev + ": " + pkg.vulnerability.title)})`,
+                  label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${targetVersion} (${color(sev + ": " + pkg.vulnerability.title)})`,
                 };
               }),
             ],
@@ -452,17 +491,23 @@ export async function runTui(context) {
             .map((pkg) => ({
               name: pkg.name,
               version: pkg.ver,
+              resolvedVer: pkg.resolvedVer,
+              isCatalog: pkg.isCatalog,
               latest: pkg.latestOutOfRange || pkg.latest,
             }));
 
-          await upgradeVersions(packagesToUpgrade, selectedWorkspacePath);
+          await upgradeVersions(
+            packagesToUpgrade,
+            selectedWorkspacePath,
+            context.PACKAGE_JSON_PATH,
+          );
 
           s.stop("Vulnerabilities patched successfully!");
 
           console.log(chalk.bold("\nPackages patched:"));
           packagesToUpgrade.forEach((pkg) => {
             console.log(
-              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.version} ➔ ${pkg.latest}`,
+              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
             );
           });
           console.log("");
@@ -474,7 +519,9 @@ export async function runTui(context) {
 
       if (resetRootMenu) {
         currentStep =
-          workspaces && workspaces.length > 0 ? "workspace" : "depType";
+          (workspaces && workspaces.length > 0) || hasCatalog
+            ? "workspace"
+            : "depType";
         continue;
       }
     }
