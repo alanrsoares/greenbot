@@ -59,41 +59,33 @@ export async function upgradeVersions(
     workspacePath &&
     workspacePath !== "catalog"
   ) {
-    const values = localPackages.map(({ name, version, latest }) => ({
-      name,
-      version,
-      latest,
-      qualifier: rawVersion(version).qualifier || "",
-    }));
+    const packagesByWorkspace: Record<string, PackageVersionInfo[]> = {};
+    for (const pkg of localPackages) {
+      const targetPath = pkg.workspacePath || workspacePath;
+      if (targetPath && targetPath !== "catalog" && targetPath !== "all") {
+        if (!packagesByWorkspace[targetPath]) {
+          packagesByWorkspace[targetPath] = [];
+        }
+        packagesByWorkspace[targetPath].push(pkg);
+      }
+    }
 
-    const from = values.map(({ name, version }) => `"${name}": "${version}"`);
-    const to = values.map(
-      ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
-    );
+    for (const [pkgPath, pkgs] of Object.entries(packagesByWorkspace)) {
+      const values = pkgs.map(({ name, version, latest }) => ({
+        name,
+        version,
+        latest,
+        qualifier: rawVersion(version).qualifier || "",
+      }));
 
-    await replaceInFile({ files: workspacePath, from, to });
+      const from = values.map(({ name, version }) => `"${name}": "${version}"`);
+      const to = values.map(
+        ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
+      );
+
+      await replaceInFile({ files: pkgPath, from, to });
+    }
   }
 
   return packages;
-}
-
-/**
- * upgradeVersion - upgrade version in package.json
- *
- * @param pkg - Package version info
- * @param path - Path to package.json
- */
-export async function upgradeVersion(
-  { name, version, latest }: PackageVersionInfo,
-  path: string,
-): Promise<PackageVersionInfo> {
-  const { qualifier } = rawVersion(version);
-
-  await replaceInFile({
-    files: path,
-    from: `"${name}": "${version}"`,
-    to: `"${name}": "${qualifier}${latest}"`,
-  });
-
-  return { name, version, latest: `${qualifier}${latest}` };
 }

@@ -1,6 +1,9 @@
-import { fetchNPMPackageMeta, rawVersion } from "./shared";
+import path from "path";
+import type { FullMetadata } from "package-json";
+import { fetchNPMPackageMeta, rawVersion, inferPackageManager } from "./shared";
 import { readPackageJson } from "./utils";
-import { runSecurityAudit } from "./audit";
+import { runSecurityAudit, type AuditResult } from "./audit";
+import { getWorkspaces } from "./workspaces";
 
 export interface PackageMetaResolved {
   name: string;
@@ -9,9 +12,10 @@ export interface PackageMetaResolved {
   type: string;
   isCatalog: boolean;
   latest: string;
-  meta?: any;
+  workspacePath: string;
+  meta?: FullMetadata;
   latestOutOfRange?: string;
-  vulnerability?: any;
+  vulnerability?: AuditResult | null;
 }
 
 export interface AnalysisResult {
@@ -49,6 +53,7 @@ export async function performAnalysis(
     resolvedVer: string;
     type: string;
     isCatalog: boolean;
+    workspacePath: string;
   }> = [];
 
   if (selectedWorkspacePath === "catalog") {
@@ -60,7 +65,69 @@ export async function performAnalysis(
       resolvedVer: ver,
       type: "dependencies",
       isCatalog: true,
+      workspacePath: rootPackageJsonPath || "package.json",
     }));
+  } else if (selectedWorkspacePath === "all" && rootPackageJsonPath) {
+    const packageManager = await inferPackageManager();
+    const rootPkgJson = await readPackageJson(rootPackageJsonPath);
+    const workspaces = await getWorkspaces(
+      rootPkgJson,
+      packageManager,
+      path.dirname(rootPackageJsonPath),
+    );
+
+    const pathsToScan = [
+      { name: "root", path: rootPackageJsonPath },
+      ...workspaces.map((w) => ({
+        name: w.name,
+        path: path.join(w.path, "package.json"),
+      })),
+    ];
+
+    for (const { path: pkgPath } of pathsToScan) {
+      try {
+        const pkgJson = await readPackageJson(pkgPath);
+        const dependencyEntries = Object.entries(pkgJson.dependencies ?? {});
+        const devDependencyEntries = Object.entries(
+          pkgJson.devDependencies ?? {},
+        );
+
+        if (depType === "dependencies" || depType === "both") {
+          allEntries.push(
+            ...dependencyEntries.map(([name, ver]) => {
+              const isCat = ver.startsWith("catalog:");
+              const resolvedVer = isCat ? catalog[name] || ver : ver;
+              return {
+                name,
+                ver,
+                resolvedVer,
+                type: "dependencies",
+                isCatalog: isCat,
+                workspacePath: pkgPath,
+              };
+            }),
+          );
+        }
+        if (depType === "devDependencies" || depType === "both") {
+          allEntries.push(
+            ...devDependencyEntries.map(([name, ver]) => {
+              const isCat = ver.startsWith("catalog:");
+              const resolvedVer = isCat ? catalog[name] || ver : ver;
+              return {
+                name,
+                ver,
+                resolvedVer,
+                type: "devDependencies",
+                isCatalog: isCat,
+                workspacePath: pkgPath,
+              };
+            }),
+          );
+        }
+      } catch (err) {
+        // Skip workspace paths that fail to load
+      }
+    }
   } else {
     const pkgJson = await readPackageJson(selectedWorkspacePath);
     const dependencyEntries = Object.entries(pkgJson.dependencies ?? {});
@@ -77,6 +144,7 @@ export async function performAnalysis(
             resolvedVer,
             type: "dependencies",
             isCatalog: isCat,
+            workspacePath: selectedWorkspacePath,
           };
         }),
       );
@@ -92,6 +160,7 @@ export async function performAnalysis(
             resolvedVer,
             type: "devDependencies",
             isCatalog: isCat,
+            workspacePath: selectedWorkspacePath,
           };
         }),
       );

@@ -9,8 +9,8 @@ import type {
   RenderBoxOptions,
 } from "./types";
 
-export const version = process.env.GREENBOT_VERSION || "0.0.0";
-export const name = process.env.GREENBOT_NAME || "greenbot";
+export const version = process.env["GREENBOT_VERSION"] || "0.0.0";
+export const name = process.env["GREENBOT_NAME"] || "greenbot";
 
 const vTag = chalk.cyan(`v${version}`);
 
@@ -104,7 +104,9 @@ ${lines
     }
 
     const lineStr = line;
-    const [short, long] = [maxLength, stripAnsi(lineStr).length].sort();
+    const lineLength = stripAnsi(lineStr).length;
+    const short = Math.min(maxLength, lineLength);
+    const long = Math.max(maxLength, lineLength);
     const rPad = long === short ? 0 : long - short - padding * 2;
     return `${v}${pad(padding)}${lineStr}${pad(padding)}${pad(Math.max(rPad, 0))}${v}`;
   })
@@ -122,10 +124,16 @@ export const indexLatestOutOfRangeEntries = (xs: any[]) =>
     {},
   );
 
-export const rawVersion = (version: string): RawVersion => ({
-  version: version.replace(/[\^~]/, ""),
-  qualifier: isNaN(Number(version[0])) ? version[0] : undefined,
-});
+export const rawVersion = (version: string): RawVersion => {
+  const result: RawVersion = {
+    version: version.replace(/[\^~]/, ""),
+  };
+  const firstChar = version[0];
+  if (firstChar && isNaN(Number(firstChar))) {
+    result.qualifier = firstChar;
+  }
+  return result;
+};
 
 const isNumber = (n: any) => !isNaN(Number(n));
 

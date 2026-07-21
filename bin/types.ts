@@ -1,8 +1,33 @@
-import type { Package, PackageInfo } from "../src/domain/types";
+import type { FullMetadata } from "package-json";
 
-// Re-export domain types
-export type { Package, PackageInfo };
+interface Package {
+  name: string;
+  version: string;
+  dependencies: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  resolutions: Record<string, string>;
+  latestOutOfRange?: Record<string, string>;
+  meta: Record<string, FullMetadata>;
+  packageManager: "npm" | "yarn" | "pnpm" | "bun";
+  workspaces:
+    | null
+    | {
+        path: string;
+        name: string;
+        version: string;
+      }[];
+}
+
 export type WorkspaceInfo = NonNullable<Package["workspaces"]>[number];
+
+export interface PackageVersionInfo {
+  name: string;
+  version: string;
+  latest: string;
+  isCatalog?: boolean;
+  resolvedVer?: string;
+  workspacePath?: string;
+}
 
 export interface AppContext {
   packageManager: string;
@@ -26,14 +51,16 @@ export interface RenderBoxOptions {
   padding?: number;
 }
 
-export interface CenterContext {
+interface CenterContext {
   center: (str: string) => string;
 }
 
 export interface PackageJsonContent {
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
-  workspaces?: string[] | { packages?: string[] };
+  workspaces?:
+    string[] | { packages?: string[]; catalog?: Record<string, string> };
+  catalog?: Record<string, string>;
 }
 
 export type RenderBoxLine = string | ((ctx: CenterContext) => string);

@@ -1,39 +1,22 @@
 #!/usr/bin/env node
 
-import fastify from "fastify";
-import path from "path";
 import chalk from "chalk";
-import open from "open";
-import cors from "@fastify/cors";
-import fastifyStatic from "@fastify/static";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+import path from "path";
 
-import {
-  GREENBOT_TAG,
-  DEFAULT_PORT,
-  inferPackageManager,
-  renderBox,
-  name,
-  rawVersion,
-} from "./shared";
+import { inferPackageManager, rawVersion } from "./shared";
 
-import { registerRoutes } from "./routes";
 import { readPackageJson, upgradeVersions } from "./utils";
 import { getWorkspaces } from "./workspaces";
 import { runTui } from "./tui";
-import { performAnalysis as performAnalysisShared } from "./analysis";
-import type { AppContext } from "./types";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import {
+  performAnalysis as performAnalysisShared,
+  type PackageMetaResolved,
+} from "./analysis";
+import type { AppContext, PackageVersionInfo } from "./types";
 
 // Parse arguments
 const args = process.argv.slice(2);
-const runWebMode = args.includes("--web") || args.includes("-w");
 const flags = [
-  "--web",
-  "-w",
   "--json",
   "-j",
   "--patch",
@@ -45,9 +28,16 @@ const flags = [
 ];
 const filteredArgs = args.filter((arg) => !flags.includes(arg));
 const hasCatalogArg = filteredArgs.includes("catalog");
-const rootArg = filteredArgs.find((arg) => arg !== "catalog") || "package.json";
+const hasAllArg = filteredArgs.includes("all");
+const rootArg =
+  filteredArgs.find((arg) => arg !== "catalog" && arg !== "all") ||
+  "package.json";
 const PACKAGE_JSON_PATH = rootArg;
-const WORKSPACE_TO_ANALYZE = hasCatalogArg ? "catalog" : rootArg;
+const WORKSPACE_TO_ANALYZE = hasCatalogArg
+  ? "catalog"
+  : hasAllArg
+    ? "all"
+    : rootArg;
 
 const isJson = args.includes("--json") || args.includes("-j");
 const isPatch = args.includes("--patch") || args.includes("-p");
@@ -58,8 +48,6 @@ const isAudit =
 const isMajor = args.includes("--major");
 const runNonInteractiveMode = isJson || isPatch || isAudit || isMajor;
 
-const STATIC_PATH = path.resolve(__dirname, "..", "dist");
-
 const CONTEXT: AppContext = {
   packageManager: "npm",
   isMonorepo: false,
@@ -67,60 +55,7 @@ const CONTEXT: AppContext = {
   PACKAGE_JSON_PATH,
 };
 
-const app = fastify({
-  logger: false,
-});
-
-// Register plugins
-app.register(cors, {
-  origin: "*",
-});
-
-app.register(fastifyStatic, {
-  root: STATIC_PATH,
-});
-
-// Register routes
-registerRoutes(app, CONTEXT);
-
-const MAX_TRIES = 5;
-
-async function startWebServer(port = DEFAULT_PORT, tries = 0): Promise<void> {
-  try {
-    await app.listen({ port });
-    const url = `http://localhost:${port}`;
-
-    renderBox(
-      [
-        ...GREENBOT_TAG.map((x) => chalk.green(x)),
-        "",
-        (ctx) => ctx.center(chalk.bold.yellow(name)),
-        "",
-        (ctx) => ctx.center(`Started listening at ${chalk.blue(url)}`),
-        "",
-        (ctx) => ctx.center(`hit ${chalk.yellow("Ctrl+C")} to stop.`),
-      ],
-      {
-        color: chalk.yellow,
-        padding: 2,
-      },
-    );
-
-    open(url).catch(() => {
-      console.log(chalk.yellow(`[greenbot] Could not open browser at ${url}`));
-    });
-  } catch (err) {
-    console.log(chalk.red("An error occurred:"), err);
-    if (tries < MAX_TRIES) {
-      return startWebServer(port + 1, tries + 1);
-    }
-  }
-}
-
-async function runNonInteractive(
-  packageJsonPath: string,
-  args: string[],
-): Promise<void> {
+async function runNonInteractive(packageJsonPath: string): Promise<void> {
   try {
     const analysis = await performAnalysisShared(
       packageJsonPath,
@@ -130,7 +65,7 @@ async function runNonInteractive(
     );
 
     if (isPatch) {
-      const packagesToUpgrade: any[] = [];
+      const packagesToUpgrade: PackageVersionInfo[] = [];
 
       // Safe upgrades (included by default)
       if (analysis.outdatedSafe.length > 0) {
@@ -141,6 +76,7 @@ async function runNonInteractive(
             resolvedVer: pkg.resolvedVer,
             isCatalog: pkg.isCatalog,
             latest: pkg.latest,
+            workspacePath: pkg.workspacePath,
           })),
         );
       }
@@ -165,6 +101,7 @@ async function runNonInteractive(
               resolvedVer: pkg.resolvedVer,
               isCatalog: pkg.isCatalog,
               latest: pkg.latestOutOfRange || pkg.latest,
+              workspacePath: pkg.workspacePath,
             });
           }
         });
@@ -176,15 +113,18 @@ async function runNonInteractive(
           const existingIdx = packagesToUpgrade.findIndex(
             (p) => p.name === pkg.name,
           );
-          if (existingIdx !== -1) {
-            packagesToUpgrade[existingIdx].latest = pkg.latestOutOfRange;
+          const existing =
+            existingIdx !== -1 ? packagesToUpgrade[existingIdx] : undefined;
+          if (existing) {
+            existing.latest = pkg.latestOutOfRange || pkg.latest;
           } else {
             packagesToUpgrade.push({
               name: pkg.name,
               version: pkg.ver,
               resolvedVer: pkg.resolvedVer,
               isCatalog: pkg.isCatalog,
-              latest: pkg.latestOutOfRange,
+              latest: pkg.latestOutOfRange || pkg.latest,
+              workspacePath: pkg.workspacePath,
             });
           }
         });
@@ -219,7 +159,7 @@ async function runNonInteractive(
 
     if (isJson) {
       const jsonOutput = {
-        packages: analysis.packages.map((pkg) => ({
+        packages: analysis.packages.map((pkg: any) => ({
           name: pkg.name,
           version: pkg.ver,
           resolvedVersion: pkg.resolvedVer,
@@ -241,10 +181,10 @@ async function runNonInteractive(
       console.log(chalk.bold.underline("\ngreenbot Analysis Results:\n"));
 
       const maxNameLen = Math.max(
-        ...analysis.packages.map((p) => p.name.length),
+        ...analysis.packages.map((p: PackageMetaResolved) => p.name.length),
         10,
       );
-      analysis.packages.forEach((pkg) => {
+      analysis.packages.forEach((pkg: PackageMetaResolved) => {
         const raw = rawVersion(pkg.resolvedVer).version;
         const isSafeLatest = raw === pkg.latest;
         const isMajorLatest =
@@ -290,16 +230,18 @@ async function runNonInteractive(
 async function main(): Promise<void> {
   const packageManager = await inferPackageManager();
   const packageJson = await readPackageJson(PACKAGE_JSON_PATH);
-  const workspaces = await getWorkspaces(packageJson, packageManager);
+  const workspaces = await getWorkspaces(
+    packageJson,
+    packageManager,
+    path.dirname(PACKAGE_JSON_PATH),
+  );
 
   CONTEXT.workspaces = workspaces;
   CONTEXT.isMonorepo = Boolean(workspaces?.length);
   CONTEXT.packageManager = packageManager;
 
   if (runNonInteractiveMode) {
-    await runNonInteractive(WORKSPACE_TO_ANALYZE, args);
-  } else if (runWebMode) {
-    await startWebServer();
+    await runNonInteractive(WORKSPACE_TO_ANALYZE);
   } else {
     await runTui(CONTEXT);
   }

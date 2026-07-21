@@ -14,6 +14,7 @@ import type { PackageJsonContent, WorkspaceInfo } from "./types";
 export async function getWorkspaces(
   packageJson: PackageJsonContent,
   packageManager: "npm" | "pnpm" | "yarn" | "bun",
+  basePath: string = ".",
 ): Promise<WorkspaceInfo[]> {
   let workspaces: string[] = [];
 
@@ -29,7 +30,7 @@ export async function getWorkspaces(
       break;
     case "pnpm":
       const rawYaml = await fs
-        .readFile("pnpm-workspace.yaml", "utf8")
+        .readFile(path.join(basePath, "pnpm-workspace.yaml"), "utf8")
         .catch(() => null);
       if (rawYaml) {
         const parsed = yaml.load(rawYaml) as { packages?: string[] };
@@ -44,7 +45,7 @@ export async function getWorkspaces(
     workspaces.map(async (workspace) => {
       const cleanWorkspace = workspace.replace(/\/\*$/, "");
 
-      const workspacePath = path.resolve(cleanWorkspace);
+      const workspacePath = path.resolve(basePath, cleanWorkspace);
 
       const subFolders = await fs
         .readdir(workspacePath, { withFileTypes: true })
@@ -80,7 +81,7 @@ export async function getWorkspaces(
         (p): p is { name: string; version: string; dir: string } => p !== null,
       );
 
-      return [cleanWorkspace, validPackages] as const;
+      return [workspacePath, validPackages] as const;
     }),
   );
 

@@ -6,7 +6,7 @@ interface Advisory {
   vulnerable_versions: string;
 }
 
-interface AuditResult {
+export interface AuditResult {
   severity: string;
   title: string;
   url: string;
@@ -59,12 +59,15 @@ export async function runSecurityAudit(
             (severityScores[a.severity] || 0),
         );
 
-        result[name] = {
-          severity: sorted[0].severity,
-          title: sorted[0].title,
-          url: sorted[0].url,
-          id: sorted[0].id,
-        };
+        const worstAdvisory = sorted[0];
+        if (worstAdvisory) {
+          result[name] = {
+            severity: worstAdvisory.severity,
+            title: worstAdvisory.title,
+            url: worstAdvisory.url,
+            id: worstAdvisory.id,
+          };
+        }
       }
     }
 
