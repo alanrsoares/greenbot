@@ -13,16 +13,7 @@
     "allowJs": true,
     "checkJs": true,
     "verbatimModuleSyntax": true,
-    "paths": {
-      "~/*": ["./src/*"]
-    },
     "ignoreDeprecations": "5.0"
   },
-  "include": [
-    "src/**/*.d.ts",
-    "src/**/*.ts",
-    "src/**/*.js",
-    "src/**/*.svelte",
-    "bin/**/*.ts"
-  ]
+  "include": ["bin/**/*.ts"]
 }

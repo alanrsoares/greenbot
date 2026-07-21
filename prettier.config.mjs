@@ -1,6 +1,4 @@
 /** @type {import("prettier").Config} */
-const config = {
-  plugins: ["prettier-plugin-svelte"],
-};
+const config = {};
 
 export default config;

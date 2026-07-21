@@ -6,7 +6,7 @@
 
 > A modern, interactive package updater for npm-based projects.
 
-`greenbot` scans your dependencies, checks for updates, and upgrades your `package.json` directly from a beautiful terminal interface (TUI) or an optional local web dashboard.
+`greenbot` scans your dependencies, checks for updates, and upgrades your `package.json` directly from a beautiful terminal interface (TUI).
 
 ---
 
@@ -32,7 +32,6 @@ _For yarn, install it globally:_ `yarn global add @greenbot/cli && greenbot`
 ## 🌿 Features
 
 - **⚡ Interactive TUI**: Instantly inspect and select package upgrades directly in your terminal.
-- **🌐 Optional Web Dashboard**: Run `greenbot --web` to open a keyboard-accessible web UI.
 - **🏗️ Multi-Manager**: Built-in support for `npm`, `yarn`, `pnpm`, and `bun`.
 - **📦 Monorepos**: Automatically detects workspaces and lets you choose which package to scan.
 
@@ -43,10 +42,6 @@ _For yarn, install it globally:_ `yarn global add @greenbot/cli && greenbot`
 ### Terminal User Interface (TUI)
 
 ![TUI Preview](https://github.com/alanrsoares/greenbot/assets/273334/487c276b-2266-439e-96e5-fbd7e658c4bd)
-
-### Web Dashboard
-
-![Web UI Preview 1](https://github.com/alanrsoares/greenbot/assets/273334/66ddde3c-0844-4440-8295-9ba6ad8334f9)
 
 ---
 
