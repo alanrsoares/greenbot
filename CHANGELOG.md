@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.40.1](https://github.com/alanrsoares/greenbot/compare/v0.40.0...v0.40.1) (2026-07-23)
+
+
+### Bug Fixes
+
+* **ci:** update release-please publish step and sanitize audit semver ([ba55029](https://github.com/alanrsoares/greenbot/commit/ba55029a2522502a93a34790f381fb5ffcd8b5db))
+* **ci:** update release-please publish step and sanitize audit semver ([123b0d2](https://github.com/alanrsoares/greenbot/commit/123b0d2d9099585143a50b7e5ef484ed1acd9688))
+
 ## [0.40.0](https://github.com/alanrsoares/greenbot/compare/v0.39.0...v0.40.0) (2026-07-23)
 
 

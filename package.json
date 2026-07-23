@@ -1,6 +1,6 @@
 {
   "name": "@greenbot/cli",
-  "version": "0.40.0",
+  "version": "0.40.1",
   "packageManager": "bun@1.3.4",
   "keywords": [
     "greenbot",
