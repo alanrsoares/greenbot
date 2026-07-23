@@ -46,6 +46,7 @@
     "zx": "^8.8.5"
   },
   "dependencies": {
+    "@clack/core": "^1.4.3",
     "@clack/prompts": "^1.7.0",
     "js-yaml": "^4.3.0",
     "package-json": "^10.0.1",
