@@ -1,3 +1,5 @@
+import { rawVersion, isValidSemVer } from "./shared";
+
 interface Advisory {
   id: number;
   title: string;
@@ -27,8 +29,14 @@ export async function runSecurityAudit(
 
   const payload: Record<string, string[]> = {};
   for (const [name, version] of Object.entries(packageMap)) {
-    const cleanVersion = version.replace(/[\^~]/, "");
-    payload[name] = [cleanVersion];
+    if (version && isValidSemVer(version)) {
+      const cleanVersion = rawVersion(version).version;
+      payload[name] = [cleanVersion];
+    }
+  }
+
+  if (Object.keys(payload).length === 0) {
+    return {};
   }
 
   try {
