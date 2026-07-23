@@ -2,13 +2,13 @@ import {
   intro,
   outro,
   select,
-  multiselect,
   spinner,
   isCancel,
   cancel,
 } from "@clack/prompts";
 import chalk from "chalk";
 import path from "path";
+import { nestedMultiselect } from "./prompt";
 import { inferPackageManager, rawVersion } from "./shared";
 import { readPackageJson, upgradeVersions } from "./utils";
 import { getWorkspaces } from "./workspaces";
@@ -305,16 +305,14 @@ export async function runTui(context: AppContext): Promise<void> {
             ...analysis.outdatedSafe.map((p: any) => p.name.length),
             10,
           );
-          const choices = await multiselect({
+          const choices = await nestedMultiselect({
             message:
               "Select safe packages to upgrade (Space to select, Enter to confirm):",
-            options: [
-              { value: "all", label: chalk.bold("All packages") },
-              ...analysis.outdatedSafe.map((pkg: any) => ({
-                value: pkg.name,
-                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
-              })),
-            ],
+            allLabel: "All packages",
+            options: analysis.outdatedSafe.map((pkg: any) => ({
+              value: pkg.name,
+              label: `${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
+            })),
           });
 
           if (isCancel(choices)) {
@@ -330,9 +328,7 @@ export async function runTui(context: AppContext): Promise<void> {
           const s = spinner();
           s.start("Upgrading package.json...");
 
-          const selectedNames = selectedChoices.includes("all")
-            ? (analysis?.outdatedSafe ?? []).map((pkg) => pkg.name)
-            : selectedChoices;
+          const selectedNames = choices as string[];
 
           const packagesToUpgrade = (analysis?.outdatedSafe ?? [])
             .filter((pkg) => selectedNames.includes(pkg.name))
@@ -382,16 +378,14 @@ export async function runTui(context: AppContext): Promise<void> {
             ...analysis.outdatedMajor.map((p: any) => p.name.length),
             10,
           );
-          const choices = await multiselect({
+          const choices = await nestedMultiselect({
             message:
               "Select major packages to upgrade (caution: breaking changes possible):",
-            options: [
-              { value: "all", label: chalk.bold("All packages") },
-              ...analysis.outdatedMajor.map((pkg: any) => ({
-                value: pkg.name,
-                label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
-              })),
-            ],
+            allLabel: "All packages",
+            options: analysis.outdatedMajor.map((pkg: any) => ({
+              value: pkg.name,
+              label: `${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
+            })),
           });
 
           if (isCancel(choices)) {
@@ -407,9 +401,7 @@ export async function runTui(context: AppContext): Promise<void> {
           const s = spinner();
           s.start("Upgrading package.json...");
 
-          const selectedNames = selectedChoices.includes("all")
-            ? (analysis?.outdatedMajor ?? []).map((pkg) => pkg.name)
-            : selectedChoices;
+          const selectedNames = choices as string[];
 
           const packagesToUpgrade = (analysis?.outdatedMajor ?? [])
             .filter((pkg) => selectedNames.includes(pkg.name))
@@ -473,26 +465,22 @@ export async function runTui(context: AppContext): Promise<void> {
             ...upgradable.map((p) => p.name.length),
             10,
           );
-          const choices = await multiselect({
+          const choices = await nestedMultiselect({
             message:
               "Select vulnerable packages to patch (Space to toggle, Enter to confirm):",
-            options: [
-              { value: "all", label: chalk.bold("All vulnerable packages") },
-              ...upgradable.map((pkg) => {
-                const targetVersion = pkg.latestOutOfRange || pkg.latest;
-                const sev =
-                  pkg.vulnerability?.severity.toUpperCase() || "UNKNOWN";
-                const color =
-                  sev === "CRITICAL" || sev === "HIGH"
-                    ? chalk.red
-                    : chalk.yellow;
-                return {
-                  value: pkg.name,
-                  label: `  ${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${targetVersion} (${color(sev + ": " + (pkg.vulnerability?.title || ""))})`,
-                };
-              }),
-            ],
-            initialValues: ["all", ...upgradable.map((pkg) => pkg.name)],
+            allLabel: "All vulnerable packages",
+            options: upgradable.map((pkg) => {
+              const targetVersion = pkg.latestOutOfRange || pkg.latest;
+              const sev =
+                pkg.vulnerability?.severity.toUpperCase() || "UNKNOWN";
+              const color =
+                sev === "CRITICAL" || sev === "HIGH" ? chalk.red : chalk.yellow;
+              return {
+                value: pkg.name,
+                label: `${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${targetVersion} (${color(sev + ": " + (pkg.vulnerability?.title || ""))})`,
+              };
+            }),
+            initialValues: upgradable.map((pkg) => pkg.name),
           });
 
           if (isCancel(choices)) {
@@ -508,9 +496,7 @@ export async function runTui(context: AppContext): Promise<void> {
           const s = spinner();
           s.start("Patching package.json...");
 
-          const selectedNames = selectedChoices.includes("all")
-            ? upgradable.map((pkg) => pkg.name)
-            : selectedChoices;
+          const selectedNames = choices as string[];
 
           const packagesToUpgrade = upgradable
             .filter((pkg) => selectedNames.includes(pkg.name))
