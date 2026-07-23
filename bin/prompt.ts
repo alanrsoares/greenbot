@@ -48,25 +48,27 @@ function styleOption(
     | "active-selected"
     | "submitted"
     | "inactive",
+  isChild = false,
 ): string {
   const label = option.label ?? String(option.value);
   const hintStr = option.hint ? ` ${chalk.dim(`(${option.hint})`)}` : "";
+  const prefix = isChild ? "  " : "";
 
   switch (state) {
     case "disabled":
-      return `${chalk.gray(S_CHECKBOX_INACTIVE)} ${chalk.strikethrough.gray(label)}${option.hint ? ` ${chalk.dim(`(${option.hint})`)}` : ""}`;
+      return `${prefix}${chalk.gray(S_CHECKBOX_INACTIVE)} ${chalk.strikethrough.gray(label)}${option.hint ? ` ${chalk.dim(`(${option.hint})`)}` : ""}`;
     case "active":
-      return `${chalk.cyan(S_CHECKBOX_ACTIVE)} ${label}${hintStr}`;
+      return `${prefix}${chalk.cyan(S_CHECKBOX_ACTIVE)} ${label}${hintStr}`;
     case "selected":
-      return `${chalk.green(S_CHECKBOX_SELECTED)} ${chalk.dim(label)}${hintStr}`;
+      return `${prefix}${chalk.green(S_CHECKBOX_SELECTED)} ${chalk.dim(label)}${hintStr}`;
     case "active-selected":
-      return `${chalk.green(S_CHECKBOX_SELECTED)} ${label}${hintStr}`;
+      return `${prefix}${chalk.green(S_CHECKBOX_SELECTED)} ${label}${hintStr}`;
     case "submitted":
       return chalk.dim(label);
     case "cancelled":
       return chalk.strikethrough.dim(label);
     default:
-      return `${chalk.dim(S_CHECKBOX_INACTIVE)} ${chalk.dim(label)}${hintStr}`;
+      return `${prefix}${chalk.dim(S_CHECKBOX_INACTIVE)} ${chalk.dim(label)}${hintStr}`;
   }
 }
 
@@ -129,13 +131,15 @@ export async function nestedMultiselect<Value>(
           const currentValues = this.value ?? [];
 
           const getStyle = (option: any, active: boolean) => {
-            if (option.disabled) return styleOption(option, "disabled");
+            const isChild = option.value !== allVal;
+            if (option.disabled)
+              return styleOption(option, "disabled", isChild);
             const isSelected = currentValues.includes(option.value);
             if (active && isSelected)
-              return styleOption(option, "active-selected");
-            if (isSelected) return styleOption(option, "selected");
-            if (active) return styleOption(option, "active");
-            return styleOption(option, "inactive");
+              return styleOption(option, "active-selected", isChild);
+            if (isSelected) return styleOption(option, "selected", isChild);
+            if (active) return styleOption(option, "active", isChild);
+            return styleOption(option, "inactive", isChild);
           };
 
           switch (this.state) {
@@ -145,7 +149,9 @@ export async function nestedMultiselect<Value>(
                   .filter(({ value }: { value: any }) =>
                     currentValues.includes(value),
                   )
-                  .map((o: any) => styleOption(o, "submitted"))
+                  .map((o: any) =>
+                    styleOption(o, "submitted", o.value !== allVal),
+                  )
                   .join(chalk.dim(", ")) || chalk.dim("none");
               const lines = wrapTextWithPrefix(
                 opts.output,
@@ -159,7 +165,9 @@ export async function nestedMultiselect<Value>(
                 .filter(({ value }: { value: any }) =>
                   currentValues.includes(value),
                 )
-                .map((o: any) => styleOption(o, "cancelled"))
+                .map((o: any) =>
+                  styleOption(o, "cancelled", o.value !== allVal),
+                )
                 .join(chalk.dim(", "));
               if (cancelledList.trim() === "")
                 return `${headerStr}${chalk.gray(S_BAR)}`;

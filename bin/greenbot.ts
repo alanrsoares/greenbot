@@ -5,14 +5,15 @@ import path from "path";
 
 import { inferPackageManager, rawVersion } from "./shared";
 
-import { readPackageJson, upgradeVersions } from "./utils";
+import { readPackageJson } from "./utils";
+import { buildUpgradePlan, executeUpgradePlan } from "./engine";
 import { getWorkspaces } from "./workspaces";
 import { runTui } from "./tui";
 import {
   performAnalysis as performAnalysisShared,
   type PackageMetaResolved,
 } from "./analysis";
-import type { AppContext, PackageVersionInfo } from "./types";
+import type { AppContext } from "./types";
 
 // Parse arguments
 const args = process.argv.slice(2);
@@ -65,23 +66,8 @@ async function runNonInteractive(packageJsonPath: string): Promise<void> {
     );
 
     if (isPatch) {
-      const packagesToUpgrade: PackageVersionInfo[] = [];
+      const candidates = [...analysis.outdatedSafe];
 
-      // Safe upgrades (included by default)
-      if (analysis.outdatedSafe.length > 0) {
-        packagesToUpgrade.push(
-          ...analysis.outdatedSafe.map((pkg) => ({
-            name: pkg.name,
-            version: pkg.ver,
-            resolvedVer: pkg.resolvedVer,
-            isCatalog: pkg.isCatalog,
-            latest: pkg.latest,
-            workspacePath: pkg.workspacePath,
-          })),
-        );
-      }
-
-      // Security patches (if requested)
       if (isAudit && analysis.vulnerablePackages.length > 0) {
         const upgradableVulnerable = analysis.vulnerablePackages.filter(
           (pkg) => {
@@ -94,55 +80,33 @@ async function runNonInteractive(packageJsonPath: string): Promise<void> {
         );
 
         upgradableVulnerable.forEach((pkg) => {
-          if (!packagesToUpgrade.some((p) => p.name === pkg.name)) {
-            packagesToUpgrade.push({
-              name: pkg.name,
-              version: pkg.ver,
-              resolvedVer: pkg.resolvedVer,
-              isCatalog: pkg.isCatalog,
-              latest: pkg.latestOutOfRange || pkg.latest,
-              workspacePath: pkg.workspacePath,
-            });
+          if (!candidates.some((c) => c.name === pkg.name)) {
+            candidates.push(pkg);
           }
         });
       }
 
-      // Major upgrades (if requested)
       if (isMajor && analysis.outdatedMajor.length > 0) {
         analysis.outdatedMajor.forEach((pkg) => {
-          const existingIdx = packagesToUpgrade.findIndex(
-            (p) => p.name === pkg.name,
-          );
-          const existing =
-            existingIdx !== -1 ? packagesToUpgrade[existingIdx] : undefined;
-          if (existing) {
-            existing.latest = pkg.latestOutOfRange || pkg.latest;
-          } else {
-            packagesToUpgrade.push({
-              name: pkg.name,
-              version: pkg.ver,
-              resolvedVer: pkg.resolvedVer,
-              isCatalog: pkg.isCatalog,
-              latest: pkg.latestOutOfRange || pkg.latest,
-              workspacePath: pkg.workspacePath,
-            });
+          if (!candidates.some((c) => c.name === pkg.name)) {
+            candidates.push(pkg);
           }
         });
       }
 
-      if (packagesToUpgrade.length > 0) {
-        await upgradeVersions(
-          packagesToUpgrade,
+      const plan = buildUpgradePlan(candidates, undefined, isMajor);
+
+      if (plan.packagesToUpgrade.length > 0) {
+        const upgraded = await executeUpgradePlan(
+          plan,
           packageJsonPath,
           PACKAGE_JSON_PATH,
         );
         if (!isJson) {
           console.log(
-            chalk.green(
-              `✔ Successfully upgraded ${packagesToUpgrade.length} packages.`,
-            ),
+            chalk.green(`✔ Successfully upgraded ${upgraded.length} packages.`),
           );
-          packagesToUpgrade.forEach((pkg) => {
+          upgraded.forEach((pkg) => {
             console.log(
               `  ${pkg.name}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
             );

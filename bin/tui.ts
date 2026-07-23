@@ -10,7 +10,8 @@ import chalk from "chalk";
 import path from "path";
 import { nestedMultiselect } from "./prompt";
 import { inferPackageManager, rawVersion } from "./shared";
-import { readPackageJson, upgradeVersions } from "./utils";
+import { readPackageJson } from "./utils";
+import { buildUpgradePlan, executeUpgradePlan } from "./engine";
 import { getWorkspaces } from "./workspaces";
 import {
   performAnalysis as performAnalysisShared,
@@ -329,20 +330,13 @@ export async function runTui(context: AppContext): Promise<void> {
           s.start("Upgrading package.json...");
 
           const selectedNames = choices as string[];
+          const plan = buildUpgradePlan(
+            analysis?.outdatedSafe ?? [],
+            selectedNames,
+          );
 
-          const packagesToUpgrade = (analysis?.outdatedSafe ?? [])
-            .filter((pkg) => selectedNames.includes(pkg.name))
-            .map((pkg) => ({
-              name: pkg.name,
-              version: pkg.ver,
-              resolvedVer: pkg.resolvedVer,
-              isCatalog: pkg.isCatalog,
-              latest: pkg.latest,
-              workspacePath: pkg.workspacePath,
-            }));
-
-          await upgradeVersions(
-            packagesToUpgrade,
+          await executeUpgradePlan(
+            plan,
             selectedWorkspacePath,
             context.PACKAGE_JSON_PATH,
           );
@@ -350,7 +344,7 @@ export async function runTui(context: AppContext): Promise<void> {
           s.stop("Upgraded successfully!");
 
           console.log(chalk.bold("\nPackages upgraded:"));
-          packagesToUpgrade.forEach((pkg: any) => {
+          plan.packagesToUpgrade.forEach((pkg: any) => {
             console.log(
               `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
             );
@@ -402,20 +396,14 @@ export async function runTui(context: AppContext): Promise<void> {
           s.start("Upgrading package.json...");
 
           const selectedNames = choices as string[];
+          const plan = buildUpgradePlan(
+            analysis?.outdatedMajor ?? [],
+            selectedNames,
+            true,
+          );
 
-          const packagesToUpgrade = (analysis?.outdatedMajor ?? [])
-            .filter((pkg) => selectedNames.includes(pkg.name))
-            .map((pkg) => ({
-              name: pkg.name,
-              version: pkg.ver,
-              resolvedVer: pkg.resolvedVer,
-              isCatalog: pkg.isCatalog,
-              latest: pkg.latestOutOfRange || pkg.latest,
-              workspacePath: pkg.workspacePath,
-            }));
-
-          await upgradeVersions(
-            packagesToUpgrade,
+          await executeUpgradePlan(
+            plan,
             selectedWorkspacePath,
             context.PACKAGE_JSON_PATH,
           );
@@ -423,7 +411,7 @@ export async function runTui(context: AppContext): Promise<void> {
           s.stop("Upgraded successfully to absolute latest version!");
 
           console.log(chalk.bold("\nPackages upgraded:"));
-          packagesToUpgrade.forEach((pkg: any) => {
+          plan.packagesToUpgrade.forEach((pkg: any) => {
             console.log(
               `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
             );
@@ -497,20 +485,10 @@ export async function runTui(context: AppContext): Promise<void> {
           s.start("Patching package.json...");
 
           const selectedNames = choices as string[];
+          const plan = buildUpgradePlan(upgradable, selectedNames, true);
 
-          const packagesToUpgrade = upgradable
-            .filter((pkg) => selectedNames.includes(pkg.name))
-            .map((pkg) => ({
-              name: pkg.name,
-              version: pkg.ver,
-              resolvedVer: pkg.resolvedVer,
-              isCatalog: pkg.isCatalog,
-              latest: pkg.latestOutOfRange || pkg.latest,
-              workspacePath: pkg.workspacePath,
-            }));
-
-          await upgradeVersions(
-            packagesToUpgrade,
+          await executeUpgradePlan(
+            plan,
             selectedWorkspacePath,
             context.PACKAGE_JSON_PATH,
           );
@@ -518,7 +496,7 @@ export async function runTui(context: AppContext): Promise<void> {
           s.stop("Vulnerabilities patched successfully!");
 
           console.log(chalk.bold("\nPackages patched:"));
-          packagesToUpgrade.forEach((pkg: any) => {
+          plan.packagesToUpgrade.forEach((pkg: any) => {
             console.log(
               `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
             );
