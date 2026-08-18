@@ -124,49 +124,146 @@ export const indexLatestOutOfRangeEntries = (xs: any[]) =>
     {},
   );
 
-export const rawVersion = (version: string): RawVersion => {
-  const result: RawVersion = {
-    version: version.replace(/[\^~]/, ""),
-  };
-  const firstChar = version[0];
-  if (firstChar && isNaN(Number(firstChar))) {
-    result.qualifier = firstChar;
+export interface ParsedSpecifier {
+  raw: string;
+  isCatalog: boolean;
+  isWorkspace: boolean;
+  isNpmAlias: boolean;
+  aliasPrefix?: string | undefined;
+  realName?: string | undefined;
+  qualifier: string;
+  version: string;
+}
+
+export function parseSpecifier(
+  spec: string,
+  defaultName?: string,
+): ParsedSpecifier {
+  const raw = spec || "";
+  let isCatalog = false;
+  let s = raw.trim();
+
+  if (s.startsWith("catalog:")) {
+    isCatalog = true;
+    s = s.slice(8);
   }
-  return result;
+
+  if (s.startsWith("workspace:")) {
+    return {
+      raw,
+      isCatalog,
+      isWorkspace: true,
+      isNpmAlias: false,
+      qualifier: "",
+      version: s,
+    };
+  }
+
+  let isNpmAlias = false;
+  let aliasPrefix: string | undefined;
+  let realName: string | undefined;
+
+  if (s.startsWith("npm:")) {
+    isNpmAlias = true;
+    const stripped = s.slice(4);
+    const lastAt = stripped.lastIndexOf("@");
+    if (lastAt > 0) {
+      realName = stripped.slice(0, lastAt);
+      aliasPrefix = `npm:${realName}@`;
+      s = stripped.slice(lastAt + 1);
+    } else {
+      realName = stripped;
+      aliasPrefix = `npm:${realName}@`;
+      s = "latest";
+    }
+  }
+
+  const match = s.match(/^([\^~]|>=|>|<=|<|~>)?(.*)$/);
+  const qualifier = match?.[1] || "";
+  const version = match?.[2] || s;
+
+  return {
+    raw,
+    isCatalog,
+    isWorkspace: false,
+    isNpmAlias,
+    aliasPrefix,
+    realName: realName || defaultName,
+    qualifier,
+    version,
+  };
+}
+
+export function formatUpdatedSpecifier(
+  originalSpec: string,
+  newCleanVersion: string,
+): string {
+  if (!originalSpec) return newCleanVersion;
+
+  const parsed = parseSpecifier(originalSpec);
+  if (parsed.isWorkspace) {
+    return originalSpec;
+  }
+
+  const catalogPrefix = parsed.isCatalog ? "catalog:" : "";
+  const aliasPrefix = parsed.aliasPrefix || "";
+  const qualifier = parsed.qualifier;
+
+  return `${catalogPrefix}${aliasPrefix}${qualifier}${newCleanVersion}`;
+}
+
+export const rawVersion = (version: string): RawVersion => {
+  const parsed = parseSpecifier(version);
+  return {
+    version: parsed.version,
+    qualifier: parsed.qualifier || undefined,
+  };
 };
 
 const isNumber = (n: any) => !isNaN(Number(n));
 
 export const isValidSemVer = (version = "") => {
-  const raw = rawVersion(version);
-  return (
-    raw.version.split(".").length === 3 &&
-    raw.version.split(".").every(isNumber)
-  );
+  const parsed = parseSpecifier(version);
+  const parts = parsed.version.split(".");
+  return parts.length === 3 && parts.every(isNumber);
 };
 
 export const fetchNPMPackageMeta = async (
   name: string,
   version = "latest",
 ): Promise<any> => {
-  if (!isValidSemVer(version)) {
+  const parsed = parseSpecifier(version, name);
+
+  if (parsed.isWorkspace) {
     return {
       name,
       version,
       latest: version,
     };
   }
+
+  const queryName = parsed.realName || name;
+  const queryVersion = parsed.qualifier + parsed.version;
+
+  if (!isValidSemVer(queryVersion)) {
+    return {
+      name,
+      version,
+      latest: parsed.version || version,
+    };
+  }
+
   try {
-    const options = { version, fullMetadata: true };
+    const options = { version: queryVersion, fullMetadata: true };
 
     const [latestInRange, absoluteLatest] = await Promise.all([
-      packageJson(name, options).catch(() => null),
-      packageJson(name, { version: "latest", fullMetadata: true }).catch(
+      packageJson(queryName, options).catch(() => null),
+      packageJson(queryName, { version: "latest", fullMetadata: true }).catch(
         () => null,
       ),
     ]);
 
-    const latest = latestInRange?.version ?? version;
+    const latest = latestInRange?.version ?? parsed.version;
     const latestOutOfRange = absoluteLatest?.version;
 
     const { version: _, ...meta } = (latestInRange ?? {}) as any;
@@ -180,25 +277,25 @@ export const fetchNPMPackageMeta = async (
     };
   } catch (error) {
     console.log(
-      chalk.red(`[greenbot] Could not fetch latest version for ${name}`),
+      chalk.red(`[greenbot] Could not fetch latest version for ${queryName}`),
     );
 
     try {
-      const absoluteLatest = await packageJson(name, {
+      const absoluteLatest = await packageJson(queryName, {
         version: "latest",
         fullMetadata: true,
       });
       return {
         name,
         version,
-        latest: version,
+        latest: parsed.version,
         latestOutOfRange: absoluteLatest.version,
       };
     } catch (fallbackError) {
       return {
         name,
         version,
-        latest: version,
+        latest: parsed.version,
       };
     }
   }

@@ -4,26 +4,23 @@ All notable changes to this project are documented in release PRs opened by [Rel
 
 ## [0.40.1](https://github.com/alanrsoares/greenbot/compare/v0.40.0...v0.40.1) (2026-07-23)
 
-
 ### Bug Fixes
 
-* **ci:** update release-please publish step and sanitize audit semver ([ba55029](https://github.com/alanrsoares/greenbot/commit/ba55029a2522502a93a34790f381fb5ffcd8b5db))
-* **ci:** update release-please publish step and sanitize audit semver ([123b0d2](https://github.com/alanrsoares/greenbot/commit/123b0d2d9099585143a50b7e5ef484ed1acd9688))
+- **ci:** update release-please publish step and sanitize audit semver ([ba55029](https://github.com/alanrsoares/greenbot/commit/ba55029a2522502a93a34790f381fb5ffcd8b5db))
+- **ci:** update release-please publish step and sanitize audit semver ([123b0d2](https://github.com/alanrsoares/greenbot/commit/123b0d2d9099585143a50b7e5ef484ed1acd9688))
 
 ## [0.40.0](https://github.com/alanrsoares/greenbot/compare/v0.39.0...v0.40.0) (2026-07-23)
 
-
 ### Features
 
-* **cli:** add engine module for upgrade pipeline ([c4caed4](https://github.com/alanrsoares/greenbot/commit/c4caed407d3b3c04d1ea473c7c4ab0d712612c21))
-* **cli:** support monorepo-wide scanning and upgrade grouping ([5bb96f3](https://github.com/alanrsoares/greenbot/commit/5bb96f3002ff8fd85cd8253b50f1e4f1ccb17958))
-* **cli:** sync nested checkbox all state ([8b274bd](https://github.com/alanrsoares/greenbot/commit/8b274bd66121be7ed7dc764fa323de9a661b11e3))
-* **cli:** sync nested checkbox all state ([958d198](https://github.com/alanrsoares/greenbot/commit/958d198895d384d596d1156758d0a5087aaa1b8c))
-
+- **cli:** add engine module for upgrade pipeline ([c4caed4](https://github.com/alanrsoares/greenbot/commit/c4caed407d3b3c04d1ea473c7c4ab0d712612c21))
+- **cli:** support monorepo-wide scanning and upgrade grouping ([5bb96f3](https://github.com/alanrsoares/greenbot/commit/5bb96f3002ff8fd85cd8253b50f1e4f1ccb17958))
+- **cli:** sync nested checkbox all state ([8b274bd](https://github.com/alanrsoares/greenbot/commit/8b274bd66121be7ed7dc764fa323de9a661b11e3))
+- **cli:** sync nested checkbox all state ([958d198](https://github.com/alanrsoares/greenbot/commit/958d198895d384d596d1156758d0a5087aaa1b8c))
 
 ### Bug Fixes
 
-* **ci:** fix postinstall path and import fallback during installation ([9b55ebd](https://github.com/alanrsoares/greenbot/commit/9b55ebd8446b0938716c5b8c6b5c75dd261b91a6))
+- **ci:** fix postinstall path and import fallback during installation ([9b55ebd](https://github.com/alanrsoares/greenbot/commit/9b55ebd8446b0938716c5b8c6b5c75dd261b91a6))
 
 ## [0.39.0](https://github.com/alanrsoares/greenbot/compare/v0.38.0...v0.39.0) (2026-07-15)
 

@@ -43,7 +43,7 @@ export interface PackageLockFile {
 
 export interface RawVersion {
   version: string;
-  qualifier?: string;
+  qualifier?: string | undefined;
 }
 
 export interface RenderBoxOptions {
