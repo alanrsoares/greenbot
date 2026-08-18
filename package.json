@@ -20,6 +20,9 @@
     "scripts/"
   ],
   "bin": "./dist/bin/greenbot.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "knip": {
     "entry": [
