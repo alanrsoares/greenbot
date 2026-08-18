@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.40.2](https://github.com/alanrsoares/greenbot/compare/v0.40.1...v0.40.2) (2026-08-18)
+
+
+### Bug Fixes
+
+* **cli:** support npm aliases, catalog, and workspace specifiers ([747a411](https://github.com/alanrsoares/greenbot/commit/747a41100e8a3c3a822942f5288c86987ffe7337))
+* **cli:** support npm aliases, catalog, and workspace specifiers ([49c0ebd](https://github.com/alanrsoares/greenbot/commit/49c0ebdaea868fadb8b6d9a32c8f38bf7ea7cd46))
+
 ## [0.40.1](https://github.com/alanrsoares/greenbot/compare/v0.40.0...v0.40.1) (2026-07-23)
 
 ### Bug Fixes
