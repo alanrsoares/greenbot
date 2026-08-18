@@ -21,9 +21,19 @@
   ],
   "bin": "./dist/bin/greenbot.js",
   "type": "module",
+  "knip": {
+    "entry": [
+      "bin/greenbot.ts",
+      "bin/**/*.spec.ts"
+    ],
+    "project": [
+      "bin/**/*.ts"
+    ]
+  },
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
+    "test": "bun test",
     "check": "knip && tsc --noEmit",
     "format": "prettier --write .",
     "postversion": "bun run build && git add . && git commit --amend --no-edit",

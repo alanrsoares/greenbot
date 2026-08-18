@@ -1,5 +1,5 @@
 import replaceInFile from "replace-in-file";
-import { rawVersion } from "./shared";
+import { formatUpdatedSpecifier } from "./shared";
 import type { PackageVersionInfo } from "./types";
 import type { PackageMetaResolved } from "./analysis";
 
@@ -13,7 +13,11 @@ export function buildUpgradePlan(
   useMajor = false,
 ): UpgradePlan {
   const filtered = selectedPackageNames
-    ? resolvedPackages.filter((pkg) => selectedPackageNames.includes(pkg.name))
+    ? resolvedPackages.filter(
+        (pkg) =>
+          selectedPackageNames.includes(pkg.name) ||
+          selectedPackageNames.includes(`${pkg.workspacePath}:${pkg.name}`),
+      )
     : resolvedPackages;
 
   const packagesToUpgrade: PackageVersionInfo[] = filtered.map((pkg) => ({
@@ -39,19 +43,17 @@ export async function executeUpgradePlan(
 
   if (catalogPackages.length > 0 && rootPackageJsonPath) {
     const values = catalogPackages.map((pkg) => {
-      const ver = pkg.resolvedVer || pkg.version || "";
+      const origVer = pkg.resolvedVer || pkg.version || "";
+      const updatedVer = formatUpdatedSpecifier(origVer, pkg.latest);
       return {
         name: pkg.name,
-        version: ver,
-        latest: pkg.latest,
-        qualifier: rawVersion(ver).qualifier || "",
+        fromStr: `"${pkg.name}": "${origVer}"`,
+        toStr: `"${pkg.name}": "${updatedVer}"`,
       };
     });
 
-    const from = values.map(({ name, version }) => `"${name}": "${version}"`);
-    const to = values.map(
-      ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
-    );
+    const from = values.map((v) => v.fromStr);
+    const to = values.map((v) => v.toStr);
 
     await replaceInFile({ files: rootPackageJsonPath, from, to });
   }
@@ -73,17 +75,18 @@ export async function executeUpgradePlan(
     }
 
     for (const [pkgPath, pkgs] of Object.entries(packagesByWorkspace)) {
-      const values = pkgs.map(({ name, version, latest }) => ({
-        name,
-        version,
-        latest,
-        qualifier: rawVersion(version).qualifier || "",
-      }));
+      const values = pkgs.map((pkg) => {
+        const origVer = pkg.version || "";
+        const updatedVer = formatUpdatedSpecifier(origVer, pkg.latest);
+        return {
+          name: pkg.name,
+          fromStr: `"${pkg.name}": "${origVer}"`,
+          toStr: `"${pkg.name}": "${updatedVer}"`,
+        };
+      });
 
-      const from = values.map(({ name, version }) => `"${name}": "${version}"`);
-      const to = values.map(
-        ({ name, qualifier, latest }) => `"${name}": "${qualifier}${latest}"`,
-      );
+      const from = values.map((v) => v.fromStr);
+      const to = values.map((v) => v.toStr);
 
       await replaceInFile({ files: pkgPath, from, to });
     }

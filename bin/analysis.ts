@@ -1,6 +1,10 @@
 import path from "path";
 import type { FullMetadata } from "package-json";
-import { fetchNPMPackageMeta, rawVersion, inferPackageManager } from "./shared";
+import {
+  fetchNPMPackageMeta,
+  parseSpecifier,
+  inferPackageManager,
+} from "./shared";
 import { readPackageJson } from "./utils";
 import { runSecurityAudit, type AuditResult } from "./audit";
 import { getWorkspaces } from "./workspaces";
@@ -47,6 +51,15 @@ export async function performAnalysis(
     catalog = (rootPkg.workspaces as any)?.catalog || rootPkg.catalog || {};
   }
 
+  const resolveVerStr = (name: string, ver: string) => {
+    const isCat = ver.startsWith("catalog:");
+    let resolved = isCat ? catalog[name] || ver : ver;
+    if (resolved.startsWith("catalog:")) {
+      resolved = resolved.slice(8);
+    }
+    return { isCat, resolved };
+  };
+
   let allEntries: Array<{
     name: string;
     ver: string;
@@ -59,14 +72,17 @@ export async function performAnalysis(
   if (selectedWorkspacePath === "catalog") {
     // Audit the catalog itself
     const catalogEntries = Object.entries(catalog);
-    allEntries = catalogEntries.map(([name, ver]) => ({
-      name,
-      ver,
-      resolvedVer: ver,
-      type: "dependencies",
-      isCatalog: true,
-      workspacePath: rootPackageJsonPath || "package.json",
-    }));
+    allEntries = catalogEntries.map(([name, ver]) => {
+      const { resolved } = resolveVerStr(name, ver);
+      return {
+        name,
+        ver,
+        resolvedVer: resolved,
+        type: "dependencies",
+        isCatalog: true,
+        workspacePath: rootPackageJsonPath || "package.json",
+      };
+    });
   } else if (selectedWorkspacePath === "all" && rootPackageJsonPath) {
     const packageManager = await inferPackageManager();
     const rootPkgJson = await readPackageJson(rootPackageJsonPath);
@@ -95,12 +111,11 @@ export async function performAnalysis(
         if (depType === "dependencies" || depType === "both") {
           allEntries.push(
             ...dependencyEntries.map(([name, ver]) => {
-              const isCat = ver.startsWith("catalog:");
-              const resolvedVer = isCat ? catalog[name] || ver : ver;
+              const { isCat, resolved } = resolveVerStr(name, ver);
               return {
                 name,
                 ver,
-                resolvedVer,
+                resolvedVer: resolved,
                 type: "dependencies",
                 isCatalog: isCat,
                 workspacePath: pkgPath,
@@ -111,12 +126,11 @@ export async function performAnalysis(
         if (depType === "devDependencies" || depType === "both") {
           allEntries.push(
             ...devDependencyEntries.map(([name, ver]) => {
-              const isCat = ver.startsWith("catalog:");
-              const resolvedVer = isCat ? catalog[name] || ver : ver;
+              const { isCat, resolved } = resolveVerStr(name, ver);
               return {
                 name,
                 ver,
-                resolvedVer,
+                resolvedVer: resolved,
                 type: "devDependencies",
                 isCatalog: isCat,
                 workspacePath: pkgPath,
@@ -136,12 +150,11 @@ export async function performAnalysis(
     if (depType === "dependencies" || depType === "both") {
       allEntries.push(
         ...dependencyEntries.map(([name, ver]) => {
-          const isCat = ver.startsWith("catalog:");
-          const resolvedVer = isCat ? catalog[name] || ver : ver;
+          const { isCat, resolved } = resolveVerStr(name, ver);
           return {
             name,
             ver,
-            resolvedVer,
+            resolvedVer: resolved,
             type: "dependencies",
             isCatalog: isCat,
             workspacePath: selectedWorkspacePath,
@@ -152,12 +165,11 @@ export async function performAnalysis(
     if (depType === "devDependencies" || depType === "both") {
       allEntries.push(
         ...devDependencyEntries.map(([name, ver]) => {
-          const isCat = ver.startsWith("catalog:");
-          const resolvedVer = isCat ? catalog[name] || ver : ver;
+          const { isCat, resolved } = resolveVerStr(name, ver);
           return {
             name,
             ver,
-            resolvedVer,
+            resolvedVer: resolved,
             type: "devDependencies",
             isCatalog: isCat,
             workspacePath: selectedWorkspacePath,
@@ -224,10 +236,12 @@ export async function performAnalysis(
   const vulnerablePackages: PackageMetaResolved[] = [];
 
   for (const pkg of packages) {
-    const raw = rawVersion(pkg.resolvedVer).version;
-    const isSafeLatest = raw === pkg.latest;
+    const parsed = parseSpecifier(pkg.resolvedVer, pkg.name);
+    const isSafeLatest = parsed.isWorkspace || parsed.version === pkg.latest;
     const isMajorLatest =
-      !pkg.latestOutOfRange || pkg.latestOutOfRange === pkg.latest;
+      parsed.isWorkspace ||
+      !pkg.latestOutOfRange ||
+      pkg.latestOutOfRange === pkg.latest;
 
     if (!isSafeLatest) {
       outdatedSafe.push(pkg);

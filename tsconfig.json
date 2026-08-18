@@ -15,5 +15,6 @@
     "verbatimModuleSyntax": true,
     "ignoreDeprecations": "5.0"
   },
-  "include": ["bin/**/*.ts"]
+  "include": ["bin/**/*.ts"],
+  "exclude": ["bin/**/*.spec.ts"]
 }

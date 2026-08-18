@@ -9,7 +9,11 @@ import {
 import chalk from "chalk";
 import path from "path";
 import { nestedMultiselect } from "./prompt";
-import { inferPackageManager, rawVersion } from "./shared";
+import {
+  inferPackageManager,
+  parseSpecifier,
+  formatUpdatedSpecifier,
+} from "./shared";
 import { readPackageJson } from "./utils";
 import { buildUpgradePlan, executeUpgradePlan } from "./engine";
 import { getWorkspaces } from "./workspaces";
@@ -240,15 +244,24 @@ export async function runTui(context: AppContext): Promise<void> {
             const nameCol = pkg.name.padEnd(maxNameLen + 2);
             const typeCol =
               `(${pkg.type === "dependencies" ? "dep" : "dev"})`.padEnd(8);
-            const current = pkg.isCatalog
-              ? `catalog:${pkg.resolvedVer}`
-              : pkg.ver;
-            const raw = rawVersion(pkg.resolvedVer).version;
-            const safe = pkg.latest;
-            const major = pkg.latestOutOfRange;
+            const current = pkg.ver.startsWith("catalog:")
+              ? pkg.ver
+              : pkg.isCatalog
+                ? `catalog:${pkg.resolvedVer}`
+                : pkg.ver;
 
-            const isSafeLatest = raw === safe;
-            const isMajorLatest = !major || major === safe;
+            const parsed = parseSpecifier(pkg.resolvedVer, pkg.name);
+            const safe = formatUpdatedSpecifier(current, pkg.latest);
+            const major = pkg.latestOutOfRange
+              ? formatUpdatedSpecifier(current, pkg.latestOutOfRange)
+              : safe;
+
+            const isSafeLatest =
+              parsed.isWorkspace || parsed.version === pkg.latest;
+            const isMajorLatest =
+              parsed.isWorkspace ||
+              !pkg.latestOutOfRange ||
+              pkg.latestOutOfRange === pkg.latest;
 
             let statusStr = "";
             if (isSafeLatest && isMajorLatest) {
@@ -310,10 +323,21 @@ export async function runTui(context: AppContext): Promise<void> {
             message:
               "Select safe packages to upgrade (Space to select, Enter to confirm):",
             allLabel: "All packages",
-            options: analysis.outdatedSafe.map((pkg: any) => ({
-              value: pkg.name,
-              label: `${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latest} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
-            })),
+            options: analysis.outdatedSafe.map((pkg: any) => {
+              const current = pkg.ver.startsWith("catalog:")
+                ? pkg.ver
+                : pkg.isCatalog
+                  ? `catalog:${pkg.resolvedVer}`
+                  : pkg.ver;
+              const target = formatUpdatedSpecifier(current, pkg.latest);
+              const choiceVal = pkg.workspacePath
+                ? `${pkg.workspacePath}:${pkg.name}`
+                : pkg.name;
+              return {
+                value: choiceVal,
+                label: `${pkg.name.padEnd(maxNameLen + 2)} ${current} ➔ ${target} (${chalk.yellow("safe update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
+              };
+            }),
           });
 
           if (isCancel(choices)) {
@@ -345,8 +369,14 @@ export async function runTui(context: AppContext): Promise<void> {
 
           console.log(chalk.bold("\nPackages upgraded:"));
           plan.packagesToUpgrade.forEach((pkg: any) => {
+            const current = pkg.version.startsWith("catalog:")
+              ? pkg.version
+              : pkg.isCatalog
+                ? `catalog:${pkg.resolvedVer}`
+                : pkg.version;
+            const target = formatUpdatedSpecifier(current, pkg.latest);
             console.log(
-              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
+              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${current} ➔ ${target}`,
             );
           });
           console.log("");
@@ -376,10 +406,24 @@ export async function runTui(context: AppContext): Promise<void> {
             message:
               "Select major packages to upgrade (caution: breaking changes possible):",
             allLabel: "All packages",
-            options: analysis.outdatedMajor.map((pkg: any) => ({
-              value: pkg.name,
-              label: `${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${pkg.latestOutOfRange} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
-            })),
+            options: analysis.outdatedMajor.map((pkg: any) => {
+              const current = pkg.ver.startsWith("catalog:")
+                ? pkg.ver
+                : pkg.isCatalog
+                  ? `catalog:${pkg.resolvedVer}`
+                  : pkg.ver;
+              const target = formatUpdatedSpecifier(
+                current,
+                pkg.latestOutOfRange || pkg.latest,
+              );
+              const choiceVal = pkg.workspacePath
+                ? `${pkg.workspacePath}:${pkg.name}`
+                : pkg.name;
+              return {
+                value: choiceVal,
+                label: `${pkg.name.padEnd(maxNameLen + 2)} ${current} ➔ ${target} (${chalk.red("major update")})${pkg.vulnerability ? ` [🛡️ ${pkg.vulnerability.severity.toUpperCase()}]` : ""}`,
+              };
+            }),
           });
 
           if (isCancel(choices)) {
@@ -412,8 +456,14 @@ export async function runTui(context: AppContext): Promise<void> {
 
           console.log(chalk.bold("\nPackages upgraded:"));
           plan.packagesToUpgrade.forEach((pkg: any) => {
+            const current = pkg.version.startsWith("catalog:")
+              ? pkg.version
+              : pkg.isCatalog
+                ? `catalog:${pkg.resolvedVer}`
+                : pkg.version;
+            const target = formatUpdatedSpecifier(current, pkg.latest);
             console.log(
-              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
+              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${current} ➔ ${target}`,
             );
           });
           console.log("");
@@ -425,10 +475,11 @@ export async function runTui(context: AppContext): Promise<void> {
         if (action === "audit") {
           const upgradable = (analysis?.vulnerablePackages ?? []).filter(
             (pkg) => {
-              const raw = rawVersion(pkg.resolvedVer).version;
-              const hasSafeUpgrade = raw !== pkg.latest;
+              const parsed = parseSpecifier(pkg.resolvedVer, pkg.name);
+              if (parsed.isWorkspace) return false;
+              const hasSafeUpgrade = parsed.version !== pkg.latest;
               const hasMajorUpgrade =
-                pkg.latestOutOfRange && pkg.latestOutOfRange !== raw;
+                pkg.latestOutOfRange && pkg.latestOutOfRange !== parsed.version;
               return hasSafeUpgrade || hasMajorUpgrade;
             },
           );
@@ -458,17 +509,28 @@ export async function runTui(context: AppContext): Promise<void> {
               "Select vulnerable packages to patch (Space to toggle, Enter to confirm):",
             allLabel: "All vulnerable packages",
             options: upgradable.map((pkg) => {
-              const targetVersion = pkg.latestOutOfRange || pkg.latest;
+              const targetVersionRaw = pkg.latestOutOfRange || pkg.latest;
+              const current = pkg.ver.startsWith("catalog:")
+                ? pkg.ver
+                : pkg.isCatalog
+                  ? `catalog:${pkg.resolvedVer}`
+                  : pkg.ver;
+              const target = formatUpdatedSpecifier(current, targetVersionRaw);
+              const choiceVal = pkg.workspacePath
+                ? `${pkg.workspacePath}:${pkg.name}`
+                : pkg.name;
               const sev =
                 pkg.vulnerability?.severity.toUpperCase() || "UNKNOWN";
               const color =
                 sev === "CRITICAL" || sev === "HIGH" ? chalk.red : chalk.yellow;
               return {
-                value: pkg.name,
-                label: `${pkg.name.padEnd(maxNameLen + 2)} ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.ver} ➔ ${targetVersion} (${color(sev + ": " + (pkg.vulnerability?.title || ""))})`,
+                value: choiceVal,
+                label: `${pkg.name.padEnd(maxNameLen + 2)} ${current} ➔ ${target} (${color(sev + ": " + (pkg.vulnerability?.title || ""))})`,
               };
             }),
-            initialValues: upgradable.map((pkg) => pkg.name),
+            initialValues: upgradable.map((pkg) =>
+              pkg.workspacePath ? `${pkg.workspacePath}:${pkg.name}` : pkg.name,
+            ),
           });
 
           if (isCancel(choices)) {
@@ -497,8 +559,14 @@ export async function runTui(context: AppContext): Promise<void> {
 
           console.log(chalk.bold("\nPackages patched:"));
           plan.packagesToUpgrade.forEach((pkg: any) => {
+            const current = pkg.version.startsWith("catalog:")
+              ? pkg.version
+              : pkg.isCatalog
+                ? `catalog:${pkg.resolvedVer}`
+                : pkg.version;
+            const target = formatUpdatedSpecifier(current, pkg.latest);
             console.log(
-              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${pkg.isCatalog ? `catalog:${pkg.resolvedVer}` : pkg.version} ➔ ${pkg.latest}`,
+              `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${current} ➔ ${target}`,
             );
           });
           console.log("");
