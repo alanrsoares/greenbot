@@ -100,6 +100,8 @@ export async function performAnalysis(
       })),
     ];
 
+    const seenCatalogEntries = new Set<string>();
+
     for (const { path: pkgPath } of pathsToScan) {
       try {
         const pkgJson = await readPackageJson(pkgPath);
@@ -108,35 +110,44 @@ export async function performAnalysis(
           pkgJson.devDependencies ?? {},
         );
 
+        const processEntry = (name: string, ver: string, type: string) => {
+          const { isCat, resolved } = resolveVerStr(name, ver);
+          if (isCat) {
+            const key = `${type}:${name}`;
+            if (seenCatalogEntries.has(key)) {
+              return null;
+            }
+            seenCatalogEntries.add(key);
+            return {
+              name,
+              ver,
+              resolvedVer: resolved,
+              type,
+              isCatalog: true,
+              workspacePath: rootPackageJsonPath,
+            };
+          }
+          return {
+            name,
+            ver,
+            resolvedVer: resolved,
+            type,
+            isCatalog: false,
+            workspacePath: pkgPath,
+          };
+        };
+
         if (depType === "dependencies" || depType === "both") {
-          allEntries.push(
-            ...dependencyEntries.map(([name, ver]) => {
-              const { isCat, resolved } = resolveVerStr(name, ver);
-              return {
-                name,
-                ver,
-                resolvedVer: resolved,
-                type: "dependencies",
-                isCatalog: isCat,
-                workspacePath: pkgPath,
-              };
-            }),
-          );
+          for (const [name, ver] of dependencyEntries) {
+            const entry = processEntry(name, ver, "dependencies");
+            if (entry) allEntries.push(entry);
+          }
         }
         if (depType === "devDependencies" || depType === "both") {
-          allEntries.push(
-            ...devDependencyEntries.map(([name, ver]) => {
-              const { isCat, resolved } = resolveVerStr(name, ver);
-              return {
-                name,
-                ver,
-                resolvedVer: resolved,
-                type: "devDependencies",
-                isCatalog: isCat,
-                workspacePath: pkgPath,
-              };
-            }),
-          );
+          for (const [name, ver] of devDependencyEntries) {
+            const entry = processEntry(name, ver, "devDependencies");
+            if (entry) allEntries.push(entry);
+          }
         }
       } catch (err) {
         // Skip workspace paths that fail to load

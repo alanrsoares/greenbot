@@ -2,6 +2,7 @@ import { describe, it, expect } from "bun:test";
 import {
   parseSpecifier,
   formatUpdatedSpecifier,
+  getDisplaySpecifiers,
   rawVersion,
   isValidSemVer,
 } from "./shared";
@@ -97,6 +98,40 @@ describe("specifier parser and formatter", () => {
       expect(formatUpdatedSpecifier("workspace:^", "1.0.0")).toBe(
         "workspace:^",
       );
+    });
+
+    it("preserves catalog protocol references without version unchanged", () => {
+      expect(formatUpdatedSpecifier("catalog:", "1.4.0")).toBe("catalog:");
+      expect(formatUpdatedSpecifier("catalog:default", "1.4.0")).toBe(
+        "catalog:default",
+      );
+    });
+  });
+
+  describe("getDisplaySpecifiers", () => {
+    it("formats display specifiers for catalog packages", () => {
+      const res = getDisplaySpecifiers(
+        {
+          ver: "catalog:",
+          resolvedVer: "^1.3.5",
+          isCatalog: true,
+        },
+        "1.4.0",
+      );
+      expect(res.currentSpec).toBe("catalog:^1.3.5");
+      expect(res.targetSpec).toBe("catalog:^1.4.0");
+    });
+
+    it("formats display specifiers for non-catalog packages", () => {
+      const res = getDisplaySpecifiers(
+        {
+          ver: "^6.20.0",
+          isCatalog: false,
+        },
+        "6.24.0",
+      );
+      expect(res.currentSpec).toBe("^6.20.0");
+      expect(res.targetSpec).toBe("^6.24.0");
     });
   });
 

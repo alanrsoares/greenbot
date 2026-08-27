@@ -205,11 +205,43 @@ export function formatUpdatedSpecifier(
     return originalSpec;
   }
 
+  if (
+    parsed.isCatalog &&
+    (!parsed.version || !isValidSemVer(parsed.qualifier + parsed.version))
+  ) {
+    return originalSpec;
+  }
+
   const catalogPrefix = parsed.isCatalog ? "catalog:" : "";
   const aliasPrefix = parsed.aliasPrefix || "";
   const qualifier = parsed.qualifier;
 
   return `${catalogPrefix}${aliasPrefix}${qualifier}${newCleanVersion}`;
+}
+
+export function getDisplaySpecifiers(
+  pkg: {
+    ver: string;
+    resolvedVer?: string;
+    isCatalog?: boolean;
+  },
+  targetVersion: string,
+): { currentSpec: string; targetSpec: string } {
+  if (pkg.isCatalog) {
+    const origCatVer = pkg.resolvedVer || pkg.ver || "";
+    const updatedCatVer = formatUpdatedSpecifier(origCatVer, targetVersion);
+    const currentSpec = origCatVer.startsWith("catalog:")
+      ? origCatVer
+      : `catalog:${origCatVer}`;
+    const targetSpec = updatedCatVer.startsWith("catalog:")
+      ? updatedCatVer
+      : `catalog:${updatedCatVer}`;
+    return { currentSpec, targetSpec };
+  }
+
+  const currentSpec = pkg.ver;
+  const targetSpec = formatUpdatedSpecifier(pkg.ver, targetVersion);
+  return { currentSpec, targetSpec };
 }
 
 export const rawVersion = (version: string): RawVersion => {
