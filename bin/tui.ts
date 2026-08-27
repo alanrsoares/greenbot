@@ -12,7 +12,7 @@ import { nestedMultiselect } from "./prompt";
 import {
   inferPackageManager,
   parseSpecifier,
-  formatUpdatedSpecifier,
+  getDisplaySpecifiers,
 } from "./shared";
 import { readPackageJson } from "./utils";
 import { buildUpgradePlan, executeUpgradePlan } from "./engine";
@@ -244,17 +244,14 @@ export async function runTui(context: AppContext): Promise<void> {
             const nameCol = pkg.name.padEnd(maxNameLen + 2);
             const typeCol =
               `(${pkg.type === "dependencies" ? "dep" : "dev"})`.padEnd(8);
-            const current = pkg.ver.startsWith("catalog:")
-              ? pkg.ver
-              : pkg.isCatalog
-                ? `catalog:${pkg.resolvedVer}`
-                : pkg.ver;
+            const { currentSpec: current, targetSpec: safe } =
+              getDisplaySpecifiers(pkg, pkg.latest);
+            const { targetSpec: major } = getDisplaySpecifiers(
+              pkg,
+              pkg.latestOutOfRange || pkg.latest,
+            );
 
             const parsed = parseSpecifier(pkg.resolvedVer, pkg.name);
-            const safe = formatUpdatedSpecifier(current, pkg.latest);
-            const major = pkg.latestOutOfRange
-              ? formatUpdatedSpecifier(current, pkg.latestOutOfRange)
-              : safe;
 
             const isSafeLatest =
               parsed.isWorkspace || parsed.version === pkg.latest;
@@ -324,12 +321,8 @@ export async function runTui(context: AppContext): Promise<void> {
               "Select safe packages to upgrade (Space to select, Enter to confirm):",
             allLabel: "All packages",
             options: analysis.outdatedSafe.map((pkg: any) => {
-              const current = pkg.ver.startsWith("catalog:")
-                ? pkg.ver
-                : pkg.isCatalog
-                  ? `catalog:${pkg.resolvedVer}`
-                  : pkg.ver;
-              const target = formatUpdatedSpecifier(current, pkg.latest);
+              const { currentSpec: current, targetSpec: target } =
+                getDisplaySpecifiers(pkg, pkg.latest);
               const choiceVal = pkg.workspacePath
                 ? `${pkg.workspacePath}:${pkg.name}`
                 : pkg.name;
@@ -369,12 +362,8 @@ export async function runTui(context: AppContext): Promise<void> {
 
           console.log(chalk.bold("\nPackages upgraded:"));
           plan.packagesToUpgrade.forEach((pkg: any) => {
-            const current = pkg.version.startsWith("catalog:")
-              ? pkg.version
-              : pkg.isCatalog
-                ? `catalog:${pkg.resolvedVer}`
-                : pkg.version;
-            const target = formatUpdatedSpecifier(current, pkg.latest);
+            const { currentSpec: current, targetSpec: target } =
+              getDisplaySpecifiers(pkg, pkg.latest);
             console.log(
               `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${current} ➔ ${target}`,
             );
@@ -407,15 +396,9 @@ export async function runTui(context: AppContext): Promise<void> {
               "Select major packages to upgrade (caution: breaking changes possible):",
             allLabel: "All packages",
             options: analysis.outdatedMajor.map((pkg: any) => {
-              const current = pkg.ver.startsWith("catalog:")
-                ? pkg.ver
-                : pkg.isCatalog
-                  ? `catalog:${pkg.resolvedVer}`
-                  : pkg.ver;
-              const target = formatUpdatedSpecifier(
-                current,
-                pkg.latestOutOfRange || pkg.latest,
-              );
+              const targetVerRaw = pkg.latestOutOfRange || pkg.latest;
+              const { currentSpec: current, targetSpec: target } =
+                getDisplaySpecifiers(pkg, targetVerRaw);
               const choiceVal = pkg.workspacePath
                 ? `${pkg.workspacePath}:${pkg.name}`
                 : pkg.name;
@@ -456,12 +439,8 @@ export async function runTui(context: AppContext): Promise<void> {
 
           console.log(chalk.bold("\nPackages upgraded:"));
           plan.packagesToUpgrade.forEach((pkg: any) => {
-            const current = pkg.version.startsWith("catalog:")
-              ? pkg.version
-              : pkg.isCatalog
-                ? `catalog:${pkg.resolvedVer}`
-                : pkg.version;
-            const target = formatUpdatedSpecifier(current, pkg.latest);
+            const { currentSpec: current, targetSpec: target } =
+              getDisplaySpecifiers(pkg, pkg.latest);
             console.log(
               `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${current} ➔ ${target}`,
             );
@@ -510,12 +489,8 @@ export async function runTui(context: AppContext): Promise<void> {
             allLabel: "All vulnerable packages",
             options: upgradable.map((pkg) => {
               const targetVersionRaw = pkg.latestOutOfRange || pkg.latest;
-              const current = pkg.ver.startsWith("catalog:")
-                ? pkg.ver
-                : pkg.isCatalog
-                  ? `catalog:${pkg.resolvedVer}`
-                  : pkg.ver;
-              const target = formatUpdatedSpecifier(current, targetVersionRaw);
+              const { currentSpec: current, targetSpec: target } =
+                getDisplaySpecifiers(pkg, targetVersionRaw);
               const choiceVal = pkg.workspacePath
                 ? `${pkg.workspacePath}:${pkg.name}`
                 : pkg.name;
@@ -559,12 +534,8 @@ export async function runTui(context: AppContext): Promise<void> {
 
           console.log(chalk.bold("\nPackages patched:"));
           plan.packagesToUpgrade.forEach((pkg: any) => {
-            const current = pkg.version.startsWith("catalog:")
-              ? pkg.version
-              : pkg.isCatalog
-                ? `catalog:${pkg.resolvedVer}`
-                : pkg.version;
-            const target = formatUpdatedSpecifier(current, pkg.latest);
+            const { currentSpec: current, targetSpec: target } =
+              getDisplaySpecifiers(pkg, pkg.latest);
             console.log(
               `  ${chalk.green("✔")} ${chalk.cyan(pkg.name)}: ${current} ➔ ${target}`,
             );
