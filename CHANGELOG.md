@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.40.3](https://github.com/alanrsoares/greenbot/compare/v0.40.2...v0.40.3) (2026-08-27)
+
+
+### Bug Fixes
+
+* **catalog:** preserve specifiers and deduplicate workspace scans ([1bb7f45](https://github.com/alanrsoares/greenbot/commit/1bb7f450c460ebebbbd07ea1e1475888ad8aad2c))
+* **catalog:** preserve specifiers and deduplicate workspace scans ([f77d9a4](https://github.com/alanrsoares/greenbot/commit/f77d9a4ff9f343b6cd215f7172c183e6860239bf))
+
 ## [0.40.2](https://github.com/alanrsoares/greenbot/compare/v0.40.1...v0.40.2) (2026-08-18)
 
 
