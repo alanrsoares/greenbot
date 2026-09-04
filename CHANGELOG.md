@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.40.4](https://github.com/alanrsoares/greenbot/compare/v0.40.3...v0.40.4) (2026-09-04)
+
+
+### Bug Fixes
+
+* **workspaces:** support direct paths and nested globs ([57291bd](https://github.com/alanrsoares/greenbot/commit/57291bd1206a609dd208a5d91b6343a5688e8fa8))
+* **workspaces:** support direct paths and nested globs ([c9417de](https://github.com/alanrsoares/greenbot/commit/c9417de93ca22c75be10603466b0ce604ebda861))
+
 ## [0.40.3](https://github.com/alanrsoares/greenbot/compare/v0.40.2...v0.40.3) (2026-08-27)
 
 
