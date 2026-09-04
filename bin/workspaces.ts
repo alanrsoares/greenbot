@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import yaml from "js-yaml";
+import { glob } from "tinyglobby";
 import type { PackageJsonContent, WorkspaceInfo } from "./types";
 
 /**
@@ -8,6 +9,7 @@ import type { PackageJsonContent, WorkspaceInfo } from "./types";
  *
  * @param packageJson - The package.json content
  * @param packageManager - The package manager
+ * @param basePath - Root directory of the repository/workspace
  *
  * @returns A promise that resolves to an array of workspace information
  */
@@ -16,14 +18,14 @@ export async function getWorkspaces(
   packageManager: "npm" | "pnpm" | "yarn" | "bun",
   basePath: string = ".",
 ): Promise<WorkspaceInfo[]> {
-  let workspaces: string[] = [];
+  let rawPatterns: string[] = [];
 
   switch (packageManager) {
     case "yarn":
     case "npm":
     case "bun":
       if (packageJson.workspaces) {
-        workspaces = Array.isArray(packageJson.workspaces)
+        rawPatterns = Array.isArray(packageJson.workspaces)
           ? packageJson.workspaces
           : (packageJson.workspaces.packages ?? []);
       }
@@ -34,66 +36,105 @@ export async function getWorkspaces(
         .catch(() => null);
       if (rawYaml) {
         const parsed = yaml.load(rawYaml) as { packages?: string[] };
-        workspaces = (parsed.packages ?? [])
-          .filter((x) => !x.startsWith("!"))
-          .map((x) => x.replace("/*", ""));
+        rawPatterns = parsed?.packages ?? [];
+      } else if (packageJson.workspaces) {
+        rawPatterns = Array.isArray(packageJson.workspaces)
+          ? packageJson.workspaces
+          : (packageJson.workspaces.packages ?? []);
       }
       break;
   }
 
-  const deepWorkspaces = await Promise.all(
-    workspaces.map(async (workspace) => {
-      const cleanWorkspace = workspace.replace(/\/\*$/, "");
+  if (!rawPatterns.length) {
+    return [];
+  }
 
-      const workspacePath = path.resolve(basePath, cleanWorkspace);
+  const positivePatterns: string[] = [];
+  const ignorePatterns: string[] = ["**/node_modules/**", "**/.git/**"];
 
-      const subFolders = await fs
-        .readdir(workspacePath, { withFileTypes: true })
-        .catch(() => [])
-        .then((entries) => entries.filter((entry) => entry.isDirectory()));
+  for (const raw of rawPatterns) {
+    if (typeof raw !== "string") continue;
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
 
-      const packageNames = await Promise.all(
-        subFolders.map(async (dir) => {
-          const packageJsonPath = path.resolve(
-            workspacePath,
-            dir.name,
-            "package.json",
-          );
-
-          const pkg = (await fs
-            .readFile(packageJsonPath, "utf8")
-            .catch(() => null)
-            .then((raw) =>
-              raw ? JSON.parse(raw) : null,
-            )) as PackageJsonContent | null;
-
-          if (!pkg) {
-            return null;
+    if (trimmed.startsWith("!")) {
+      const cleanIgnore = trimmed
+        .slice(1)
+        .replace(/^\.\//, "")
+        .replace(/\/+$/, "");
+      if (cleanIgnore) {
+        ignorePatterns.push(
+          cleanIgnore,
+          cleanIgnore.endsWith("/**") ? cleanIgnore : `${cleanIgnore}/**`,
+        );
+      }
+    } else {
+      const clean = trimmed.replace(/^\.\//, "").replace(/\/+$/, "");
+      if (clean) {
+        if (clean.endsWith("package.json")) {
+          positivePatterns.push(clean);
+        } else {
+          positivePatterns.push(`${clean}/package.json`);
+          // If the pattern has no wildcards, also support it matching directory children
+          // in case a user specified e.g. "apps" instead of "apps/*"
+          if (!clean.includes("*") && !clean.includes("?")) {
+            positivePatterns.push(`${clean}/*/package.json`);
           }
+        }
+      }
+    }
+  }
 
-          const { name, version } = pkg as any;
+  if (!positivePatterns.length) {
+    return [];
+  }
 
-          return { name, version, dir: dir.name };
-        }),
-      );
+  const resolvedBasePath = path.resolve(basePath);
 
-      const validPackages = packageNames.filter(
-        (p): p is { name: string; version: string; dir: string } => p !== null,
-      );
+  const matchedFiles = await glob(positivePatterns, {
+    cwd: resolvedBasePath,
+    ignore: ignorePatterns,
+    dot: false,
+  }).catch(() => []);
 
-      return [workspacePath, validPackages] as const;
+  const rootPkgPath = path.join(resolvedBasePath, "package.json");
+  const workspacesMap = new Map<string, WorkspaceInfo>();
+
+  await Promise.all(
+    matchedFiles.map(async (relFile) => {
+      const fullPkgPath = path.resolve(resolvedBasePath, relFile);
+      if (fullPkgPath === rootPkgPath) {
+        return;
+      }
+
+      const workspaceDir = path.dirname(fullPkgPath);
+      if (workspaceDir === resolvedBasePath) {
+        return;
+      }
+
+      const pkgRaw = await fs.readFile(fullPkgPath, "utf8").catch(() => null);
+      if (!pkgRaw) return;
+
+      let pkg: PackageJsonContent | null = null;
+      try {
+        pkg = JSON.parse(pkgRaw);
+      } catch {
+        return;
+      }
+      if (!pkg) return;
+
+      const name = (pkg as any).name || path.basename(workspaceDir);
+      const version = (pkg as any).version || "";
+
+      workspacesMap.set(workspaceDir, {
+        path: workspaceDir,
+        name,
+        version,
+      });
     }),
   );
 
-  const flatWorkspaces = deepWorkspaces
-    .filter(([_, packages]) => packages.length)
-    .flatMap(([workspace, packages]) =>
-      packages.map((p) => ({
-        path: `${workspace}/${p.dir}`,
-        name: p.name,
-        version: p.version,
-      })),
-    );
-
-  return flatWorkspaces;
+  return Array.from(workspacesMap.values()).sort((a, b) =>
+    a.path.localeCompare(b.path),
+  );
 }
