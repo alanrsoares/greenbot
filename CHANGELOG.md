@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in release PRs opened by [Release Please](https://github.com/googleapis/release-please) once this automation is enabled.
 
+## [0.40.5](https://github.com/alanrsoares/greenbot/compare/v0.40.4...v0.40.5) (2026-11-14)
+
+
+### Bug Fixes
+
+* **prompt:** adapt to @clack/prompts v1.9.0 signature ([4541222](https://github.com/alanrsoares/greenbot/commit/4541222c5402b379c284de064d568e802e1f267f))
+* **prompt:** adapt to @clack/prompts v1.9.0 signature ([4abbe2a](https://github.com/alanrsoares/greenbot/commit/4abbe2a924088c3c80b7351d8d096a8fb569f492))
+
 ## [0.40.4](https://github.com/alanrsoares/greenbot/compare/v0.40.3...v0.40.4) (2026-09-04)
 
 
