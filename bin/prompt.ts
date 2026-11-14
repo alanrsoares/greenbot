@@ -206,7 +206,16 @@ export async function nestedMultiselect<Value>(
               const bar = withGuide ? `${chalk.cyan(S_BAR)}  ` : "";
               const headerRows = headerStr.split("\n").length;
               const footerLines = showInstructions
-                ? formatInstructionFooter(MULTISELECT_INSTRUCTIONS, withGuide)
+                ? formatInstructionFooter.length >= 3
+                  ? (formatInstructionFooter as any)(
+                      opts.output,
+                      MULTISELECT_INSTRUCTIONS,
+                      withGuide,
+                    )
+                  : (formatInstructionFooter as any)(
+                      MULTISELECT_INSTRUCTIONS,
+                      withGuide,
+                    )
                 : withGuide
                   ? [chalk.cyan(S_BAR_END)]
                   : [];
